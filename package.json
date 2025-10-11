@@ -1,0 +1,12 @@
+{
+  "name": "savr-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Savr - Meal Planning Application",
+  "scripts": {
+    "frontend:dev": "cd frontend && npm run dev",
+    "frontend:build": "cd frontend && npm run build",
+    "frontend:install": "cd frontend && npm install"
+  }
+}
+
