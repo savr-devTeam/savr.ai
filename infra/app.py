@@ -8,11 +8,18 @@ from stacks.iam_roles_stack import IamRolesStack
 
 app = cdk.App()
 
-# Create each stack (you can pass dependencies later)
+# Create stacks with proper dependencies
 iam_stack = IamRolesStack(app, "IamRolesStack")
 s3_stack = S3Stack(app, "S3Stack")
 dynamodb_stack = DynamoDBStack(app, "DynamoDBStack")
-lambda_stack = LambdaStack(app, "LambdaStack")
-api_stack = ApiGatewayStack(app, "ApiGatewayStack")
+lambda_stack = LambdaStack(app, "LambdaStack", iam_role=iam_stack.lambda_execution_role)
+
+# Pass lambda functions to API Gateway
+lambda_functions = {
+    "generate_plan": lambda_stack.generate_plan_function,
+    "get_meal_plan": lambda_stack.get_meal_plan_function,
+    "parse_receipt": lambda_stack.parse_receipt_function
+}
+api_stack = ApiGatewayStack(app, "ApiGatewayStack", lambda_functions=lambda_functions)
 
 app.synth()
