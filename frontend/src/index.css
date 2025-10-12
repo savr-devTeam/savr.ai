@@ -1,4 +1,10 @@
 :root {
+  font-family: 'League Spartan', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color: #ffffff;
+  background-color: #000000;
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -26,6 +32,10 @@
 
 body {
   margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #000000;
+  color: #ffffff;
   display: flex;
   place-items: center;
   min-width: 320px;
@@ -35,10 +45,17 @@ body {
 #root {
   width: 100%;
   min-height: 100vh;
+  background-color: #000000;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'League Spartan', sans-serif;
 }
 
 a {
   font-weight: 500;
+  color: #ffffff;
+  text-decoration: none;
   color: #646cff;
   text-decoration: inherit;
 }
@@ -53,6 +70,9 @@ button {
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
+  font-family: 'League Spartan', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
   font-family: inherit;
   background-color: #1a1a1a;
   cursor: pointer;
@@ -65,6 +85,9 @@ button:hover {
 
 button:focus,
 button:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
   outline: 4px auto -webkit-focus-ring-color;
 }
 
