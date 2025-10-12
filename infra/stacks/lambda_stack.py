@@ -9,8 +9,36 @@ import os
 
 
 class LambdaStack(Stack):
-    def __init__(self, scope: Construct, construct_id: str, iam_role=None, **kwargs) -> None:
+    def __init__(
+        self, 
+        scope: Construct, 
+        construct_id: str, 
+        meal_plans_table,
+        user_preferences_table,
+        receipts_table,
+        receipts_bucket,
+        iam_role=None, 
+        **kwargs
+    ) -> None:
         super().__init__(scope, construct_id, **kwargs)
+
+
+        self.api_upload_function = _lambda.Function(
+            self,
+            "ApiUploadFunction",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            handler="handler.lambda_handler",
+            code=_lambda.Code.from_asset("../backend/lambdas/api_upload"),
+            timeout=Duration.seconds(30),
+            memory_size=256,
+            role=iam_role,
+            environment={
+                "RECEIPTS_BUCKET": receipts_bucket.bucket_name,
+            },
+        )
+        # allow presign target bucket writes
+        receipts_bucket.grant_write(self.api_upload_function)
+
 
         # Create Lambda functions for each handler
         self.generate_plan_function = _lambda.Function(
@@ -19,36 +47,65 @@ class LambdaStack(Stack):
             runtime=_lambda.Runtime.PYTHON_3_9,
             handler="handler.lambda_handler",
             code=_lambda.Code.from_asset("../backend/lambdas/generate_plan"),
-            timeout=Duration.seconds(30),
+            timeout=Duration.seconds(60),
+            memory_size=512,
             role=iam_role,
             environment={
-                "MEAL_PLANS_TABLE": "MealPlans",
-                "USER_PREFERENCES_TABLE": "UserPreferences"
-            }
+                "MEAL_PLANS_TABLE": meal_plans_table.table_name,
+                "USER_PREFERENCES_TABLE": user_preferences_table.table_name,
+                "RECEIPTS_TABLE": receipts_table.table_name,
+            },
         )
+        # DDB access
+        meal_plans_table.grant_read_write_data(self.generate_plan_function)
+        user_preferences_table.grant_read_data(self.generate_plan_function)
+        receipts_table.grant_read_data(self.generate_plan_function)
+        # Bedrock invoke permissions
+        self.generate_plan_function.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=["bedrock:InvokeModel", "bedrock:InvokeAgent"],
+                resources=["*"],
+            )
+        )
+
 
         self.get_meal_plan_function = _lambda.Function(
             self,
-            "GetMealPlanFunction", 
+            "GetMealPlanFunction",
             runtime=_lambda.Runtime.PYTHON_3_9,
             handler="handler.lambda_handler",
             code=_lambda.Code.from_asset("../backend/lambdas/get_meal_plan"),
             timeout=Duration.seconds(30),
+            memory_size=256,
             role=iam_role,
             environment={
-                "MEAL_PLANS_TABLE": "MealPlans"
-            }
+                "MEAL_PLANS_TABLE": meal_plans_table.table_name,
+            },
         )
+        meal_plans_table.grant_read_data(self.get_meal_plan_function)
+
 
         self.parse_receipt_function = _lambda.Function(
             self,
             "ParseReceiptFunction",
             runtime=_lambda.Runtime.PYTHON_3_9,
-            handler="handler.lambda_handler", 
+            handler="handler.lambda_handler",
             code=_lambda.Code.from_asset("../backend/lambdas/parse_receipt"),
-            timeout=Duration.seconds(30),
+            timeout=Duration.seconds(60),
+            memory_size=512,
             role=iam_role,
             environment={
-                "RECEIPTS_BUCKET": f"savr-receipts-{self.account}-{self.region}"
-            }
+                "RECEIPTS_BUCKET": receipts_bucket.bucket_name,
+                "RECEIPTS_TABLE": receipts_table.table_name,
+            },
+        )
+        # S3 read (for head/get object during OCR) + DDB write
+        receipts_bucket.grant_read(self.parse_receipt_function)
+        receipts_table.grant_read_write_data(self.parse_receipt_function)
+        # Textract permission for AnalyzeExpense
+        self.parse_receipt_function.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=["textract:AnalyzeExpense"],
+                resources=["*"],
+            )
         )
