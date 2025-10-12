@@ -33,3 +33,17 @@ class DynamoDBStack(Stack):
             ),
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
         )
+
+        # Create DynamoDB table for storing parsed receipts & line-items
+        self.receipts_table = dynamodb.Table(
+            self,
+            "ReceiptsTable",
+            table_name="Receipts",
+            partition_key=dynamodb.Attribute(
+                name="user_id", type=dynamodb.AttributeType.STRING
+            ),
+            sort_key=dynamodb.Attribute(
+                name="receipt_id", type=dynamodb.AttributeType.STRING
+            ),
+            billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
+        )
