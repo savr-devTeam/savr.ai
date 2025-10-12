@@ -1,0 +1,197 @@
+.meal-plan-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #000000;
+}
+
+.header {
+  padding: 1.5rem 2rem;
+  background-color: #000000;
+  border-bottom: 1px solid #222222;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+}
+
+.logo-image {
+  height: 84px;
+  width: auto;
+}
+
+.logo {
+  font-family: 'League Spartan', sans-serif;
+  font-size: 2.16rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #ffffff;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  background: none;
+  border: 1px solid #333333;
+  cursor: pointer;
+  font-size: 1rem;
+  font-family: 'League Spartan', sans-serif;
+}
+
+.nav-link:hover {
+  background-color: #222222;
+  border-color: #ffffff;
+}
+
+.main-content {
+  flex: 1;
+  padding: 3rem 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.preferences-section {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+  padding: 2rem;
+  border-radius: 16px;
+  border: 1px solid #222222;
+  backdrop-filter: blur(10px);
+}
+
+.preferences-section h2 {
+  font-family: 'League Spartan', sans-serif;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.preferences-section > p {
+  color: #999999;
+  margin-bottom: 2rem;
+  font-family: 'League Spartan', sans-serif;
+  font-weight: 300;
+}
+
+.preferences-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #ffffff;
+  font-family: 'League Spartan', sans-serif;
+}
+
+.form-group select,
+.form-group input[type="number"],
+.form-group textarea {
+  padding: 0.75rem;
+  border: 1px solid #333333;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: 'League Spartan', sans-serif;
+  background-color: rgba(255, 255, 255, 0.02);
+  color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.form-group select:focus,
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.form-group select option {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.macro-targets {
+  padding: 1.5rem;
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border: 1px solid #222222;
+}
+
+.macro-targets h3 {
+  margin: 0 0 1rem 0;
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-family: 'League Spartan', sans-serif;
+  font-weight: 700;
+}
+
+.submit-button {
+  padding: 0.75rem 2rem;
+  background-color: #ffffff;
+  color: #000000;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  font-family: 'League Spartan', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+.submit-button:hover {
+  background-color: #eeeeee;
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+}
+
+.footer {
+  padding: 2rem;
+  background-color: #000000;
+  border-top: 1px solid #222222;
+  text-align: center;
+  color: #666666;
+}
+
+.footer p {
+  font-family: 'League Spartan', sans-serif;
+  font-weight: 300;
+}
+
+@media (max-width: 768px) {
+  .logo {
+    font-size: 1.8rem;
+  }
+
+  .logo-image {
+    height: 66px;
+  }
+}

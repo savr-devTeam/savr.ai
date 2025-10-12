@@ -1,34 +1,7 @@
-.app-container {
+.app {
   width: 100%;
   min-height: 100vh;
+  background-color: #000000;
+  color: #ffffff;
+  font-family: 'League Spartan', sans-serif;
 }
-
-.page-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
-.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 200px;
-  font-size: 1.2rem;
-}
-
-.error {
-  color: #f44336;
-  padding: 1rem;
-  background-color: #ffebee;
-  border-radius: 4px;
-  margin: 1rem 0;
-}
-
-@media (max-width: 768px) {
-  .page-container {
-    padding: 1rem;
-  }
-}
-
-
