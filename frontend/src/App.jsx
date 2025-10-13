@@ -7,7 +7,7 @@ export default function Home({ onNavigate }) {
       {/* Left Section */}
       <div className="max-w-xl md:w-1/2 space-y-6">
         {/* Logo */}
-        <h1 className="text-5xl font-bold font-serif text-gray-900">
+        <h1 className="text-5xl font-bold text-gray-900" style={{ fontFamily: 'Pacifico, cursive' }}>
           <span className="border-b-4 border-blue-500 pb-1">Savr</span>
         </h1>
 
