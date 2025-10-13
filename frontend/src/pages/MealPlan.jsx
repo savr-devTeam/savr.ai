@@ -3,7 +3,7 @@ import './MealPlan.css'
 
 const MealPlan = ({ onNavigate }) => {
   const [preferences, setPreferences] = useState({
-    budget: 'comfortable',
+    budget: '',
     dietaryRestrictions: '',
     nutritionGoal: 'none',
     caloricTarget: '',
@@ -33,8 +33,10 @@ const MealPlan = ({ onNavigate }) => {
           <img src="/savricon.png" alt="Savr Logo" className="logo-image" />
           <h1 className="logo">Savr</h1>
         </div>
-        <nav>
+        <nav className="nav-menu">
           <button onClick={() => onNavigate('home')} className="nav-link">Home</button>
+          <button onClick={() => onNavigate('about')} className="nav-link">About Us</button>
+          <button onClick={() => onNavigate('contact')} className="nav-link">Contact Us</button>
         </nav>
       </header>
 
@@ -46,17 +48,19 @@ const MealPlan = ({ onNavigate }) => {
           <form onSubmit={handleSubmit} className="preferences-form">
             
             <div className="form-group">
-              <label htmlFor="budget">Budget Level</label>
-              <select
+              <label htmlFor="budget">Weekly Budget ($)</label>
+              <input
+                type="number"
                 id="budget"
                 name="budget"
                 value={preferences.budget}
                 onChange={handleChange}
+                placeholder="Enter your weekly grocery budget (e.g., 100)"
+                min="0"
+                step="0.01"
                 required
-              >
-                <option value="low-budget">Low Budget</option>
-                <option value="comfortable">Comfortable</option>
-              </select>
+              />
+              <small className="form-hint">Enter your weekly grocery budget in dollars</small>
             </div>
 
             <div className="form-group">

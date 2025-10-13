@@ -36,6 +36,12 @@
   letter-spacing: 0.5px;
 }
 
+.nav-menu {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
 .nav-link {
   text-decoration: none;
   color: #ffffff;
