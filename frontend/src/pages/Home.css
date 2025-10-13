@@ -212,3 +212,34 @@
     height: 85px;
   }
 }
+
+
+@media (prefers-color-scheme: light) {
+  .header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .footer {
+    background-color: #f5f5f5;
+    border-top: 1px solid #e0e0e0;
+  }
+
+  .footer p {
+    color: #666;
+  }
+
+  .feature-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(33, 150, 243, 0.15) 100%);
+  }
+
+  .cta-section {
+    background-color: rgba(76, 175, 80, 0.08);
+  }
+}
+
