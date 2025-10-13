@@ -71,3 +71,5 @@ main (production)
 | `VERCEL_TOKEN`          | Vercel deployment token       |
 
 _More to be added_
+
+---
