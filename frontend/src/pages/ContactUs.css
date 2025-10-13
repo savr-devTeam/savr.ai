@@ -57,9 +57,6 @@
 }
 
 .info-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
   margin-bottom: 1.5rem;
   padding-bottom: 1.5rem;
   border-bottom: 1px solid #333333;
@@ -69,11 +66,6 @@
   border-bottom: none;
   margin-bottom: 0;
   padding-bottom: 0;
-}
-
-.info-icon {
-  font-size: 2rem;
-  flex-shrink: 0;
 }
 
 .info-item h4 {
@@ -293,10 +285,6 @@
   }
 
   .contact-info h3 {
-    font-size: 1.5rem;
-  }
-
-  .info-icon {
     font-size: 1.5rem;
   }
 
