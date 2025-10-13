@@ -1,0 +1,268 @@
+.about-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #000000;
+}
+
+.about-section {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.about-section h2 {
+  font-size: 2.5rem;
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: 3rem;
+  font-weight: 700;
+  font-family: 'Satoshi', sans-serif;
+}
+
+.about-section h3 {
+  font-size: 1.8rem;
+  color: #ffffff;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  font-family: 'Satoshi', sans-serif;
+}
+
+.mission-statement,
+.vision-section,
+.values-section,
+.story-section,
+.cta-section {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+  padding: 2rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+  border: 1px solid #222222;
+  backdrop-filter: blur(10px);
+}
+
+.mission-statement h3,
+.vision-section h3,
+.values-section h3,
+.story-section h3,
+.cta-section h3 {
+  color: #ffffff;
+  margin-bottom: 1rem;
+  font-family: 'Satoshi', sans-serif;
+}
+
+.mission-statement p,
+.vision-section p,
+.story-section p,
+.cta-section p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #cccccc;
+  margin-bottom: 1rem;
+  font-family: 'Satoshi', sans-serif;
+  font-weight: 300;
+}
+
+.feature-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 1.5rem;
+}
+
+.feature-list li {
+  padding: 0.75rem 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #999999;
+  border-bottom: 1px solid #333333;
+  font-family: 'Satoshi', sans-serif;
+  font-weight: 300;
+}
+
+.feature-list li:last-child {
+  border-bottom: none;
+}
+
+.feature-list strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.value-card {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #333333;
+  transition: all 0.3s ease;
+}
+
+.value-card:hover {
+  transform: translateY(-5px);
+  border-color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.value-card h4 {
+  font-size: 1.3rem;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+  color: #ffffff;
+  font-family: 'Satoshi', sans-serif;
+}
+
+.value-card p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #cccccc;
+  font-family: 'Satoshi', sans-serif;
+  font-weight: 300;
+}
+
+.cta-section {
+  text-align: center;
+}
+
+.cta-button {
+  background-color: #ffffff;
+  color: #000000;
+  border: none;
+  padding: 1rem 3rem;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 700;
+  margin-top: 1rem;
+  font-family: 'Satoshi', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+.cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+  background-color: #eeeeee;
+}
+
+.header {
+  padding: 0.75rem 2rem;
+  background-color: #000000;
+  border-bottom: 1px solid #222222;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.logo-image {
+  height: 110px;
+  width: auto;
+}
+
+.logo {
+  font-family: 'Satoshi', sans-serif;
+  font-size: 2.7rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+}
+
+.nav-menu {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #ffffff;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  background: none;
+  border: 1px solid #333333;
+  cursor: pointer;
+  font-size: 1rem;
+  font-family: 'Satoshi', sans-serif;
+}
+
+.nav-link:hover {
+  background-color: #222222;
+  border-color: #ffffff;
+}
+
+.nav-link.active {
+  font-weight: 700;
+  background-color: #222222;
+}
+
+.main-content {
+  flex: 1;
+  padding: 3rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.footer {
+  padding: 2rem;
+  background-color: #000000;
+  border-top: 1px solid #222222;
+  text-align: center;
+  color: #666666;
+}
+
+.footer p {
+  font-family: 'Satoshi', sans-serif;
+  font-weight: 300;
+}
+
+@media (max-width: 768px) {
+  .about-section {
+    padding: 1rem;
+  }
+
+  .about-section h2 {
+    font-size: 2rem;
+  }
+
+  .about-section h3 {
+    font-size: 1.5rem;
+  }
+
+  .values-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mission-statement,
+  .vision-section,
+  .values-section,
+  .story-section,
+  .cta-section {
+    padding: 1.5rem;
+  }
+
+  .logo {
+    font-size: 2.2rem;
+  }
+
+  .logo-image {
+    height: 85px;
+  }
+}
+

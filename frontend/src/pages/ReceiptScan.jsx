@@ -26,8 +26,10 @@ const ReceiptScan = ({ onNavigate }) => {
           <img src="/savricon.png" alt="Savr Logo" className="logo-image" />
           <h1 className="logo">Savr</h1>
         </div>
-        <nav>
+        <nav className="nav-menu">
           <button onClick={() => onNavigate('home')} className="nav-link">Home</button>
+          <button onClick={() => onNavigate('about')} className="nav-link">About Us</button>
+          <button onClick={() => onNavigate('contact')} className="nav-link">Contact Us</button>
         </nav>
       </header>
 

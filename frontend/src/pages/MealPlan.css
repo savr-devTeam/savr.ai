@@ -36,6 +36,12 @@
   letter-spacing: 0.5px;
 }
 
+.nav-menu {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
 .nav-link {
   text-decoration: none;
   color: #ffffff;
@@ -132,6 +138,14 @@
 .form-group select option {
   background-color: #000000;
   color: #ffffff;
+}
+
+.form-hint {
+  font-size: 0.85rem;
+  color: #999999;
+  font-family: 'League Spartan', sans-serif;
+  font-weight: 300;
+  margin-top: 0.25rem;
 }
 
 .macro-targets {
