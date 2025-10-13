@@ -8,10 +8,6 @@ const Home = ({ onNavigate }) => {
           <img src="/savricon.png" alt="Savr Logo" className="logo-image" />
           <h1 className="logo">Savr</h1>
         </div>
-        <nav className="nav-menu">
-          <button onClick={() => onNavigate('about')} className="nav-link">About Us</button>
-          <button onClick={() => onNavigate('contact')} className="nav-link">Contact Us</button>
-        </nav>
       </header>
 
       <main className="main-content">
@@ -21,28 +17,44 @@ const Home = ({ onNavigate }) => {
             Your intelligent meal planning assistant
           </p>
           <p className="hero-description">
-            Save time and money with personalized meal plans based on your preferences and budget
+            Save time and money with personalized meal plans based on your preferences and budget.
           </p>
         </section>
 
         <section className="features">
           <div className="feature-card" onClick={() => onNavigate('meal-plan')}>
             <h3>Smart Meal Planning</h3>
-            <p>Get personalized meal plans tailored to your dietary preferences and budget</p>
+            <p>
+              Get personalized meal plans tailored to your dietary preferences and budget.
+            </p>
             <button className="feature-button">Get Started</button>
           </div>
 
           <div className="feature-card" onClick={() => onNavigate('receipt-scan')}>
             <h3>Receipt Scanner</h3>
-            <p>Scan your grocery receipts to track spending and manage your food inventory</p>
+            <p>
+              Scan your grocery receipts to track spending and manage your food inventory.
+            </p>
             <button className="feature-button">Scan Receipt</button>
           </div>
 
           <div className="feature-card">
             <h3>Budget Tracking</h3>
-            <p>Monitor your grocery spending and stay within your budget goals</p>
-            <button className="feature-button" disabled>Coming Soon</button>
+            <p>
+              Monitor your grocery spending and stay within your budget goals.
+            </p>
+            <button className="feature-button" disabled>
+              Coming Soon
+            </button>
           </div>
+        </section>
+
+        <section className="cta-section">
+          <h2>Coming Soon</h2>
+          <p>We're working hard to bring you the best meal planning experience.</p>
+          <button className="cta-button" disabled>
+            Launching Soon
+          </button>
         </section>
       </main>
 
@@ -54,3 +66,5 @@ const Home = ({ onNavigate }) => {
 }
 
 export default Home
+
+
