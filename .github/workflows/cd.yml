@@ -1,0 +1,150 @@
+name: CD Pipeline - Deploy to AWS
+
+on:
+  workflow_dispatch: # Manual trigger only
+    inputs:
+      environment:
+        description: "Environment to deploy to"
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - production
+      skip-tests:
+        description: "Skip tests before deployment"
+        required: false
+        type: boolean
+        default: false
+
+env:
+  AWS_REGION: us-east-1
+  PYTHON_VERSION: "3.11"
+  NODE_VERSION: "20"
+
+jobs:
+  # Pre-deployment validation
+  pre-deploy-checks:
+    name: Pre-deployment Checks
+    runs-on: ubuntu-latest
+    if: ${{ !inputs.skip-tests }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run CI validations
+        uses: ./.github/workflows/ci.yml
+
+  # Deploy infrastructure
+  deploy-infrastructure:
+    name: Deploy Infrastructure
+    runs-on: ubuntu-latest
+    needs: [pre-deploy-checks]
+    if: always() && (needs.pre-deploy-checks.result == 'success' || inputs.skip-tests)
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: Install CDK dependencies
+        working-directory: ./infra
+        run: |
+          pip install -r requirements.txt
+
+      - name: CDK Bootstrap (if needed)
+        working-directory: ./infra
+        run: |
+          cdk bootstrap aws://${{ secrets.AWS_ACCOUNT_ID }}/${{ env.AWS_REGION }}
+
+      - name: CDK Deploy
+        working-directory: ./infra
+        run: |
+          cdk deploy --all --require-approval never
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
+
+      - name: Get API Gateway URL
+        id: api-url
+        run: |
+          API_URL=$(aws cloudformation describe-stacks \
+            --stack-name ApiGatewayStack \
+            --query 'Stacks[0].Outputs[?OutputKey==`ApiUrl`].OutputValue' \
+            --output text)
+          echo "api_url=$API_URL" >> $GITHUB_OUTPUT
+
+    outputs:
+      api-url: ${{ steps.api-url.outputs.api_url }}
+
+  # Deploy frontend
+  deploy-frontend:
+    name: Deploy Frontend to Vercel
+    runs-on: ubuntu-latest
+    needs: [deploy-infrastructure]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: |
+          npm ci
+          npm run build
+        env:
+          VITE_API_URL: ${{ needs.deploy-infrastructure.outputs.api-url }}
+
+      - name: Deploy to Vercel
+        working-directory: ./frontend
+        run: |
+          if [ "${{ inputs.environment }}" == "production" ]; then
+            vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
+          else
+            vercel --token=${{ secrets.VERCEL_TOKEN }}
+          fi
+
+  # Post-deployment tests
+  post-deploy-tests:
+    name: Post-Deployment Smoke Tests
+    runs-on: ubuntu-latest
+    needs: [deploy-infrastructure, deploy-frontend]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run API health checks
+        run: |
+          API_URL="${{ needs.deploy-infrastructure.outputs.api-url }}"
+          echo "Testing API at: $API_URL"
+
+          # Add your smoke tests here
+          # curl -f $API_URL/health || exit 1
+
+      - name: Notify deployment status
+        if: always()
+        run: |
+          echo "Deployment to ${{ inputs.environment }} completed!"
+          echo "API URL: ${{ needs.deploy-infrastructure.outputs.api-url }}"

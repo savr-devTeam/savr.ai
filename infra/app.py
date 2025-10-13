@@ -10,10 +10,18 @@ app = cdk.App()
 
 # Create stacks with proper dependencies
 iam_stack = IamRolesStack(app, "IamRolesStack")
-s3_stack = S3Stack(app, "S3Stack")
 dynamodb_stack = DynamoDBStack(app, "DynamoDBStack")
-lambda_stack = LambdaStack(app, "LambdaStack", iam_role=iam_stack.lambda_execution_role)
+s3_stack = S3Stack(app, "S3Stack")
 
+lambda_stack = LambdaStack(
+    app, 
+    "LambdaStack",
+    meal_plans_table=dynamodb_stack.meal_plans_table,
+    user_preferences_table=dynamodb_stack.user_preferences_table,
+    receipts_table=dynamodb_stack.receipts_table,
+    receipts_bucket=s3_stack.receipts_bucket,
+    iam_role=iam_stack.lambda_execution_role
+)
 # Pass lambda functions to API Gateway
 lambda_functions = {
     "generate_plan": lambda_stack.generate_plan_function,
