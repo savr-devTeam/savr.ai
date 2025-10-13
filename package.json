@@ -7,6 +7,13 @@
     "frontend:dev": "cd frontend && npm run dev",
     "frontend:build": "cd frontend && npm run build",
     "frontend:install": "cd frontend && npm install"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.14"
+  },
+  "dependencies": {
+    "react-router-dom": "^6.30.1"
   }
 }
-

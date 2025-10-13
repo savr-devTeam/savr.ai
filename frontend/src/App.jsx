@@ -1,60 +1,46 @@
-import { useState, useEffect } from 'react'
-import Home from './pages/Home'
-import ReceiptScan from './pages/ReceiptScan'
-import MealPlan from './pages/MealPlan'
-import AboutUs from './pages/AboutUs'
-import ContactUs from './pages/ContactUs'
-import './App.css'
+import React from "react";
+import "./App.css"; // optional, if you have it
 
-function App() {
-  const [currentPage, setCurrentPage] = useState('home')
+export default function Home({ onNavigate }) {
+  return (
+    <section className="bg-[#f9f4ed] min-h-screen flex flex-col md:flex-row items-center justify-center px-8 md:px-16">
+      {/* Left Section */}
+      <div className="max-w-xl md:w-1/2 space-y-6">
+        {/* Logo */}
+        <h1 className="text-5xl font-bold font-serif text-gray-900">
+          <span className="border-b-4 border-blue-500 pb-1">Savr</span>
+        </h1>
 
-  // Handle manual navigation
-  const navigate = (page) => {
-    setCurrentPage(page)
-    window.history.pushState({ page }, '', `#${page}`)
-  }
+        {/* Headline */}
+        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight">
+          Never Worry About What to Make for Your Next Meal Again
+        </h2>
 
-  // Handle browser back/forward arrows
-  useEffect(() => {
-    const handlePopState = (event) => {
-      if (event.state?.page) {
-        setCurrentPage(event.state.page)
-      } else {
-        // default if there's no state
-        const hash = window.location.hash.replace('#', '')
-        setCurrentPage(hash || 'home')
-      }
-    }
+        {/* Description */}
+        <p className="text-gray-600 text-base leading-relaxed">
+          Tired of spending hours planning your meals for the week?
+          <br />
+          That’s why we created Savr — the AI kitchen companion that turns your
+          ingredients into instant, delicious recipes made just for you.
+        </p>
 
-    // Listen for back/forward navigation
-    window.addEventListener('popstate', handlePopState)
+        {/* Button */}
+        <button
+          className="bg-[#f86842] hover:bg-[#e35732] text-white font-semibold py-3 px-6 rounded-md transition-all duration-200"
+          onClick={() => onNavigate("meal-plan")}
+        >
+          Start Planning
+        </button>
+      </div>
 
-    
-    const initialHash = window.location.hash.replace('#', '')
-    if (initialHash) setCurrentPage(initialHash)
-
-    return () => {
-      window.removeEventListener('popstate', handlePopState)
-    }
-  }, [])
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'receipt-scan':
-        return <ReceiptScan onNavigate={navigate} />
-      case 'meal-plan':
-        return <MealPlan onNavigate={navigate} />
-      case 'about':
-        return <AboutUs onNavigate={setCurrentPage} />
-      case 'contact':
-        return <ContactUs onNavigate={setCurrentPage} />
-      default:
-        return <Home onNavigate={navigate} />
-    }
-  }
-
-  return <div className="app">{renderPage()}</div>
+      {/* Right Section */}
+      <div className="mt-10 md:mt-0 md:w-1/2 flex justify-center">
+        <img
+          src="/laptop-mockup.jpg"
+          alt="Savr app preview"
+          className="w-[90%] md:w-[80%] drop-shadow-xl"
+        />
+      </div>
+    </section>
+  );
 }
-
-export default App
