@@ -33,6 +33,9 @@ jobs:
           pip install -r requirements-dev.txt
         working-directory: ./infra
 
+      - name: Install AWS CDK CLI
+        run: npm install -g aws-cdk
+
       - name: Run CDK Synth
         run: |
           cdk synth --all
