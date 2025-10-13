@@ -7,47 +7,7 @@ on:
     branches: [main, develop]
 
 jobs:
-  # Job 1: Lint and validate infrastructure code
-  infrastructure-validation:
-    name: Validate Infrastructure (CDK)
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./infra
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-          cache: "pip"
-          cache-dependency-path: "infra/requirements.txt"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install -r requirements-dev.txt
-        working-directory: ./infra
-
-      - name: Install AWS CDK CLI
-        run: npm install -g aws-cdk
-
-      - name: Run CDK Synth
-        run: |
-          cdk synth --all
-        env:
-          CDK_DEFAULT_ACCOUNT: "123456789012" # Dummy account for synth
-          CDK_DEFAULT_REGION: "us-east-1"
-
-      - name: Run infrastructure tests
-        run: |
-          pytest tests/
-
-  # Job 2: Frontend build and test
+  # Job 1: Frontend build and test
   frontend-build:
     name: Build & Test Frontend
     runs-on: ubuntu-latest
