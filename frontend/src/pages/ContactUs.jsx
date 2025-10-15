@@ -57,21 +57,18 @@ const ContactUs = ({ onNavigate }) => {
             <div className="contact-info">
               <h3>Get In Touch</h3>
               <div className="info-item">
-                <span className="info-icon">📧</span>
                 <div>
                   <h4>Email</h4>
                   <p>support@savr.ai</p>
                 </div>
               </div>
               <div className="info-item">
-                <span className="info-icon">💬</span>
                 <div>
                   <h4>Support</h4>
                   <p>Available Monday - Friday, 9am - 5pm EST</p>
                 </div>
               </div>
               <div className="info-item">
-                <span className="info-icon">🌐</span>
                 <div>
                   <h4>Social Media</h4>
                   <p>Follow us for updates and tips</p>
@@ -82,7 +79,7 @@ const ContactUs = ({ onNavigate }) => {
             <div className="contact-form-container">
               {isSubmitted ? (
                 <div className="success-message">
-                  <h3>✅ Message Sent!</h3>
+                  <h3>Message Sent!</h3>
                   <p>Thank you for reaching out. We'll get back to you soon!</p>
                 </div>
               ) : (

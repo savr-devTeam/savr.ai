@@ -4,6 +4,7 @@ import ReceiptScan from './pages/ReceiptScan'
 import MealPlan from './pages/MealPlan'
 import AboutUs from './pages/AboutUs'
 import ContactUs from './pages/ContactUs'
+import Allergies from './pages/Allergies'
 import './App.css'
 
 function App() {
@@ -49,6 +50,8 @@ function App() {
         return <AboutUs onNavigate={setCurrentPage} />
       case 'contact':
         return <ContactUs onNavigate={setCurrentPage} />
+      case 'allergies':
+        return <Allergies onNavigate={setCurrentPage} />
       default:
         return <Home onNavigate={navigate} />
     }

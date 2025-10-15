@@ -1,8 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anybody:wght@300;400;600;700&display=swap');
+
 .about-page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #000000;
+  background-color: #FFFFFF;
 }
 
 .about-section {
@@ -13,19 +16,19 @@
 
 .about-section h2 {
   font-size: 2.5rem;
-  color: #ffffff;
+  color: #000000;
   text-align: center;
   margin-bottom: 3rem;
   font-weight: 700;
-  font-family: 'Satoshi', sans-serif;
+  font-family: 'Anybody', sans-serif;
 }
 
 .about-section h3 {
   font-size: 1.8rem;
-  color: #ffffff;
+  color: #000000;
   margin-bottom: 1rem;
   font-weight: 600;
-  font-family: 'Satoshi', sans-serif;
+  font-family: 'Anybody', sans-serif;
 }
 
 .mission-statement,
@@ -33,12 +36,12 @@
 .values-section,
 .story-section,
 .cta-section {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+  background: #F4F0E5;
   padding: 2rem;
   border-radius: 16px;
   margin-bottom: 2rem;
-  border: 1px solid #222222;
-  backdrop-filter: blur(10px);
+  border: 1px solid #BC903A;
+  box-shadow: 0 2px 8px rgba(188, 144, 58, 0.1);
 }
 
 .mission-statement h3,
@@ -46,9 +49,9 @@
 .values-section h3,
 .story-section h3,
 .cta-section h3 {
-  color: #ffffff;
+  color: #000000;
   margin-bottom: 1rem;
-  font-family: 'Satoshi', sans-serif;
+  font-family: 'Anybody', sans-serif;
 }
 
 .mission-statement p,
@@ -57,10 +60,10 @@
 .cta-section p {
   font-size: 1.1rem;
   line-height: 1.8;
-  color: #cccccc;
+  color: #333333;
   margin-bottom: 1rem;
-  font-family: 'Satoshi', sans-serif;
-  font-weight: 300;
+  font-family: 'Anybody', sans-serif;
+  font-weight: 400;
 }
 
 .feature-list {
@@ -73,10 +76,10 @@
   padding: 0.75rem 0;
   font-size: 1.1rem;
   line-height: 1.6;
-  color: #999999;
-  border-bottom: 1px solid #333333;
-  font-family: 'Satoshi', sans-serif;
-  font-weight: 300;
+  color: #333333;
+  border-bottom: 1px solid #BC903A;
+  font-family: 'Anybody', sans-serif;
+  font-weight: 400;
 }
 
 .feature-list li:last-child {
@@ -84,7 +87,7 @@
 }
 
 .feature-list strong {
-  color: #ffffff;
+  color: #AA1235;
   font-weight: 600;
 }
 
@@ -96,33 +99,34 @@
 }
 
 .value-card {
-  background: rgba(255, 255, 255, 0.05);
+  background: #FFFFFF;
   padding: 1.5rem;
   border-radius: 12px;
-  border: 1px solid #333333;
+  border: 1px solid #BC903A;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(188, 144, 58, 0.1);
 }
 
 .value-card:hover {
   transform: translateY(-5px);
-  border-color: #ffffff;
-  background: rgba(255, 255, 255, 0.08);
+  border-color: #AA1235;
+  box-shadow: 0 8px 20px rgba(170, 18, 53, 0.15);
 }
 
 .value-card h4 {
   font-size: 1.3rem;
   margin-bottom: 0.75rem;
   font-weight: 700;
-  color: #ffffff;
-  font-family: 'Satoshi', sans-serif;
+  color: #AA1235;
+  font-family: 'Anybody', sans-serif;
 }
 
 .value-card p {
   font-size: 0.95rem;
   line-height: 1.6;
-  color: #cccccc;
-  font-family: 'Satoshi', sans-serif;
-  font-weight: 300;
+  color: #333333;
+  font-family: 'Anybody', sans-serif;
+  font-weight: 400;
 }
 
 .cta-section {
@@ -130,8 +134,8 @@
 }
 
 .cta-button {
-  background-color: #ffffff;
-  color: #000000;
+  background-color: #AA1235;
+  color: #FFFFFF;
   border: none;
   padding: 1rem 3rem;
   font-size: 1.1rem;
@@ -140,20 +144,20 @@
   transition: all 0.3s ease;
   font-weight: 700;
   margin-top: 1rem;
-  font-family: 'Satoshi', sans-serif;
+  font-family: 'Anybody', sans-serif;
   letter-spacing: 0.5px;
 }
 
 .cta-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
-  background-color: #eeeeee;
+  box-shadow: 0 4px 12px rgba(170, 18, 53, 0.4);
+  background-color: #8a0e2a;
 }
 
 .header {
-  padding: 0.75rem 2rem;
-  background-color: #000000;
-  border-bottom: 1px solid #222222;
+  padding: 1.5rem 4rem;
+  background-color: #FFFFFF;
+  border-bottom: 1px solid #BC903A;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -162,23 +166,23 @@
 .logo-container {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
   cursor: pointer;
 }
 
 .logo-image {
-  height: 110px;
-  width: auto;
+  width: 70px;
+  height: 62px;
+  object-fit: contain;
 }
 
 .logo {
-  font-family: 'Satoshi', sans-serif;
-  font-size: 2.7rem;
-  font-weight: 700;
-  color: #ffffff;
+  font-family: 'Pacifico', cursive;
+  font-size: 2.5rem;
+  font-weight: 400;
+  color: #000000;
   margin: 0;
   cursor: pointer;
-  letter-spacing: 0.5px;
 }
 
 .nav-menu {
@@ -189,26 +193,29 @@
 
 .nav-link {
   text-decoration: none;
-  color: #ffffff;
+  color: #000000;
   font-weight: 500;
   padding: 0.5rem 1rem;
   border-radius: 4px;
-  transition: background-color 0.3s;
+  transition: all 0.3s;
   background: none;
-  border: 1px solid #333333;
+  border: 1px solid #BC903A;
   cursor: pointer;
   font-size: 1rem;
-  font-family: 'Satoshi', sans-serif;
+  font-family: 'Anybody', sans-serif;
 }
 
 .nav-link:hover {
-  background-color: #222222;
-  border-color: #ffffff;
+  background-color: #F4F0E5;
+  border-color: #AA1235;
+  color: #AA1235;
 }
 
 .nav-link.active {
   font-weight: 700;
-  background-color: #222222;
+  background-color: #AA1235;
+  color: #FFFFFF;
+  border-color: #AA1235;
 }
 
 .main-content {
@@ -221,15 +228,15 @@
 
 .footer {
   padding: 2rem;
-  background-color: #000000;
-  border-top: 1px solid #222222;
+  background-color: #F4F0E5;
+  border-top: 1px solid #BC903A;
   text-align: center;
   color: #666666;
 }
 
 .footer p {
-  font-family: 'Satoshi', sans-serif;
-  font-weight: 300;
+  font-family: 'Anybody', sans-serif;
+  font-weight: 400;
 }
 
 @media (max-width: 768px) {
