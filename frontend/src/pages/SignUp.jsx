@@ -24,7 +24,7 @@ const LandingPage = () => {
                 lineHeight: "1",
               }}
             >
-              Never Worry About
+              Never Worry About Hello world
                <br />
                What to Make for
               <br/>
