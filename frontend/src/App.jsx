@@ -5,12 +5,12 @@ import MealPlan from './pages/MealPlan'
 import AboutUs from './pages/AboutUs'
 import ContactUs from './pages/ContactUs'
 import Allergies from './pages/Allergies'
-import Signup from './pages/SignUp'
+import LandingPage from './pages/LandingPage'
 import './App.css'
 
 function App() {
   // 🟢 Set default page to 'signup'
-  const [currentPage, setCurrentPage] = useState('signup')
+  const [currentPage, setCurrentPage] = useState('LandingPage')
 
   // Function to handle navigation when buttons/links are clicked
   const navigate = (page) => {
@@ -26,7 +26,7 @@ function App() {
       } else {
         // Use hash if available, fallback to signup
         const hash = window.location.hash.replace('#', '')
-        setCurrentPage(hash || 'signup')
+        setCurrentPage(hash || 'LandingPage')
       }
     }
 
@@ -46,8 +46,8 @@ function App() {
   // Function to decide which page component to render
   const renderPage = () => {
     switch (currentPage) {
-      case 'signup':
-        return <Signup onNavigate={navigate} />
+      case 'LandingPage':
+        return <LandingPage onNavigate={navigate} />
       case 'receipt-scan':
         return <ReceiptScan onNavigate={navigate} />
       case 'meal-plan':
