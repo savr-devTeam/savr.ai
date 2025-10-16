@@ -8,15 +8,8 @@ const LandingPage = () => {
     <div className="landing-container">
       <section className="section light-bg">
         <div className="content">
-          <h1
-            className="pacifico-regular"
-            style={{
-              fontSize: "4rem",
-              marginTop: "-150px",
-            }}
-          >
-            Savr
-          </h1>
+        <h1 className="pacifico-regular savr-header">Savr</h1>
+
 
           <div className="anybody">
             <h2
@@ -69,6 +62,7 @@ const LandingPage = () => {
       <section className="section-two-wrapper">
         {/* LEFT SIDE — TEXT */}
         <div className="text-side">
+          <h1 className="pacifico-regular savr-header">Savr</h1>
           <div className="logo-title">
             <img src="/savricon.png" alt="Savr Logo" className="savr-logo" />
             <h2>
