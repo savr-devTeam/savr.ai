@@ -6,6 +6,8 @@ import AboutUs from './pages/AboutUs'
 import ContactUs from './pages/ContactUs'
 import Allergies from './pages/Allergies'
 import LandingPage from './pages/LandingPage'
+import Dashboard from './pages/dashboard'
+
 import './App.css'
 
 function App() {

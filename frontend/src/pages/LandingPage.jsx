@@ -2,11 +2,12 @@ import React from "react";
 import "./LandingPage.css";
 import laptopImage1 from "/laptop1.png";
 import laptopImage2 from "/laptop2.png";
-import savricon from "/savricon.png";
 
-const LandingPage = () => {
+
+const LandingPage = ({onNavigate}) => {
   return (
     <div className="landing-container">
+      {/* Section 1 */}
       <section className="section light-bg">
         <div className="content">
           <h1 className="pacifico-regular" 
@@ -24,7 +25,7 @@ const LandingPage = () => {
                 lineHeight: "1",
               }}
             >
-              Never Worry About
+              Never Worry About Hello world
                <br />
                What to Make for
               <br/>
@@ -51,7 +52,9 @@ const LandingPage = () => {
               </span>
             </p>
 
-            <button className="btn" style={{ marginTop: "50px" }}>
+            <button className="btn"
+            style={{ marginTop: "50px" }}
+            onClick={() => onNavigate('Dashboard')}>
               Start Planning
             </button>
           </div>
@@ -66,9 +69,8 @@ const LandingPage = () => {
           />
         </div>
       </section>
-
 <section className="content">
-  {/* 🟢 NEW FLEX CONTAINER */}
+
   <div className="text-laptop-row">
     <div className="text-column">
       <div className="anybody">
@@ -83,7 +85,7 @@ const LandingPage = () => {
           Savr
         </h1>
       </div>
-
+      {/*section 2*/}
       <div className="intro-row">
         <div className="logo-title">
           <img src="/savricon.png" alt="Savr Logo" className="savr-logo" />
@@ -124,6 +126,7 @@ const LandingPage = () => {
         <button
           className="btn"
           style={{ marginTop: "40px", marginLeft: "8rem" }}
+          onClick={() => onNavigate('Dashboard')}
         >
           Start Planning
         </button>
