@@ -7,6 +7,8 @@
     "frontend:dev": "cd frontend && npm run dev",
     "frontend:build": "cd frontend && npm run build",
     "frontend:install": "cd frontend && npm install"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1692.0"
   }
 }
-
