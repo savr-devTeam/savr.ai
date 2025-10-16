@@ -3,7 +3,7 @@ import "./LandingPage.css";
 import laptopImage1 from "/laptop1.png";
 import laptopImage2 from "/laptop2.png";
 
-const LandingPage = () => {
+const LandingPage = ({onNavigate}) => {
   return (
     <div className="landing-container">
       <section className="section light-bg">
@@ -46,7 +46,9 @@ const LandingPage = () => {
               </span>
             </p>
 
-            <button className="btn" style={{ marginTop: "50px" }}>
+            <button className="btn" style={{ marginTop: "50px" }}
+             onClick={() => onNavigate("Dashboard")}
+            >
               Start Planning
             </button>
           </div>
@@ -83,7 +85,8 @@ const LandingPage = () => {
             have into delicious, customized meals effortlessly.
           </p>
 
-          <button className="btn" style={{ marginTop: "40px" }}>
+          <button className="btn" style={{ marginTop: "40px" }}
+           onClick={() => onNavigate("Dashboard")}>
             Start Planning
           </button>
         </div>
