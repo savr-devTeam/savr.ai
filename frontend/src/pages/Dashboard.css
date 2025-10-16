@@ -1,0 +1,157 @@
+body {
+  background-color: #f7f7f7;
+  font-family: "Inter", sans-serif;
+  margin: 0;
+  color: #111;
+}
+
+.dashboard {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 40px;
+  border-bottom: 1px solid #ccc;
+  background-color: #f9f9f9;
+}
+
+.logo {
+  font-family: "Pacifico", cursive;
+  font-size: 1.8rem;
+}
+
+.icons {
+  display: flex;
+  gap: 20px;
+  font-size: 1.3rem;
+}
+
+.content {
+  display: flex;
+  justify-content: space-between;
+  padding: 40px;
+}
+
+.left-panel {
+  width: 35%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.assistant-box {
+  background: #fff;
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.assistant-icon {
+  font-size: 2rem;
+}
+
+.assistant-box button {
+  display: block;
+  margin: 10px auto;
+  background: none;
+  border: 1px solid #000;
+  border-radius: 20px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.chat-box {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 20px;
+  padding: 5px 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.chat-box input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 10px;
+}
+
+.attach-btn {
+  background: #eee;
+  border: none;
+  border-radius: 10px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.right-panel {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.meal-plan .meal-item {
+  margin-bottom: 10px;
+}
+
+.view-more {
+  text-align: right;
+  font-size: 0.9rem;
+  color: gray;
+  cursor: pointer;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tags span {
+  background: #eee;
+  border-radius: 15px;
+  padding: 5px 12px;
+  margin-right: 8px;
+  font-size: 0.9rem;
+}
+
+.budget h2 {
+  margin: 10px 0;
+}
+
+.progress-bar {
+  background: #f0f0f0;
+  border-radius: 10px;
+  height: 8px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+.progress {
+  background: #77c593;
+  height: 100%;
+}
+
+.grocery-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.grocery-list li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
