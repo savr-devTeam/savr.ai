@@ -1,5 +1,5 @@
 import React from "react";
-import "./Landingpage.css";
+import LandingPage from "./LandingPage.css";
 import laptopImage1 from "/laptop1.png";
 import laptopImage2 from "/laptop2.png";
 import savricon from "/savricon.png";
