@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { generateMealPlan, getMealPlans } from '../services/api'
+import { getUserId, saveUserPreferences, getUserPreferences } from '../utils/user'
 import './MealPlan.css'
 
 const MealPlan = ({ onNavigate }) => {
@@ -12,6 +14,34 @@ const MealPlan = ({ onNavigate }) => {
     fatTarget: ''
   })
 
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [generatedPlan, setGeneratedPlan] = useState(null)
+  const [error, setError] = useState(null)
+  const [recentPlans, setRecentPlans] = useState([])
+
+  // Load saved preferences on component mount
+  useEffect(() => {
+    const savedPreferences = getUserPreferences()
+    if (savedPreferences) {
+      setPreferences(savedPreferences)
+    }
+
+    // Load recent meal plans
+    loadRecentPlans()
+  }, [])
+
+  const loadRecentPlans = async () => {
+    try {
+      const userId = getUserId()
+      const response = await getMealPlans(userId, null, 5)
+      if (response.success) {
+        setRecentPlans(response.mealPlans || [])
+      }
+    } catch (error) {
+      console.error('Error loading recent plans:', error)
+    }
+  }
+
   const handleChange = (e) => {
     const { name, value } = e.target
     setPreferences(prev => ({
@@ -20,10 +50,31 @@ const MealPlan = ({ onNavigate }) => {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // TODO: Implement meal plan generation logic
-    console.log('Generating meal plan with preferences:', preferences)
+    setIsGenerating(true)
+    setError(null)
+
+    try {
+      // Save preferences
+      saveUserPreferences(preferences)
+
+      // Generate meal plan
+      const userId = getUserId()
+      const response = await generateMealPlan(preferences, userId)
+
+      if (response.success) {
+        setGeneratedPlan(response.mealPlan)
+        // Refresh recent plans
+        await loadRecentPlans()
+      } else {
+        setError(response.error || 'Failed to generate meal plan')
+      }
+    } catch (error) {
+      setError(error.message || 'Failed to generate meal plan')
+    } finally {
+      setIsGenerating(false)
+    }
   }
 
   return (
@@ -46,7 +97,7 @@ const MealPlan = ({ onNavigate }) => {
           <p>Customize your meal plan based on your budget, dietary needs, and nutrition goals</p>
 
           <form onSubmit={handleSubmit} className="preferences-form">
-            
+
             <div className="form-group">
               <label htmlFor="budget">Weekly Budget ($)</label>
               <input
@@ -108,7 +159,7 @@ const MealPlan = ({ onNavigate }) => {
 
                 <div className="macro-targets">
                   <h3>Macro Targets (Optional)</h3>
-                  
+
                   <div className="form-group">
                     <label htmlFor="proteinTarget">Protein (g)</label>
                     <input
