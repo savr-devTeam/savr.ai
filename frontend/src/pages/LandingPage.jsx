@@ -3,10 +3,10 @@ import "./LandingPage.css";
 import laptopImage1 from "/laptop1.png";
 import laptopImage2 from "/laptop2.png";
 
+
 const LandingPage = () => {
   return (
     <div className="landing-container">
-      {/* Section 1 */}
       <section className="section light-bg">
         <div className="content">
           <h1 className="pacifico-regular" 
@@ -24,7 +24,7 @@ const LandingPage = () => {
                 lineHeight: "1",
               }}
             >
-              Never Worry About 
+              Never Worry About
                <br />
                What to Make for
               <br/>
@@ -67,77 +67,78 @@ const LandingPage = () => {
         </div>
       </section>
 
-      <section className="content">
-        <div className="text-laptop-row">
-          <div className="text-column">
-            <div className="anybody">
-              <h1
-                className="pacifico-regular"
-                style={{
-                  fontSize: "4rem",
-                  marginTop: "100px",
-                  paddingLeft: "8rem",
-                }}
-              >
-                Savr
-              </h1>
-            </div>
+<section className="content">
+  {/* 🟢 NEW FLEX CONTAINER */}
+  <div className="text-laptop-row">
+    <div className="text-column">
+      <div className="anybody">
+        <h1
+          className="pacifico-regular"
+          style={{
+            fontSize: "4rem",
+            marginTop: "100px",
+            paddingLeft: "8rem",
+          }}
+        >
+          Savr
+        </h1>
+      </div>
 
-            <div className="intro-row">
-              <div className="logo-title">
-                <img src="/savricon.png" alt="Savr Logo" className="savr-logo" />
-                <h2
-                  style={{
-                    fontSize: "2.5rem",
-                    marginLeft: "1rem",
-                    lineHeight: "2rem",
-                    marginTop: "100px",
-                  }}
-                >
-                  Hi, I’m Savr, the{" "}
-                  <span className="highlight">AI kitchen companion.</span>
-                </h2>
-              </div>
-
-              <p
-                className="anybody"
-                style={{
-                  marginLeft: "8rem",
-                  marginTop: "38px",
-                  fontWeight: "200",
-                  fontSize: "1.25rem",
-                  lineHeight: "1.5rem",
-                }}
-              >
-                I take the stress out of meal planning.
-                <br />
-                By learning your tastes, preferences, and schedule, I craft
-                personalized recipes and weekly meal plans made just for you —
-                in minutes.
-                <br />
-                <br />
-                Simply upload your grocery receipt, and I’ll turn what you
-                already have into delicious, customized meals effortlessly.
-              </p>
-
-              <button
-                className="btn"
-                style={{ marginTop: "40px", marginLeft: "8rem" }}
-              >
-                Start Planning
-              </button>
-            </div>
-          </div>
-
-          <div className="laptop-side">
-            <img
-              src={laptopImage2}
-              alt="Savr AI planner preview"
-              className="laptop"
-            />
-          </div>
+      <div className="intro-row">
+        <div className="logo-title">
+          <img src="/savricon.png" alt="Savr Logo" className="savr-logo" />
+          <h2
+            style={{
+              fontSize: "2.5rem",
+              marginLeft: "1rem",
+              lineHeight: "2rem",
+              marginTop: "100px",
+            }}
+          >
+            Hi, I’m Savr, the{" "}
+            <span className="highlight">AI kitchen companion.</span>
+          </h2>
         </div>
-      </section>
+
+        <p
+          className="anybody"
+          style={{
+            marginLeft: "8rem",
+            marginTop: "38px",
+            fontWeight: "200",
+            fontSize: "1.25rem",
+            lineHeight: "1.5rem",
+          }}
+        >
+          I take the stress out of meal planning.
+          <br />
+          By learning your tastes, preferences, and schedule, I craft
+          personalized recipes and weekly meal plans made just for you — in
+          minutes.
+          <br />
+          <br />
+          Simply upload your grocery receipt, and I’ll turn what you already
+          have into delicious, customized meals effortlessly.
+        </p>
+
+        <button
+          className="btn"
+          style={{ marginTop: "40px", marginLeft: "8rem" }}
+        >
+          Start Planning
+        </button>
+      </div>
+    </div>
+
+    <div className="laptop-side">
+      <img
+        src={laptopImage2}
+        alt="Savr AI planner preview"
+        className="laptop"
+      />
+    </div>
+  </div>
+</section>
     </div>
   );
 };
