@@ -1,0 +1,13 @@
+# --- Ignore environments and dependencies ---
+.venv/
+backend/.venv/
+node_modules/
+backend/node_modules/
+.env
+
+# --- Ignore IDE/editor stuff ---
+.vscode/
+__pycache__/
+*.log
+.DS_Store
+Thumbs.db
