@@ -31,8 +31,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 15rem 8%;
+  padding: 6rem 6% 15rem;
   overflow: hidden;
+  border-radius: 0;
+}
+
+/* fix Savr header getting cut off */
+.savr-header {
+  margin-top: -150px;
 }
 
 .laptop-box {
@@ -96,16 +102,19 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8rem 10%;
+  padding: 3rem 8% 3rem;
   gap: 4rem;
   flex-wrap: wrap;
   box-sizing: border-box;
+  margin-top: 0px;
+  padding-top: 0;
 }
 
 .text-side {
   flex: 1;
   text-align: left;
   max-width: 600px;
+  margin-top: 20px;
 }
 
 .logo-title {
@@ -118,7 +127,13 @@
   width: 80px;
   height: auto;
 }
-
+.savr-header {
+  margin-bottom: 2.5rem;
+  margin-top: 5px;
+  padding-top: 2.5rem;
+  font-size: 4rem;
+  
+}
 .text-side h2 {
   font-size: 2.5rem;
   font-weight: 700;
@@ -145,6 +160,8 @@
   max-width: 600px;
   height: auto;
   border-radius: 8px;
+  margin-top: 200px;
+  
 }
 
 /* ===============================
@@ -181,6 +198,11 @@
   .laptop-side .laptop {
     max-width: 700px;
   }
+
+  .savr-header {
+    margin-top: -80px;
+    font-size: 3rem;
+  }
 }
 
 /* Tablets (below 1024px) */
@@ -202,6 +224,15 @@
   .laptop-side .laptop {
     max-width: 400px;
   }
+
+  .savr-header {
+    margin-top: 0;
+    font-size: 2.8rem;
+  }
+
+  .section.light-bg {
+    padding-top: 8rem;
+  }
 }
 
 /* Phones (below 768px) */
@@ -210,7 +241,7 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 5rem 2rem;
+    padding: 6rem 2rem;
   }
 
   .pacifico-regular {
@@ -241,6 +272,11 @@
     margin: 2rem auto;
     max-width: 300px;
   }
+
+  .savr-header {
+    margin-top: 0;
+    font-size: 2.5rem;
+  }
 }
 
 /* Very small phones (below 480px) */
@@ -262,6 +298,56 @@
   .savr-logo {
     width: 50px;
   }
+
+  .savr-header {
+    font-size: 2rem;
+    margin-top: -40px;
+  }
+}
+
+/* ===============================
+   SECTION 2 ADJUSTMENTS
+=============================== */
+
+/* Pull the entire section upward */
+.text-laptop-row {
+  margin-top: -100px; /* move whole block up */
+}
+
+.intro-row {
+  margin-top: -10px; 
+}
+
+/* For medium screens (keep spacing balanced) */
+@media (max-width: 1024px) {
+  .text-laptop-row {
+    margin-top: -40px;
+  }
+
+  .text-column .pacifico-regular {
+    margin-bottom: 2rem;
+  }
+}
+
+/* For phones (reduce spacing to fit smaller screens) */
+@media (max-width: 768px) {
+  .text-laptop-row {
+    margin-top: -20px;
+  }
+
+  .text-column .pacifico-regular {
+    margin-bottom: 1.5rem;
+  }
+}
+
+.section-two-wrapper {
+  margin-top: -125px; 
+}
+
+.text-side .savr-header {
+  margin-top: 0;         
+  margin-bottom: 3.5rem;  
+  padding-top: 1rem;      
 }
 
 
