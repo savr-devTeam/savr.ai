@@ -52,3 +52,12 @@ class ApiGatewayStack(Stack):
                 lambda_functions.get("api_upload")
             )
             upload_resource.add_method("POST", upload_integration)
+
+        # Output the API Gateway URL
+        from aws_cdk import CfnOutput
+        CfnOutput(
+            self,
+            "SavrApiEndpoint",
+            value=self.api.url,
+            description="Savr API Gateway endpoint URL"
+        )
