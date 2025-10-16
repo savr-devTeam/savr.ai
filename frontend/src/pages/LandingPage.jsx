@@ -1,5 +1,5 @@
 import React from "react";
-import LandingPage from "./LandingPage.css";
+import "./LandingPage.css";
 import laptopImage1 from "/laptop1.png";
 import laptopImage2 from "/laptop2.png";
 import savricon from "/savricon.png";
@@ -7,7 +7,6 @@ import savricon from "/savricon.png";
 const LandingPage = () => {
   return (
     <div className="landing-container">
-      {/* Section 1 */}
       <section className="section light-bg">
         <div className="content">
           <h1 className="pacifico-regular" 
@@ -87,7 +86,7 @@ const LandingPage = () => {
 
       <div className="intro-row">
         <div className="logo-title">
-          <img src={savricon} alt="Savr Logo" className="savr-logo" />
+          <img src="/savricon.png" alt="Savr Logo" className="savr-logo" />
           <h2
             style={{
               fontSize: "2.5rem",
