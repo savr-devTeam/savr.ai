@@ -10,12 +10,17 @@ class ApiGatewayStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, lambda_functions=None, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # Create API Gateway
+        # Create API Gateway with CORS
         self.api = apigateway.RestApi(
             self,
             "SavrApi",
             rest_api_name="Savr API",
             description="API for Savr meal planning application",
+            default_cors_preflight_options=apigateway.CorsOptions(
+                allow_origins=apigateway.Cors.ALL_ORIGINS,
+                allow_methods=apigateway.Cors.ALL_METHODS,
+                allow_headers=["Content-Type", "X-Amz-Date", "Authorization", "X-Api-Key"]
+            )
         )
 
         if lambda_functions:
@@ -40,3 +45,19 @@ class ApiGatewayStack(Stack):
                 lambda_functions.get("parse_receipt")
             )
             parse_receipt_resource.add_method("POST", parse_receipt_integration)
+
+            # /upload endpoint for receipt uploads
+            upload_resource = self.api.root.add_resource("upload")
+            upload_integration = apigateway.LambdaIntegration(
+                lambda_functions.get("api_upload")
+            )
+            upload_resource.add_method("POST", upload_integration)
+
+        # Output the API Gateway URL
+        from aws_cdk import CfnOutput
+        CfnOutput(
+            self,
+            "SavrApiEndpoint",
+            value=self.api.url,
+            description="Savr API Gateway endpoint URL"
+        )
