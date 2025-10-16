@@ -97,6 +97,15 @@ const LandingPage = () => {
           />
         </div>
       </section>
+
+      {/* FOOTER SECTION */}
+      <footer className="landing-footer">
+        {/* Footer Bottom */}
+        <div className="footer-bottom">
+          <p>&copy; 2025 Savr. All rights reserved.</p>
+          <p>Made with ❤️ for AWS AI Global Hackathon</p>
+        </div>
+      </footer>
     </div>
   );
 };
