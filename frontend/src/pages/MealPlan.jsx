@@ -46,7 +46,7 @@ const MealPlan = ({ onNavigate }) => {
           <p>Customize your meal plan based on your budget, dietary needs, and nutrition goals</p>
 
           <form onSubmit={handleSubmit} className="preferences-form">
-            
+
             <div className="form-group">
               <label htmlFor="budget">Weekly Budget ($)</label>
               <input
@@ -108,7 +108,7 @@ const MealPlan = ({ onNavigate }) => {
 
                 <div className="macro-targets">
                   <h3>Macro Targets (Optional)</h3>
-                  
+
                   <div className="form-group">
                     <label htmlFor="proteinTarget">Protein (g)</label>
                     <input

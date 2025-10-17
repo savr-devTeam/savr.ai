@@ -1,0 +1,769 @@
+/* General Layout */
+.pacifico-regular {
+  font-family: "Pacifico", cursive;
+  font-weight: 400;
+  font-size: 3.5rem;
+  font-style: normal;
+}
+
+.anybody {
+  font-family: "Anybody", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+.dashboard-container {
+  font-family: "Anybody";
+  background-color: #f3f2ef;
+  min-height: 100vh;
+  padding-bottom: 2rem;
+}
+.dashboard {
+  display: flex;
+  justify-content: space-between; /* keeps both sides apart */
+  align-items: flex-start;
+  width: 100%;
+  padding: 2rem 5rem; /* control how far from screen edges */
+  box-sizing: border-box;
+}
+
+/* LEFT SIDE */
+.left-panel {
+  flex: 1;
+  max-width: 40%; /* takes up about 40% of page */
+}
+
+/* RIGHT SIDE */
+.right-panel {
+  flex: 1.2;
+  margin-left: 3rem; 
+  margin-top: 4rem;
+  margin: 0 auto;
+}
+
+
+/* Header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 4%;
+  background-color: #f3f2ef;
+}
+
+.logo {
+  font-size: 3rem;
+  color: #1c1c1c;
+}
+
+.dashboard-icons i {
+  font-size: 1.3rem;
+  margin-left: 1.2rem;
+  cursor: pointer;
+}
+
+.divider {
+  border: 0.5px solid #cfcfcf;
+  margin-bottom: 1rem;
+}
+
+/* Main Content Layout */
+.dashboard-content {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 0 4%;
+}
+
+.help-section {
+  text-align: center;
+  margin-top: -5rem;
+}
+.help-section h3 {
+  font-size: 2rem;     
+  font-weight: 700;     
+  text-align: center;    
+  margin-bottom: 2rem;   
+  margin-top: -1rem;
+}
+
+
+.help-icon {
+  width: 80px;
+  margin-bottom: 2rem;
+  margin-top: 14rem;
+}
+
+.action-btn {
+  display: block;
+  width: 325px;
+  margin: 10px auto;
+  padding: 0.5rem;
+  border: 1px solid #00000049;
+  border-radius: 20px;
+  background: rgb(255, 255, 255);
+  cursor: pointer;
+  font-weight: 450;
+  font-size: 1rem;
+  transition: 0.3s;
+}
+
+.action-btn:hover {
+  background-color: #f26d3da7;
+  color: rgb(251, 250, 250);
+  font-weight: 800;
+  border-color: #f26d3d;
+}
+
+/*message container*/
+.ask-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 18px;
+  width: 500px;
+  height: 100px;
+  padding: 0.8rem 1rem;
+  margin-top: 0;
+  margin: 1rem auto;
+}
+
+/* message chat bot button*/
+.ask-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  width: 100%;
+  height: 100px;
+  max-width: 40rem;
+  background: #fff;
+  border: 1px solid #0000004f;
+  border-radius: 25px;   /*rounded corners*/
+  padding: 1.2rem 6rem;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 60px;
+  margin-top: 150px;
+  padding-left: 1.5rem;
+  margin: 180px auto 60px;
+}
+.attach-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 1px;
+  vertical-align: middle;
+}
+
+.ask-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 1.1rem;
+  color: #333;
+  background: transparent;
+  align-items: flex-start;
+  text-align: left;
+  width: 100%;  
+}
+
+.attach-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border: 1px solid #0000003a;
+  color: #100f0f;
+  background: transparent;
+  border-radius: 20px;
+  padding: .1rem .75rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.attach-btn:hover {
+  background: #d9d1ce5a;
+  border-color: #696564;
+}
+
+
+/* Cards */
+.card {
+  background-color: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.21);
+}
+/* Today's Menu Title */
+.card h2 {
+    font-size: 1.7rem;
+}
+.meal-plan {
+  background: #fff;
+  border-radius: 20px;
+  padding: 1.5rem 2rem !important;
+  width: 100%;
+  max-width: 950px;
+  margin: 0 auto;
+  margin-top: 40px;
+}
+.card.meal-plan {
+  position: relative; /* allows absolute positioning for children */
+  width: 100%;
+  max-width: 950px;
+  margin: 0 auto;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+
+.view-meal-btn {
+  position: absolute;
+  top: 1rem;     /* adjust vertical spacing */
+  right: 1rem;   /* adjust horizontal spacing */
+  background-color: #f26d3d;
+  color: white;
+  padding: .5rem 1.5rem;
+  border-radius: 20px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 1rem;
+
+}
+
+.view-meal-btn:hover {
+  font-weight: 800;
+  border-color: #f26d3dc1;
+  padding: .6rem 1.8rem;
+}
+
+.card.meal-plan {
+  height: 420px; /* fixed height */
+  overflow-y: auto; /* scroll inside if content overflows */
+}
+
+.meal-plan img {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+/* food course breakfast, lunch, dinner */
+.meal-item {
+  font-size: 25px;
+  background-color: #fdfbfb00;
+  border-radius: 16px;
+  padding: 16px;
+  width: 100%;
+  text-align: left;
+  margin-bottom: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+.meal-item:hover {
+  border-radius: 1rem;
+  border-color: #0c0c0c2d;
+  transform: scale(1.02);
+  font-weight: 1000 !important;
+  background-color: #c2bfbd32;
+  color: rgb(0, 0, 0);
+  font-weight: 800;
+  border-color: #3939393f;
+}
+
+.meal-detail {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.meal-name {
+  font-weight: 550;
+  font-size: 16px;
+}
+
+.ingredients {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.date {
+  color: #555555d4;
+  margin-bottom: 1rem;
+  margin-top: -1px;
+  font-size: 15px;
+
+}
+
+.view-menu {
+  text-align: right;
+  font-size: 0.9rem;
+  color: #666;
+  cursor: pointer;
+
+}
+
+/* BOTTOM ROW */
+.bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr; /* Left column smaller, right column larger */
+  grid-template-rows: auto auto;
+  grid-column-gap: 1.5rem;
+  grid-row-gap: 1.5rem;
+  align-items: start;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin-top: 2rem;
+}
+.dashboard-content,
+.right-panel,
+.left-panel {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Shared Card Style */
+.card {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+  width: 100%;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Card Header (title + icon) */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.card-header h3 {
+  font-size: 25px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.card-header i {
+  font-size: 1.1rem;
+  color: #333;
+  cursor: pointer;
+}
+
+/* Allergies Card */
+.allergies {
+  grid-column: 1;
+  grid-row: 1;
+  position: relative;
+}
+.edit-allergy-btn {
+  position: absolute;
+  top: 10px;     
+  right: 10px;    
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  vertical-align: middle;
+}
+.allergies .tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.allergies .tags span {
+  background-color: #ffffff;
+  border: 1px solid #000;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.allergies .tags span:hover {
+  background-color: #f3f3f3;
+}
+/* Allergy tags display inside dashboard */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tags span {
+  background-color: #f3f3f3;
+  padding: 0.4rem 0.8rem;
+  border-radius: 18px;
+  font-size: 0.9rem;
+  border: 1px solid #ddd;
+}
+
+.placeholder-text {
+  font-size: 0.9rem;
+  color: #777;
+  margin-top: 0.5rem;
+}
+
+/* Weekly Budget */
+.spend-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* spacing between input and button */
+  margin-top: 1rem;
+}
+
+.spend-section input {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.spend-section .save-btn {
+  background-color: #f26d3d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.5rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.spend-section .save-btn:hover {
+  background-color: #e05f32;
+}
+.budget {
+  grid-column: 1;
+  grid-row: 2;
+  position: relative;
+}
+.reset-info {
+  font-size: 0.85rem;
+  color: #777;
+  margin-top: 0.5rem;
+}
+
+.edit-budget-btn {
+  position: absolute;
+  top: 10px;     
+  right: 10px;    
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  vertical-align: middle;
+}
+.budget h2 {
+  margin-top: 0.5rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: #eee;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.progress {
+  height: 100%;
+  background-color: #345c3e; /* green progress */
+  width: 60%; /* adjust dynamically as needed */
+  border-radius: 5px;
+  transition: width 0.3s ease;
+}
+
+.remaining {
+  color: #555;
+  font-size: 0.9rem;
+  margin-top: 0.3rem;
+}
+
+/* Grocery List */
+.grocery-list {
+  grid-column: 2;           /* right side */
+  grid-row: 1 / span 2;     /* spans both rows vertically */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  position: relative;
+  overflow-y: auto;
+  flex:1;
+  min-width:250px;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+.grocery-list ul {
+  flex: 1; /* takes all available space above the button */
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.grocery-list ul::after {
+  content: "";
+  position: sticky;
+  bottom: 0;
+  height: 2rem;
+  background: linear-gradient(to bottom, transparent, white);
+  pointer-events: none;
+}
+.card.grocery-list {
+  overflow-y: auto; /* scroll inside if content overflows */
+}
+.view-more-btn {
+  position: absolute;
+  bottom: 1rem;     /* adjust vertical spacing */
+  right: 1rem;   /* adjust horizontal spacing */
+  background-color: #f26d3d;
+  color: white;
+  padding: .5rem 1.5rem;
+  border-radius: 20px;
+  font-weight: 500;
+  cursor: pointer;
+
+}
+
+.view-more-btn:hover {
+  font-weight: 800;
+  border-color: #f26d3dc1;
+  padding: .6rem 1.8rem;
+}
+
+.grocery-list h3 {
+  font-size: 25px;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+}
+
+.grocery-list ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.grocery-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.4rem 0;
+  font-size: 0.95rem;
+}
+
+.grocery-list input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: black;
+}
+
+.view-more {
+  text-align: right;
+  font-size: 0.9rem;
+  color: #444;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+/* Responsive Layout */
+@media (max-width: 1024px) {
+  .bottom-row {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .grocery-list {
+    grid-row: auto;
+    grid-column: auto;
+    height: auto;
+  }
+}
+/* ---------- Two-column default layout ---------- */
+.dashboard-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;  /* left half chatbot | right half cards */
+  gap: 2rem;
+  align-items: flex-start;
+  width: 100%;
+}
+
+
+/* ---------- Bottom cards grid ---------- */
+.bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* left = allergy/budget | right = grocery */
+  grid-template-rows: auto auto;
+  gap: 1.5rem;
+}
+
+/* ---------- Responsive behavior ---------- */
+@media (max-width: 1024px) {
+  .dashboard-content {
+    grid-template-columns: 1fr; /* stack vertically */
+    justify-items: center;
+  }
+
+  .left-panel,
+  .right-panel {
+    width: 100%;
+    max-width: 700px;
+  }
+
+  .bottom-row {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    align-items: center;
+  }
+}
+
+/* Popup overlay */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Popup box */
+.popup-box {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 400px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.3s ease;
+  position: relative;
+}
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/*ALLERGY POPUP WINDOW*/
+.allergy-section h2 {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.allergy-section h3 {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #555;
+  margin-bottom: 1.5rem;
+  line-height: 1.4;
+  max-width: 100%;
+}
+
+/* Optional: center text */
+.allergy-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.allergy-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.allergy-option {
+  border: 1px solid #ccc;
+  border-radius: 18px;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background-color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.allergy-option.selected {
+  background-color: #f26d3d;
+  color: white;
+  border-color: #f26d3d;
+}
+
+.popup-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.popup-buttons button {
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.popup-buttons .save-btn {
+  background-color: #f26d3d;
+  color: white;
+}
+.popup-buttons .save-btn:hover {
+  opacity: 0.85;
+  font-weight: 600;
+  padding: .5rem 2rem;
+}
+.cancel-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+  padding: 0; /* remove extra spacing */
+}
+
+.cancel-btn:hover {
+  color: #f26d3d; /* subtle hover color to match your theme */
+}
+
+/* Remove number input arrows */
+
+/* Chrome, Safari, Edge, Opera */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
