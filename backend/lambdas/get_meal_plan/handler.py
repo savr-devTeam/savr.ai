@@ -2,6 +2,7 @@ import json
 import boto3
 import os
 from boto3.dynamodb.conditions import Key
+from decimal import Decimal
 
 # Initialize AWS clients
 dynamodb = boto3.resource('dynamodb')
@@ -11,6 +12,13 @@ MEAL_PLANS_TABLE = os.environ.get('MEAL_PLANS_TABLE')
 
 # DynamoDB table
 meal_plans_table = dynamodb.Table(MEAL_PLANS_TABLE)
+
+# JSON encoder for DynamoDB Decimal type
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, Decimal):
+            return float(o)
+        return super(DecimalEncoder, self).default(o)
 
 
 def lambda_handler(event, context):
@@ -122,5 +130,5 @@ def create_response(status_code, body):
             'Access-Control-Allow-Methods': 'GET, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type'
         },
-        'body': json.dumps(body)
+        'body': json.dumps(body, cls=DecimalEncoder)
     }
