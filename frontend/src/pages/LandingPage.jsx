@@ -1,14 +1,39 @@
 import React from "react";
+import { useAuth } from "../context/AuthContext";
 import "./LandingPage.css";
 import laptopImage1 from "/laptop1.png";
 import laptopImage2 from "/laptop2.png";
 
 const LandingPage = ({onNavigate}) => {
+  const { isAuthenticated, login, user } = useAuth();
+
+  const handleGetStarted = () => {
+    if (isAuthenticated) {
+      onNavigate("Dashboard");
+    } else {
+      login();
+    }
+  };
+
   return (
     <div className="landing-container">
       <section className="section light-bg">
         <div className="content">
-        <h1 className="pacifico-regular savr-header">Savr</h1>
+        <div className="landing-header">
+          <h1 className="pacifico-regular savr-header">Savr</h1>
+          {!isAuthenticated ? (
+            <button className="login-btn" onClick={login}>
+              Log In
+            </button>
+          ) : (
+            <div className="user-greeting">
+              <span>Welcome, {user?.name || user?.email || 'User'}!</span>
+              <button className="dashboard-btn" onClick={() => onNavigate("Dashboard")}>
+                Go to Dashboard
+              </button>
+            </div>
+          )}
+        </div>
 
 
           <div className="anybody">
@@ -47,9 +72,9 @@ const LandingPage = ({onNavigate}) => {
             </p>
 
             <button className="btn" style={{ marginTop: "50px" }}
-             onClick={() => onNavigate("Dashboard")}
+             onClick={handleGetStarted}
             >
-              Start Planning
+              {isAuthenticated ? "Go to Dashboard" : "Get Started"}
             </button>
           </div>
         </div>
@@ -87,8 +112,8 @@ const LandingPage = ({onNavigate}) => {
           </p>
 
           <button className="btn" style={{ marginTop: "40px" }}
-           onClick={() => onNavigate("Dashboard")}>
-            Start Planning
+           onClick={handleGetStarted}>
+            {isAuthenticated ? "Go to Dashboard" : "Start Planning"}
           </button>
         </div>
 
