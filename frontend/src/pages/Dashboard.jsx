@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
 import "./Dashboard.css";
 
-const Dashboard = () => {
+const Dashboard = ({ onNavigate }) => {
+  const { user, isAuthenticated, logout, loading } = useAuth();
   const [showAllergyPopup, setShowAllergyPopup] = useState(false);
   const [showBudgetPopup, setShowBudgetPopup] = useState(false);
   const [selectedAllergies, setSelectedAllergies] = useState([]);
@@ -36,6 +38,14 @@ const Dashboard = () => {
     if (budget === 0) return 0;
     return Math.min((spent / budget) * 100, 100);
   };
+
+  // Check authentication and redirect if not logged in
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      // Redirect to landing page if not authenticated
+      onNavigate('LandingPage');
+    }
+  }, [isAuthenticated, loading, onNavigate]);
 
   // Load & auto-reset spending every 7 days
 useEffect(() => {
@@ -74,16 +84,52 @@ useEffect(() => {
     localStorage.setItem("spent", spent.toString());
   }, [spent]);
 
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="dashboard-container">
+        <div className="loading-screen">
+          <div className="spinner"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated (will redirect)
+  if (!isAuthenticated) {
+    return null;
+  }
+
   return (
     <div className="dashboard-container">
       {/* Header */}
       <header className="dashboard-header">
         <h1 className="pacifico-regular logo">Savr</h1>
-        <nav className="dashboard-icons">
-          <i className="fa-regular fa-heart"></i>
-          <i className="fa-regular fa-user"></i>
-          <i className="fa-solid fa-house"></i>
-        </nav>
+        <div className="dashboard-user-section">
+          <span className="user-name">
+            {user?.name || user?.email?.split('@')[0] || 'User'}
+          </span>
+          <nav className="dashboard-icons">
+            <i className="fa-regular fa-heart"></i>
+            <i 
+              className="fa-regular fa-user" 
+              title="Profile"
+            ></i>
+            <i 
+              className="fa-solid fa-right-from-bracket" 
+              onClick={logout}
+              title="Logout"
+              style={{ cursor: 'pointer' }}
+            ></i>
+            <i 
+              className="fa-solid fa-house"
+              onClick={() => onNavigate('LandingPage')}
+              style={{ cursor: 'pointer' }}
+              title="Home"
+            ></i>
+          </nav>
+        </div>
       </header>
 
       <hr className="divider" />
