@@ -69,10 +69,11 @@ const LandingPage = ({onNavigate}) => {
             <img src="/savricon.png" alt="Savr Logo" className="savr-logo" />
             <h2>
               Hi, I’m <span className="highlight">Savr</span>,{" "}
-              the <span className="highlight">AI kitchen companion.</span>
+              the 
+              <br/>
+              <span className="highlight">AI kitchen companion.</span>
             </h2>
           </div>
-
           <p className="anybody">
             I take the stress out of meal planning.
             <br />

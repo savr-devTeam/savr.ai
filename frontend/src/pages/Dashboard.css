@@ -36,7 +36,7 @@
 /* RIGHT SIDE */
 .right-panel {
   flex: 1.2;
-  margin-left: 3rem; /* moves the right side farther right */
+  margin-left: 3rem; 
   margin-top: 4rem;
   margin: 0 auto;
 }
@@ -77,7 +77,7 @@
 
 .help-section {
   text-align: center;
-  margin-top: 2rem;
+  margin-top: -5rem;
 }
 .help-section h3 {
   font-size: 2rem;     
@@ -91,12 +91,12 @@
 .help-icon {
   width: 80px;
   margin-bottom: 2rem;
-  margin-top: 10rem;
+  margin-top: 14rem;
 }
 
 .action-btn {
   display: block;
-  width: 300px;
+  width: 325px;
   margin: 10px auto;
   padding: 0.5rem;
   border: 1px solid #00000049;
@@ -145,8 +145,9 @@
   padding: 1.2rem 6rem;
   box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
   margin-bottom: 60px;
-  margin-top: 180px;
+  margin-top: 150px;
   padding-left: 1.5rem;
+  margin: 180px auto 60px;
 }
 .attach-icon {
   width: 20px;
@@ -217,7 +218,7 @@
   box-sizing: border-box;
 }
 
-/* Target your black button */
+
 .view-meal-btn {
   position: absolute;
   top: 1rem;     /* adjust vertical spacing */
@@ -304,7 +305,7 @@
 
 }
 
-/* Bottom Row */
+/* BOTTOM ROW */
 .bottom-row {
   display: grid;
   grid-template-columns: 1fr 2fr; /* Left column smaller, right column larger */
@@ -394,13 +395,68 @@
 .allergies .tags span:hover {
   background-color: #f3f3f3;
 }
+/* Allergy tags display inside dashboard */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tags span {
+  background-color: #f3f3f3;
+  padding: 0.4rem 0.8rem;
+  border-radius: 18px;
+  font-size: 0.9rem;
+  border: 1px solid #ddd;
+}
+
+.placeholder-text {
+  font-size: 0.9rem;
+  color: #777;
+  margin-top: 0.5rem;
+}
 
 /* Weekly Budget */
+.spend-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* spacing between input and button */
+  margin-top: 1rem;
+}
+
+.spend-section input {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.spend-section .save-btn {
+  background-color: #f26d3d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.5rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.spend-section .save-btn:hover {
+  background-color: #e05f32;
+}
 .budget {
   grid-column: 1;
   grid-row: 2;
   position: relative;
 }
+.reset-info {
+  font-size: 0.85rem;
+  color: #777;
+  margin-top: 0.5rem;
+}
+
 .edit-budget-btn {
   position: absolute;
   top: 10px;     
@@ -448,6 +504,31 @@
   flex-direction: column;
   justify-content: flex-start;
   position: relative;
+  overflow-y: auto;
+  flex:1;
+  min-width:250px;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+.grocery-list ul {
+  flex: 1; /* takes all available space above the button */
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.grocery-list ul::after {
+  content: "";
+  position: sticky;
+  bottom: 0;
+  height: 2rem;
+  background: linear-gradient(to bottom, transparent, white);
+  pointer-events: none;
+}
+.card.grocery-list {
+  overflow-y: auto; /* scroll inside if content overflows */
 }
 .view-more-btn {
   position: absolute;
@@ -459,6 +540,7 @@
   border-radius: 20px;
   font-weight: 500;
   cursor: pointer;
+
 }
 
 .view-more-btn:hover {
@@ -550,4 +632,138 @@
     grid-template-rows: auto auto auto;
     align-items: center;
   }
+}
+
+/* Popup overlay */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Popup box */
+.popup-box {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 400px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.3s ease;
+  position: relative;
+}
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/*ALLERGY POPUP WINDOW*/
+.allergy-section h2 {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.allergy-section h3 {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #555;
+  margin-bottom: 1.5rem;
+  line-height: 1.4;
+  max-width: 100%;
+}
+
+/* Optional: center text */
+.allergy-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.allergy-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.allergy-option {
+  border: 1px solid #ccc;
+  border-radius: 18px;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background-color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.allergy-option.selected {
+  background-color: #f26d3d;
+  color: white;
+  border-color: #f26d3d;
+}
+
+.popup-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.popup-buttons button {
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.popup-buttons .save-btn {
+  background-color: #f26d3d;
+  color: white;
+}
+.popup-buttons .save-btn:hover {
+  opacity: 0.85;
+  font-weight: 600;
+  padding: .5rem 2rem;
+}
+.cancel-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+  padding: 0; /* remove extra spacing */
+}
+
+.cancel-btn:hover {
+  color: #f26d3d; /* subtle hover color to match your theme */
+}
+
+/* Remove number input arrows */
+
+/* Chrome, Safari, Edge, Opera */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
 }
