@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { AuthProvider } from "./context/AuthContext";
 import Home from "./pages/Home";
 import ReceiptScan from "./pages/ReceiptScan";
 import MealPlan from "./pages/MealPlan";
@@ -8,7 +7,6 @@ import ContactUs from "./pages/ContactUs";
 import Allergies from "./pages/Allergies";
 import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
-import AuthCallback from "./pages/AuthCallback";
 import "./App.css";
 
 function App() {
@@ -45,14 +43,6 @@ function App() {
     };
   }, []);
 
-  // Check for auth callback on mount
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('code')) {
-      setCurrentPage('auth-callback');
-    }
-  }, []);
-
   // Render the correct page based on current state
   const renderPage = () => {
     switch (currentPage) {
@@ -60,8 +50,6 @@ function App() {
         return <LandingPage onNavigate={navigate} />;
       case "Dashboard":
         return <Dashboard onNavigate={navigate} />;
-      case "auth-callback":
-        return <AuthCallback onNavigate={navigate} />;
       case "receipt-scan":
         return <ReceiptScan onNavigate={navigate} />;
       case "meal-plan":
@@ -77,11 +65,7 @@ function App() {
     }
   };
 
-  return (
-    <AuthProvider>
-      <div className="app">{renderPage()}</div>
-    </AuthProvider>
-  );
+  return <div className="app">{renderPage()}</div>;
 }
 
 export default App;
