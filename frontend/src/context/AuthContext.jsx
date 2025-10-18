@@ -21,6 +21,8 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuth = async () => {
     try {
+      console.log('Checking auth with API URL:', API_URL);
+      
       // Check if we have tokens in localStorage
       const storedTokens = localStorage.getItem('savr_tokens');
       const storedUser = localStorage.getItem('savr_user');
@@ -30,8 +32,10 @@ export const AuthProvider = ({ children }) => {
         setUser(JSON.parse(storedUser));
       }
 
-      // Verify with backend
-      const response = await axios.get(`${API_URL}/auth/user`);
+      // Verify with backend - add timeout
+      const response = await axios.get(`${API_URL}/auth/user`, {
+        timeout: 5000
+      });
       
       if (response.data.authenticated) {
         setUser(response.data.user);
@@ -43,13 +47,15 @@ export const AuthProvider = ({ children }) => {
         setTokens(null);
       }
     } catch (err) {
-      console.error('Auth check failed:', err);
-      // Clear local storage on error
+      console.error('Auth check failed (non-critical):', err.message);
+      // Don't block the app if backend is unreachable
+      // Just clear local storage on error
       localStorage.removeItem('savr_tokens');
       localStorage.removeItem('savr_user');
       setUser(null);
       setTokens(null);
     } finally {
+      console.log('Auth check complete, setting loading to false');
       setLoading(false);
     }
   };
