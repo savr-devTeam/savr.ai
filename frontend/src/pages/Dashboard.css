@@ -279,6 +279,18 @@
   gap: 2rem;
 }
 
+.meal-image-placeholder {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
 .meal-name {
   font-weight: 550;
   font-size: 16px;
