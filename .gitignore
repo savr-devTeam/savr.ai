@@ -37,6 +37,14 @@ cdk.out/
 .env.local
 .env.*.local
 
+# SSH/Keys - NEVER commit private keys
+*.pem
+*.ppk
+*.key
+id_rsa
+id_rsa.pub
+.ssh/
+
 # IDE
 .vscode/
 .idea/
