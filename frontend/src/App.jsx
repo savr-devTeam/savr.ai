@@ -56,6 +56,7 @@ function App() {
   const renderPage = () => {
     switch (currentPage) {
       case "LandingPage":
+      case "home":
         return <LandingPage onNavigate={navigate} />;
       case "Dashboard":
         return <Dashboard onNavigate={navigate} />;
