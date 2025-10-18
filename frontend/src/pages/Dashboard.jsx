@@ -110,25 +110,13 @@ useEffect(() => {
           <span className="user-name">
             {user?.name || user?.email?.split('@')[0] || 'User'}
           </span>
-          <nav className="dashboard-icons">
-            <i className="fa-regular fa-heart"></i>
-            <i 
-              className="fa-regular fa-user" 
-              title="Profile"
-            ></i>
-            <i 
-              className="fa-solid fa-right-from-bracket" 
-              onClick={logout}
-              title="Logout"
-              style={{ cursor: 'pointer' }}
-            ></i>
-            <i 
-              className="fa-solid fa-house"
-              onClick={() => onNavigate('LandingPage')}
-              style={{ cursor: 'pointer' }}
-              title="Home"
-            ></i>
-          </nav>
+          <button 
+            className="logout-btn"
+            onClick={logout}
+            title="Sign Out"
+          >
+            Sign Out
+          </button>
         </div>
       </header>
 

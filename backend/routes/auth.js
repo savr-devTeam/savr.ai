@@ -59,7 +59,14 @@ router.get('/login', async (req, res) => {
     });
 
     console.log('🔐 Redirecting to Cognito login:', authorizationUrl);
-    res.json({ authUrl: authorizationUrl });
+    
+    // Return authUrl, codeVerifier, and state to frontend
+    // Frontend will store these and use them in callback
+    res.json({ 
+      authUrl: authorizationUrl,
+      codeVerifier: codeVerifier,
+      state: state
+    });
   } catch (error) {
     console.error('Error in /login:', error);
     res.status(500).json({ 

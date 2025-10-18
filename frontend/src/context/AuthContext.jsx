@@ -65,7 +65,18 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       const response = await axios.get(`${API_URL}/auth/login`);
       
-      if (response.data.authUrl) {
+      console.log('Login response:', response.data);
+      
+      if (response.data.authUrl && response.data.codeVerifier && response.data.state) {
+        // Store code verifier and state in localStorage for callback
+        localStorage.setItem('pkce_code_verifier', response.data.codeVerifier);
+        localStorage.setItem('pkce_state', response.data.state);
+        
+        console.log('Stored PKCE params:', {
+          codeVerifier: response.data.codeVerifier,
+          state: response.data.state
+        });
+        
         // Redirect to Cognito hosted UI
         window.location.href = response.data.authUrl;
       } else {
@@ -83,9 +94,34 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
 
+      console.log('handleCallback called with:', { code, state });
+
+      // Get stored code verifier from localStorage
+      const codeVerifier = localStorage.getItem('pkce_code_verifier');
+      const storedState = localStorage.getItem('pkce_state');
+
+      console.log('Retrieved from localStorage:', { 
+        codeVerifier: codeVerifier ? 'present' : 'MISSING',
+        storedState: storedState ? 'present' : 'MISSING',
+        stateMatch: state === storedState
+      });
+
+      if (!codeVerifier || !storedState) {
+        console.error('PKCE parameters missing from localStorage');
+        throw new Error('Missing PKCE parameters');
+      }
+
+      if (state !== storedState) {
+        console.error('State mismatch!', { received: state, stored: storedState });
+        throw new Error('State mismatch - possible CSRF attack');
+      }
+
+      console.log('Calling /auth/token endpoint...');
+
       // Call backend to exchange code for tokens
-      const response = await axios.get(`${API_URL}/auth/callback`, {
-        params: { code, state }
+      const response = await axios.post(`${API_URL}/auth/token`, {
+        code,
+        codeVerifier
       });
 
       if (response.data.success) {
@@ -99,6 +135,10 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('savr_user', JSON.stringify(userData));
         localStorage.setItem('savr_tokens', JSON.stringify(tokenData));
 
+        // Clean up PKCE parameters
+        localStorage.removeItem('pkce_code_verifier');
+        localStorage.removeItem('pkce_state');
+
         return true;
       } else {
         throw new Error('Authentication failed');
@@ -106,6 +146,11 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       console.error('Callback handling failed:', err);
       setError(err.response?.data?.message || 'Authentication failed');
+      
+      // Clean up on error
+      localStorage.removeItem('pkce_code_verifier');
+      localStorage.removeItem('pkce_state');
+      
       return false;
     } finally {
       setLoading(false);

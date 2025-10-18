@@ -8,7 +8,12 @@ function AuthCallback({ onNavigate }) {
   const [message, setMessage] = useState('Processing authentication...');
 
   useEffect(() => {
+    let processed = false; // Guard to prevent multiple executions
+    
     const processCallback = async () => {
+      if (processed) return; // Skip if already processing
+      processed = true;
+      
       try {
         // Extract code and state from URL
         const urlParams = new URLSearchParams(window.location.search);
