@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { AuthProvider } from "./context/AuthContext";
-import Home from "./pages/Home";
 import ReceiptScan from "./pages/ReceiptScan";
 import MealPlan from "./pages/MealPlan";
 import AboutUs from "./pages/AboutUs";
@@ -73,7 +72,7 @@ function App() {
       case "allergies":
         return <Allergies onNavigate={navigate} />;
       default:
-        return <Home onNavigate={navigate} />;
+        return <LandingPage onNavigate={navigate} />;
     }
   };
 
