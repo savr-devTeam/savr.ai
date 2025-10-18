@@ -153,7 +153,7 @@ useEffect(() => {
             <button className="meal-item">
               <h4>Breakfast</h4>
               <div className="meal-detail">
-                <img src="/omelette.jpg" alt="Omelette" />
+                <div className="meal-image-placeholder">🍳</div>
                 <div>
                   <p className="meal-name">Vegetable Omelette</p>
                   <p className="ingredients">List ingredients here</p>
@@ -164,7 +164,7 @@ useEffect(() => {
             <button className="meal-item">
               <h4>Lunch</h4>
               <div className="meal-detail">
-                <img src="/wrap.jpg" alt="Wrap" />
+                <div className="meal-image-placeholder">🌯</div>
                 <div>
                   <p className="meal-name">Turkey and Avocado Wrap</p>
                   <p className="ingredients">List ingredients here</p>
@@ -175,7 +175,7 @@ useEffect(() => {
             <button className="meal-item">
               <h4>Dinner</h4>
               <div className="meal-detail">
-                <img src="/curry.jpg" alt="Curry" />
+                <div className="meal-image-placeholder">🍛</div>
                 <div>
                   <p className="meal-name">Chickpea Curry</p>
                   <p className="ingredients">List ingredients here</p>
