@@ -4,6 +4,7 @@ import session from "express-session";
 import dotenv from "dotenv";
 import documentsRouter from "./routes/documents.js";
 import authRouter from "./routes/auth.js";
+import apiRouter from "./routes/api.js";
 import { attachUser } from "./middleware/authMiddleware.js";
 
 // Load environment variables
@@ -47,6 +48,7 @@ app.get('/', (req, res) => {
     endpoints: {
       health: '/health',
       auth: '/auth/*',
+      api: '/api/*',
       documents: '/documents'
     }
   });
@@ -59,6 +61,7 @@ app.get('/health', (req, res) => {
 
 // Connect routes
 app.use("/auth", authRouter);
+app.use("/api", apiRouter);
 app.use("/documents", documentsRouter);
 
 // Error handling middleware
