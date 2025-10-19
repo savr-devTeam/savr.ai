@@ -39,6 +39,19 @@ app.use(session({
 // Attach user to request if session exists
 app.use(attachUser);
 
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'Savr.ai API Server',
+    version: '1.0.0',
+    endpoints: {
+      health: '/health',
+      auth: '/auth/*',
+      documents: '/documents'
+    }
+  });
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
