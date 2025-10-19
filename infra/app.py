@@ -32,6 +32,8 @@ lambda_stack = LambdaStack(
 )
 # Pass lambda functions to API Gateway
 lambda_functions = {
+    "auth_login": lambda_stack.auth_login_function,
+    "auth_callback": lambda_stack.auth_callback_function,
     "generate_plan": lambda_stack.generate_plan_function,
     "get_meal_plan": lambda_stack.get_meal_plan_function,
     "parse_receipt": lambda_stack.parse_receipt_function,

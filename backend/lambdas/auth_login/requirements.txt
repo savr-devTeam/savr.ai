@@ -1,0 +1,2 @@
+# No external dependencies needed for auth_login
+# Uses only Python standard library

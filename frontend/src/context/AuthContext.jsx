@@ -4,7 +4,7 @@ import axios from 'axios';
 const AuthContext = createContext(null);
 
 // Configure axios defaults
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = import.meta.env.VITE_API_URL || 'https://2bficji0m1.execute-api.us-east-2.amazonaws.com/prod';
 
 axios.defaults.withCredentials = true;
 
@@ -116,12 +116,13 @@ export const AuthProvider = ({ children }) => {
         throw new Error('State mismatch - possible CSRF attack');
       }
 
-      console.log('Calling /auth/token endpoint...');
+      console.log('Calling /auth/callback endpoint...');
 
       // Call backend to exchange code for tokens
-      const response = await axios.post(`${API_URL}/auth/token`, {
+      const response = await axios.post(`${API_URL}/auth/callback`, {
         code,
-        codeVerifier
+        codeVerifier,
+        state
       });
 
       if (response.data.success) {

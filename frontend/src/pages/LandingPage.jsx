@@ -6,14 +6,22 @@ import laptopImage1 from "/laptop1.png";
 import laptopImage2 from "/laptop2.png";
 
 const LandingPage = () => {
-  const { isAuthenticated, login, user } = useAuth();
+  const { isAuthenticated, login, user, error } = useAuth();
   const navigate = useNavigation();
+  const [loginError, setLoginError] = React.useState(null);
 
-  const handleGetStarted = () => {
+  const handleGetStarted = async () => {
     if (isAuthenticated) {
       navigate("Dashboard");
     } else {
-      login();
+      try {
+        setLoginError(null);
+        console.log('Starting login process...');
+        await login();
+      } catch (err) {
+        console.error('Login error caught:', err);
+        setLoginError(err.message || 'Failed to start login. Please try again.');
+      }
     }
   };
 
@@ -29,6 +37,13 @@ const LandingPage = () => {
               </div>
             )}
           </div>
+
+          {loginError && (
+            <div className="error-alert" style={{ marginBottom: '20px' }}>
+              <p><strong>⚠️ Login Error:</strong> {loginError}</p>
+              <small>Backend URL: {import.meta.env.VITE_API_URL || 'http://3.136.22.169:3001'}</small>
+            </div>
+          )}
 
 
           <div className="anybody">
