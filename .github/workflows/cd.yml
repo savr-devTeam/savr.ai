@@ -75,6 +75,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install AWS CDK
+        run: npm install -g aws-cdk
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -88,7 +96,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: "pip"
 
-      - name: Install CDK dependencies
+      - name: Install CDK Python dependencies
         working-directory: ./infra
         run: |
           pip install -r requirements.txt
