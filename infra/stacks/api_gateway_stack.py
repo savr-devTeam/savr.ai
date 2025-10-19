@@ -70,6 +70,13 @@ class ApiGatewayStack(Stack):
             )
             upload_resource.add_method("POST", upload_integration)
 
+            # /analyze-receipt endpoint for AI-powered receipt analysis
+            analyze_receipt_resource = self.api.root.add_resource("analyze-receipt")
+            analyze_receipt_integration = apigateway.LambdaIntegration(
+                lambda_functions.get("analyze_receipt_ai")
+            )
+            analyze_receipt_resource.add_method("POST", analyze_receipt_integration)
+
         # Output the API Gateway URL
         from aws_cdk import CfnOutput
         CfnOutput(

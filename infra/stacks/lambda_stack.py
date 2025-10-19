@@ -143,3 +143,30 @@ class LambdaStack(Stack):
                 resources=["*"],
             )
         )
+
+
+        # AI Receipt Analysis Function (NEW)
+        self.analyze_receipt_ai_function = _lambda.Function(
+            self,
+            "AnalyzeReceiptAIFunction",
+            runtime=_lambda.Runtime.PYTHON_3_11,
+            handler="handler.lambda_handler",
+            code=_lambda.Code.from_asset("../backend/lambdas/analyze_receipt_ai"),
+            timeout=Duration.seconds(60),
+            memory_size=512,
+            role=iam_role,
+            environment={
+                "RECEIPTS_TABLE": receipts_table.table_name,
+                "USER_PREFERENCES_TABLE": user_preferences_table.table_name,
+            },
+        )
+        # DDB access
+        receipts_table.grant_read_write_data(self.analyze_receipt_ai_function)
+        user_preferences_table.grant_read_data(self.analyze_receipt_ai_function)
+        # Bedrock invoke permissions for AI analysis
+        self.analyze_receipt_ai_function.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"],
+                resources=["*"],
+            )
+        )

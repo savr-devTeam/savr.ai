@@ -37,7 +37,8 @@ lambda_functions = {
     "generate_plan": lambda_stack.generate_plan_function,
     "get_meal_plan": lambda_stack.get_meal_plan_function,
     "parse_receipt": lambda_stack.parse_receipt_function,
-    "api_upload": lambda_stack.api_upload_function
+    "api_upload": lambda_stack.api_upload_function,
+    "analyze_receipt_ai": lambda_stack.analyze_receipt_ai_function
 }
 api_stack = ApiGatewayStack(app, "ApiGatewayStack", env=env, lambda_functions=lambda_functions)
 
