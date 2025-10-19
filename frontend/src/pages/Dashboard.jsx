@@ -43,18 +43,27 @@ const Dashboard = ({ onNavigate }) => {
     toggleAllergyPopup();
   };
 
-  // Progress bar logic
+  // Progress bar logic - allows over 100% for overspending
   const getProgress = () => {
     if (budget === 0) return 0;
-    return Math.min((spent / budget) * 100, 100);
+    return (spent / budget) * 100;
   };
 
   // Get progress bar color based on spending
   const getProgressColor = () => {
     const progress = getProgress();
+    if (progress > 100) return '#dc2626'; // darker red for over budget
     if (progress >= 90) return '#ef4444'; // red
     if (progress >= 70) return '#f59e0b'; // orange
     return '#10b981'; // green
+  };
+
+  // Reset budget spending
+  const handleResetBudget = () => {
+    setSpent(0);
+    setExpenseAdded(false);
+    localStorage.setItem("spent", "0");
+    localStorage.setItem("lastReset", new Date().toISOString());
   };
 
   // Load & auto-reset spending every 7 days
@@ -207,19 +216,28 @@ useEffect(() => {
                 <div 
                   className="progress" 
                   style={{ 
-                    width: `${getProgress()}%`,
+                    width: `${Math.min(getProgress(), 100)}%`,
                     backgroundColor: getProgressColor(),
                     transition: 'all 0.3s ease'
                   }}
                 ></div>
               </div>
 
-              <p className="remaining">
-                ${Math.max(budget - spent, 0).toFixed(2)} remaining
-                {spent > 0 && <span style={{marginLeft: '8px', fontSize: '0.9em', opacity: 0.7}}>
-                  (${spent.toFixed(2)} spent)
-                </span>}
-              </p>
+              {spent <= budget ? (
+                <p className="remaining">
+                  ${(budget - spent).toFixed(2)} remaining
+                  {spent > 0 && <span style={{marginLeft: '8px', fontSize: '0.9em', opacity: 0.7}}>
+                    (${spent.toFixed(2)} spent)
+                  </span>}
+                </p>
+              ) : (
+                <p className="remaining" style={{color: '#dc2626'}}>
+                  ${(spent - budget).toFixed(2)} over budget!
+                  <span style={{marginLeft: '8px', fontSize: '0.9em', opacity: 0.7}}>
+                    (${spent.toFixed(2)} spent of ${budget.toFixed(2)})
+                  </span>
+                </p>
+              )}
 
               <div className="spend-section">
                 <input
@@ -253,6 +271,30 @@ useEffect(() => {
                 }}>
                   ✓ Expense added successfully!
                 </p>
+              )}
+              
+              {spent > 0 && (
+                <button 
+                  className="reset-budget-btn"
+                  onClick={handleResetBudget}
+                  style={{
+                    marginTop: '12px',
+                    padding: '8px 16px',
+                    backgroundColor: spent > budget ? '#dc2626' : '#667eea',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '0.9em',
+                    fontWeight: '500',
+                    transition: 'all 0.2s ease',
+                    width: '100%'
+                  }}
+                  onMouseOver={(e) => e.target.style.opacity = '0.9'}
+                  onMouseOut={(e) => e.target.style.opacity = '1'}
+                >
+                  {spent > budget ? '🔄 Reset Budget (Over Limit!)' : '🔄 Reset Budget'}
+                </button>
               )}
             </section>
              {/* Grocery List Card */}
