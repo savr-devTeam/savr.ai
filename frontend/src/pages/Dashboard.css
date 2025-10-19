@@ -265,6 +265,21 @@
   border-radius: 8px;
   object-fit: cover;
 }
+.empty-plan {
+  padding: 12px 0 4px;
+}
+
+.primary-btn {
+  background: #e2724f; /* your peach tone */
+  color: #fff;
+  font-weight: 600;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: filter .15s;
+}
+.primary-btn:hover { filter: brightness(0.97); }
 
 /* food course breakfast, lunch, dinner */
 .meal-item {
