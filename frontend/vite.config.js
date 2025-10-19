@@ -8,15 +8,20 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    open: true,
-    historyApiFallback: true
+    open: true
   },
   build: {
     outDir: 'dist',
-    sourcemap: true
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: undefined
+      }
+    }
   },
   preview: {
     port: 3000,
     open: true
-  }
+  },
+  base: './'
 })
