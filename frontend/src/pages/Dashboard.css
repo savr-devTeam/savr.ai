@@ -852,4 +852,47 @@ input[type=number] {
   font-size: 1.2rem;
   color: #666;
   font-weight: 500;
+}/
+* Loading states for backend integration */
+.action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #ff6b6b;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Enhanced meal items for dynamic content */
+.meal-name {
+  font-weight: 600;
+  color: #333;
+}
+
+.ingredients {
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.3;
+}
+
+/* Grocery list enhancements */
+.grocery-list ul li {
+  transition: background-color 0.2s ease;
+}
+
+.grocery-list ul li:hover {
+  background-color: rgba(255, 107, 107, 0.1);
+  border-radius: 4px;
 }
