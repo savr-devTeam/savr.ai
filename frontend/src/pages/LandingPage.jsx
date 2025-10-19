@@ -1,18 +1,11 @@
 import React from "react";
-import { useAuth } from "../context/AuthContext";
 import "./LandingPage.css";
 import laptopImage1 from "/laptop1.png";
 import laptopImage2 from "/laptop2.png";
 
 const LandingPage = ({onNavigate}) => {
-  const { isAuthenticated, login, user } = useAuth();
-
   const handleGetStarted = () => {
-    if (isAuthenticated) {
-      onNavigate("Dashboard");
-    } else {
-      login();
-    }
+    onNavigate("Dashboard");
   };
 
   return (
@@ -21,18 +14,6 @@ const LandingPage = ({onNavigate}) => {
         <div className="content">
         <div className="landing-header">
           <h1 className="pacifico-regular savr-header">Savr</h1>
-          {isAuthenticated ? (
-            <div className="user-greeting">
-              <span>Welcome, {user?.name || user?.email || 'User'}!</span>
-              <button className="dashboard-btn" onClick={() => onNavigate("Dashboard")}>
-                Go to Dashboard
-              </button>
-            </div>
-          ) : (
-            <button className="login-btn" onClick={login}>
-              Log In
-            </button>
-          )}
         </div>
 
 
@@ -74,7 +55,7 @@ const LandingPage = ({onNavigate}) => {
             <button className="btn" style={{ marginTop: "50px" }}
              onClick={handleGetStarted}
             >
-              {isAuthenticated ? "Go to Dashboard" : "Get Started"}
+              Get Started
             </button>
           </div>
         </div>
@@ -113,7 +94,7 @@ const LandingPage = ({onNavigate}) => {
 
           <button className="btn" style={{ marginTop: "40px" }}
            onClick={handleGetStarted}>
-            {isAuthenticated ? "Go to Dashboard" : "Start Planning"}
+            Start Planning
           </button>
         </div>
 

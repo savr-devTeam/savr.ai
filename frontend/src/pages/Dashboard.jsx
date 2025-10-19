@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
 import "./Dashboard.css";
 
 const Dashboard = ({ onNavigate }) => {
-  const { user, isAuthenticated, logout, loading } = useAuth();
   const [showAllergyPopup, setShowAllergyPopup] = useState(false);
   const [showBudgetPopup, setShowBudgetPopup] = useState(false);
   const [selectedAllergies, setSelectedAllergies] = useState([]);
@@ -13,10 +11,22 @@ const Dashboard = ({ onNavigate }) => {
   const [spent, setSpent] = useState(0);
   const [newExpense, setNewExpense] = useState("");
   const [lastReset, setLastReset] = useState(null);
+  const [expenseAdded, setExpenseAdded] = useState(false);
 
   // Popup toggles
   const toggleAllergyPopup = () => setShowAllergyPopup(!showAllergyPopup);
   const toggleBudgetPopup = () => setShowBudgetPopup(!showBudgetPopup);
+
+  // Add expense handler
+  const handleAddExpense = () => {
+    const expenseAmount = Number(newExpense);
+    if (expenseAmount && expenseAmount > 0) {
+      setSpent((prev) => prev + expenseAmount);
+      setNewExpense("");
+      setExpenseAdded(true);
+      setTimeout(() => setExpenseAdded(false), 2000);
+    }
+  };
 
   // Select allergies
   const toggleAllergy = (item) => {
@@ -39,13 +49,13 @@ const Dashboard = ({ onNavigate }) => {
     return Math.min((spent / budget) * 100, 100);
   };
 
-  // Check authentication and redirect if not logged in
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      // Redirect to landing page if not authenticated
-      onNavigate('LandingPage');
-    }
-  }, [isAuthenticated, loading, onNavigate]);
+  // Get progress bar color based on spending
+  const getProgressColor = () => {
+    const progress = getProgress();
+    if (progress >= 90) return '#ef4444'; // red
+    if (progress >= 70) return '#f59e0b'; // orange
+    return '#10b981'; // green
+  };
 
   // Load & auto-reset spending every 7 days
 useEffect(() => {
@@ -84,40 +94,11 @@ useEffect(() => {
     localStorage.setItem("spent", spent.toString());
   }, [spent]);
 
-  // Show loading state while checking authentication
-  if (loading) {
-    return (
-      <div className="dashboard-container">
-        <div className="loading-screen">
-          <div className="spinner"></div>
-          <p>Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Don't render if not authenticated (will redirect)
-  if (!isAuthenticated) {
-    return null;
-  }
-
   return (
     <div className="dashboard-container">
       {/* Header */}
       <header className="dashboard-header">
-        <h1 className="pacifico-regular logo">Savr</h1>
-        <div className="dashboard-user-section">
-          <span className="user-name">
-            {user?.name || user?.email?.split('@')[0] || 'User'}
-          </span>
-          <button 
-            className="logout-btn"
-            onClick={logout}
-            title="Sign Out"
-          >
-            Sign Out
-          </button>
-        </div>
+        <h1 className="pacifico-regular logo" onClick={() => onNavigate('home')} style={{cursor: 'pointer'}}>Savr</h1>
       </header>
 
       <hr className="divider" />
@@ -220,13 +201,25 @@ useEffect(() => {
                 />
               </div>
 
-              <h2>${budget}</h2>
+              <h2>${budget.toFixed(2)}</h2>
 
               <div className="progress-bar">
-                <div className="progress" style={{ width: `${getProgress()}%` }}></div>
+                <div 
+                  className="progress" 
+                  style={{ 
+                    width: `${getProgress()}%`,
+                    backgroundColor: getProgressColor(),
+                    transition: 'all 0.3s ease'
+                  }}
+                ></div>
               </div>
 
-              <p className="remaining">${Math.max(budget - spent, 0)} remaining</p>
+              <p className="remaining">
+                ${Math.max(budget - spent, 0).toFixed(2)} remaining
+                {spent > 0 && <span style={{marginLeft: '8px', fontSize: '0.9em', opacity: 0.7}}>
+                  (${spent.toFixed(2)} spent)
+                </span>}
+              </p>
 
               <div className="spend-section">
                 <input
@@ -234,18 +227,33 @@ useEffect(() => {
                   placeholder="Add expense..."
                   value={newExpense}
                   onChange={(e) => setNewExpense(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleAddExpense()}
                   className="popup-input"
+                  min="0"
+                  step="0.01"
                 />
                 <button
                   className="save-btn"
-                  onClick={() => {
-                    setSpent((prev) => prev + Number(newExpense || 0));
-                    setNewExpense("");
+                  onClick={handleAddExpense}
+                  disabled={!newExpense || Number(newExpense) <= 0}
+                  style={{
+                    opacity: (!newExpense || Number(newExpense) <= 0) ? 0.5 : 1,
+                    cursor: (!newExpense || Number(newExpense) <= 0) ? 'not-allowed' : 'pointer'
                   }}
                 >
                   Add
                 </button>
               </div>
+              {expenseAdded && (
+                <p style={{
+                  color: '#10b981',
+                  fontSize: '0.9em',
+                  marginTop: '8px',
+                  animation: 'fadeIn 0.3s ease'
+                }}>
+                  ✓ Expense added successfully!
+                </p>
+              )}
             </section>
              {/* Grocery List Card */}
             <section className="card grocery-list">
@@ -330,8 +338,17 @@ useEffect(() => {
               <button
                 className="save-btn"
                 onClick={() => {
-                  setBudget(Number(newBudget) || 0);
-                  toggleBudgetPopup();
+                  const budgetAmount = Number(newBudget);
+                  if (budgetAmount >= 0) {
+                    setBudget(budgetAmount);
+                    setNewBudget("");
+                    toggleBudgetPopup();
+                  }
+                }}
+                disabled={!newBudget || Number(newBudget) < 0}
+                style={{
+                  opacity: (!newBudget || Number(newBudget) < 0) ? 0.5 : 1,
+                  cursor: (!newBudget || Number(newBudget) < 0) ? 'not-allowed' : 'pointer'
                 }}
               >
                 Save
