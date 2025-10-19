@@ -18,25 +18,29 @@
   min-height: 100vh;
   padding-bottom: 2rem;
 }
+
 .dashboard {
   display: flex;
-  justify-content: space-between; /* keeps both sides apart */
+  justify-content: space-between;
+  /* keeps both sides apart */
   align-items: flex-start;
   width: 100%;
-  padding: 2rem 5rem; /* control how far from screen edges */
+  padding: 2rem 5rem;
+  /* control how far from screen edges */
   box-sizing: border-box;
 }
 
 /* LEFT SIDE */
 .left-panel {
   flex: 1;
-  max-width: 40%; /* takes up about 40% of page */
+  max-width: 40%;
+  /* takes up about 40% of page */
 }
 
 /* RIGHT SIDE */
 .right-panel {
   flex: 1.2;
-  margin-left: 3rem; 
+  margin-left: 3rem;
   margin-top: 4rem;
   margin: 0 auto;
 }
@@ -79,11 +83,12 @@
   text-align: center;
   margin-top: -5rem;
 }
+
 .help-section h3 {
-  font-size: 2rem;     
-  font-weight: 700;     
-  text-align: center;    
-  margin-bottom: 2rem;   
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 2rem;
   margin-top: -1rem;
 }
 
@@ -141,7 +146,8 @@
   max-width: 40rem;
   background: #fff;
   border: 1px solid #0000004f;
-  border-radius: 25px;   /*rounded corners*/
+  border-radius: 25px;
+  /*rounded corners*/
   padding: 1.2rem 6rem;
   box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
   margin-bottom: 60px;
@@ -149,6 +155,7 @@
   padding-left: 1.5rem;
   margin: 180px auto 60px;
 }
+
 .attach-icon {
   width: 20px;
   height: 20px;
@@ -165,7 +172,7 @@
   background: transparent;
   align-items: flex-start;
   text-align: left;
-  width: 100%;  
+  width: 100%;
 }
 
 .attach-btn {
@@ -196,10 +203,12 @@
   padding: 2rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.21);
 }
+
 /* Today's Menu Title */
 .card h2 {
-    font-size: 1.7rem;
+  font-size: 1.7rem;
 }
+
 .meal-plan {
   background: #fff;
   border-radius: 20px;
@@ -209,8 +218,10 @@
   margin: 0 auto;
   margin-top: 40px;
 }
+
 .card.meal-plan {
-  position: relative; /* allows absolute positioning for children */
+  position: relative;
+  /* allows absolute positioning for children */
   width: 100%;
   max-width: 950px;
   margin: 0 auto;
@@ -221,8 +232,10 @@
 
 .view-meal-btn {
   position: absolute;
-  top: 1rem;     /* adjust vertical spacing */
-  right: 1rem;   /* adjust horizontal spacing */
+  top: 1rem;
+  /* adjust vertical spacing */
+  right: 1rem;
+  /* adjust horizontal spacing */
   background-color: #f26d3d;
   color: white;
   padding: .5rem 1.5rem;
@@ -240,8 +253,10 @@
 }
 
 .card.meal-plan {
-  height: 420px; /* fixed height */
-  overflow-y: auto; /* scroll inside if content overflows */
+  height: 420px;
+  /* fixed height */
+  overflow-y: auto;
+  /* scroll inside if content overflows */
 }
 
 .meal-plan img {
@@ -250,6 +265,7 @@
   border-radius: 8px;
   object-fit: cover;
 }
+
 /* food course breakfast, lunch, dinner */
 .meal-item {
   font-size: 25px;
@@ -262,6 +278,7 @@
   cursor: pointer;
   transition: all 0.2s ease-in-out;
 }
+
 .meal-item:hover {
   border-radius: 1rem;
   border-color: #0c0c0c2d;
@@ -320,7 +337,8 @@
 /* BOTTOM ROW */
 .bottom-row {
   display: grid;
-  grid-template-columns: 1fr 2fr; /* Left column smaller, right column larger */
+  grid-template-columns: 1fr 2fr;
+  /* Left column smaller, right column larger */
   grid-template-rows: auto auto;
   grid-column-gap: 1.5rem;
   grid-row-gap: 1.5rem;
@@ -331,6 +349,7 @@
   box-sizing: border-box;
   margin-top: 2rem;
 }
+
 .dashboard-content,
 .right-panel,
 .left-panel {
@@ -379,15 +398,17 @@
   grid-row: 1;
   position: relative;
 }
+
 .edit-allergy-btn {
   position: absolute;
-  top: 10px;     
-  right: 10px;    
+  top: 10px;
+  right: 10px;
   cursor: pointer;
   width: 40px;
   height: 40px;
   vertical-align: middle;
 }
+
 .allergies .tags {
   display: flex;
   flex-wrap: wrap;
@@ -407,6 +428,7 @@
 .allergies .tags span:hover {
   background-color: #f3f3f3;
 }
+
 /* Allergy tags display inside dashboard */
 .tags {
   display: flex;
@@ -432,7 +454,8 @@
 .spend-section {
   display: flex;
   align-items: center;
-  gap: 0.5rem; /* spacing between input and button */
+  gap: 0.5rem;
+  /* spacing between input and button */
   margin-top: 1rem;
 }
 
@@ -458,11 +481,13 @@
 .spend-section .save-btn:hover {
   background-color: #e05f32;
 }
+
 .budget {
   grid-column: 1;
   grid-row: 2;
   position: relative;
 }
+
 .reset-info {
   font-size: 0.85rem;
   color: #777;
@@ -471,13 +496,14 @@
 
 .edit-budget-btn {
   position: absolute;
-  top: 10px;     
-  right: 10px;    
+  top: 10px;
+  right: 10px;
   cursor: pointer;
   width: 40px;
   height: 40px;
   vertical-align: middle;
 }
+
 .budget h2 {
   margin-top: 0.5rem;
   font-size: 1.8rem;
@@ -495,8 +521,10 @@
 
 .progress {
   height: 100%;
-  background-color: #345c3e; /* green progress */
-  width: 60%; /* adjust dynamically as needed */
+  background-color: #345c3e;
+  /* green progress */
+  width: 60%;
+  /* adjust dynamically as needed */
   border-radius: 5px;
   transition: width 0.3s ease;
 }
@@ -509,23 +537,27 @@
 
 /* Grocery List */
 .grocery-list {
-  grid-column: 2;           /* right side */
-  grid-row: 1 / span 2;     /* spans both rows vertically */
+  grid-column: 2;
+  /* right side */
+  grid-row: 1 / span 2;
+  /* spans both rows vertically */
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   position: relative;
   overflow-y: auto;
-  flex:1;
-  min-width:250px;
+  flex: 1;
+  min-width: 250px;
   max-width: 100%;
   max-height: 100%;
   overflow: hidden;
   position: relative;
 }
+
 .grocery-list ul {
-  flex: 1; /* takes all available space above the button */
+  flex: 1;
+  /* takes all available space above the button */
   overflow-y: auto;
   padding-right: 0.5rem;
   margin-bottom: 1rem;
@@ -539,13 +571,18 @@
   background: linear-gradient(to bottom, transparent, white);
   pointer-events: none;
 }
+
 .card.grocery-list {
-  overflow-y: auto; /* scroll inside if content overflows */
+  overflow-y: auto;
+  /* scroll inside if content overflows */
 }
+
 .view-more-btn {
   position: absolute;
-  bottom: 1rem;     /* adjust vertical spacing */
-  right: 1rem;   /* adjust horizontal spacing */
+  bottom: 1rem;
+  /* adjust vertical spacing */
+  right: 1rem;
+  /* adjust horizontal spacing */
   background-color: #f26d3d;
   color: white;
   padding: .5rem 1.5rem;
@@ -608,10 +645,12 @@
     height: auto;
   }
 }
+
 /* ---------- Two-column default layout ---------- */
 .dashboard-content {
   display: grid;
-  grid-template-columns: 1fr 1fr;  /* left half chatbot | right half cards */
+  grid-template-columns: 1fr 1fr;
+  /* left half chatbot | right half cards */
   gap: 2rem;
   align-items: flex-start;
   width: 100%;
@@ -621,7 +660,8 @@
 /* ---------- Bottom cards grid ---------- */
 .bottom-row {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* left = allergy/budget | right = grocery */
+  grid-template-columns: 1fr 1fr;
+  /* left = allergy/budget | right = grocery */
   grid-template-rows: auto auto;
   gap: 1.5rem;
 }
@@ -629,7 +669,8 @@
 /* ---------- Responsive behavior ---------- */
 @media (max-width: 1024px) {
   .dashboard-content {
-    grid-template-columns: 1fr; /* stack vertically */
+    grid-template-columns: 1fr;
+    /* stack vertically */
     justify-items: center;
   }
 
@@ -670,12 +711,14 @@
   animation: fadeIn 0.3s ease;
   position: relative;
 }
+
 /* Animation */
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -744,11 +787,13 @@
   background-color: #f26d3d;
   color: white;
 }
+
 .popup-buttons .save-btn:hover {
   opacity: 0.85;
   font-weight: 600;
   padding: .5rem 2rem;
 }
+
 .cancel-btn {
   position: absolute;
   top: 20px;
@@ -759,11 +804,13 @@
   font-size: 1.5rem;
   cursor: pointer;
   transition: 0.2s ease;
-  padding: 0; /* remove extra spacing */
+  padding: 0;
+  /* remove extra spacing */
 }
 
 .cancel-btn:hover {
-  color: #f26d3d; /* subtle hover color to match your theme */
+  color: #f26d3d;
+  /* subtle hover color to match your theme */
 }
 
 /* Remove number input arrows */
@@ -844,17 +891,22 @@ input[type=number] {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-screen p {
   font-size: 1.2rem;
   color: #666;
   font-weight: 500;
-}/
-* Loading states for backend integration */
-.action-btn:disabled {
+}
+
+/ * Loading states for backend integration */ .action-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -871,8 +923,13 @@ input[type=number] {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Enhanced meal items for dynamic content */
@@ -895,7 +952,9 @@ input[type=number] {
 .grocery-list ul li:hover {
   background-color: rgba(255, 107, 107, 0.1);
   border-radius: 4px;
-}/* E
+}
+
+/* E
 nhanced ask section for interactive chat */
 .ask-section form {
   display: flex;
