@@ -8,7 +8,21 @@ import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
 import "./App.css";
 
+// Initialize session ID on first load
+const initializeSession = () => {
+  let sessionId = localStorage.getItem('savr_session_id');
+  if (!sessionId) {
+    // Generate a unique session ID (UUID v4 format)
+    sessionId = 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+    localStorage.setItem('savr_session_id', sessionId);
+  }
+  return sessionId;
+};
+
 function App() {
+  // Initialize session on app load
+  const [sessionId] = useState(() => initializeSession());
+  
   // Start on the LandingPage by default
   const [currentPage, setCurrentPage] = useState("LandingPage");
 
@@ -51,11 +65,11 @@ function App() {
       case "home":
         return <LandingPage onNavigate={navigate} />;
       case "Dashboard":
-        return <Dashboard onNavigate={navigate} />;
+        return <Dashboard onNavigate={navigate} sessionId={sessionId} />;
       case "receipt-scan":
-        return <ReceiptScan onNavigate={navigate} />;
+        return <ReceiptScan onNavigate={navigate} sessionId={sessionId} />;
       case "meal-plan":
-        return <MealPlan onNavigate={navigate} />;
+        return <MealPlan onNavigate={navigate} sessionId={sessionId} />;
       case "about":
         return <AboutUs onNavigate={navigate} />;
       case "contact":

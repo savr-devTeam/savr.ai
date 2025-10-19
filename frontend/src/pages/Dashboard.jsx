@@ -36,7 +36,7 @@ async function generateMealPlanStub() {
   return { generatedAt: new Date().toISOString(), days };
 }
 
-const Dashboard = ({ onNavigate }) => {
+const Dashboard = ({ onNavigate, sessionId }) => {
   const [showAllergyPopup, setShowAllergyPopup] = useState(false);
   const [showBudgetPopup, setShowBudgetPopup] = useState(false);
   const [selectedAllergies, setSelectedAllergies] = useState([]);
