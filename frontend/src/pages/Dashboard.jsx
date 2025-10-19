@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigation } from "../hooks/useNavigation";
-import { generateMealPlan, getMealPlans, uploadReceipt, parseReceipt } from "../services/api";
-import { getUserId, saveUserPreferences } from "../utils/userUtils";
+import { generateMealPlan, getMealPlans, uploadReceipt, parseReceipt, getUserPreferences, saveUserPreferences as savePreferencesToBackend } from "../services/api";
+import { getUserId } from "../utils/userUtils";
 import "./Dashboard.css";
 
 const Dashboard = () => {
@@ -23,6 +23,8 @@ const Dashboard = () => {
   const [groceryItems, setGroceryItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [askInput, setAskInput] = useState("");
+  const [preferencesLoading, setPreferencesLoading] = useState(false);
+  const [preferencesError, setPreferencesError] = useState(null);
 
 
   // Popup toggles
@@ -42,14 +44,35 @@ const Dashboard = () => {
   const saveAllergies = async () => {
     setSavedAllergies(selectedAllergies);
 
-    // Save to backend
-    const preferences = {
-      dietaryRestrictions: selectedAllergies.join(', '),
-      budget: budget
-    };
-    saveUserPreferences(preferences);
+    if (!user?.userId) {
+      console.error('User ID not available');
+      return;
+    }
 
-    toggleAllergyPopup();
+    try {
+      setPreferencesLoading(true);
+      setPreferencesError(null);
+
+      // Save to backend
+      const preferences = {
+        dietaryRestrictions: selectedAllergies,
+        allergies: selectedAllergies,
+        budget: budget
+      };
+
+      await savePreferencesToBackend(user.userId, preferences);
+      console.log('✅ Preferences saved to backend');
+
+      // Also save to localStorage as fallback
+      localStorage.setItem('userPreferences', JSON.stringify(preferences));
+      toggleAllergyPopup();
+    } catch (error) {
+      const errorMsg = error.message || 'Failed to save preferences';
+      setPreferencesError(errorMsg);
+      console.error('❌ Error saving preferences:', error);
+    } finally {
+      setPreferencesLoading(false);
+    }
   };
 
   // Progress bar logic
@@ -107,8 +130,51 @@ const Dashboard = () => {
   useEffect(() => {
     if (user && isAuthenticated) {
       loadTodaysMeals();
+      loadUserPreferences();
     }
   }, [user, isAuthenticated]);
+
+  // Load user preferences from backend
+  const loadUserPreferences = async () => {
+    if (!user?.userId) return;
+
+    try {
+      setPreferencesLoading(true);
+      setPreferencesError(null);
+      
+      const preferences = await getUserPreferences(user.userId);
+      console.log('✅ Preferences loaded from backend:', preferences);
+
+      // Update state from backend
+      if (preferences.budget) {
+        setBudget(preferences.budget);
+      }
+
+      if (preferences.dietaryRestrictions && Array.isArray(preferences.dietaryRestrictions)) {
+        setSavedAllergies(preferences.dietaryRestrictions);
+        setSelectedAllergies(preferences.dietaryRestrictions);
+      } else if (preferences.allergies && Array.isArray(preferences.allergies)) {
+        setSavedAllergies(preferences.allergies);
+        setSelectedAllergies(preferences.allergies);
+      }
+
+      // Cache in localStorage as fallback
+      localStorage.setItem('userPreferences', JSON.stringify(preferences));
+    } catch (error) {
+      // If backend fails, try to load from localStorage
+      const cached = localStorage.getItem('userPreferences');
+      if (cached) {
+        console.log('⚠️ Using cached preferences from localStorage');
+        const prefs = JSON.parse(cached);
+        if (prefs.budget) setBudget(prefs.budget);
+        if (prefs.dietaryRestrictions) setSavedAllergies(prefs.dietaryRestrictions);
+      }
+      console.error('❌ Error loading preferences:', error.message);
+      setPreferencesError(error.message);
+    } finally {
+      setPreferencesLoading(false);
+    }
+  };
 
   const loadTodaysMeals = async () => {
     if (!user) return;
@@ -571,12 +637,35 @@ const Dashboard = () => {
               <button onClick={toggleBudgetPopup}>Cancel</button>
               <button
                 className="save-btn"
-                onClick={() => {
-                  setBudget(Number(newBudget) || 0);
+                onClick={async () => {
+                  const newBudgetValue = Number(newBudget) || 0;
+                  setBudget(newBudgetValue);
+                  
+                  // Save to backend
+                  if (user?.userId) {
+                    try {
+                      setPreferencesLoading(true);
+                      const preferences = {
+                        budget: newBudgetValue,
+                        dietaryRestrictions: savedAllergies,
+                        allergies: savedAllergies
+                      };
+                      await savePreferencesToBackend(user.userId, preferences);
+                      console.log('✅ Budget saved to backend');
+                      localStorage.setItem('userPreferences', JSON.stringify(preferences));
+                    } catch (error) {
+                      console.error('❌ Error saving budget:', error);
+                      setPreferencesError(error.message);
+                    } finally {
+                      setPreferencesLoading(false);
+                    }
+                  }
+                  
                   toggleBudgetPopup();
                 }}
+                disabled={preferencesLoading}
               >
-                Save
+                {preferencesLoading ? 'Saving...' : 'Save'}
               </button>
             </div>
           </div>
