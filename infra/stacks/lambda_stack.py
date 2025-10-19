@@ -176,3 +176,20 @@ class LambdaStack(Stack):
                 ],
             )
         )
+
+        # Preferences Function (GET/POST user preferences)
+        self.preferences_function = _lambda.Function(
+            self,
+            "PreferencesFunction",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            handler="handler.lambda_handler",
+            code=_lambda.Code.from_asset("../backend/lambdas/preferences"),
+            timeout=Duration.seconds(10),
+            memory_size=128,
+            role=iam_role,
+            environment={
+                "USER_PREFERENCES_TABLE": user_preferences_table.table_name,
+            },
+        )
+        # DDB read/write access for preferences
+        user_preferences_table.grant_read_write_data(self.preferences_function)
