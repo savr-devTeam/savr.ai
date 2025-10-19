@@ -73,7 +73,7 @@ function AuthCallback() {
     };
 
     processCallback();
-  }, [handleCallback, onNavigate]);
+  }, [handleCallback, navigate]);
 
   return (
     <div className="auth-callback-container">
