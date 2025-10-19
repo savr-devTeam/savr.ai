@@ -21,17 +21,13 @@ const LandingPage = ({onNavigate}) => {
         <div className="content">
         <div className="landing-header">
           <h1 className="pacifico-regular savr-header">Savr</h1>
-          {isAuthenticated ? (
+          {isAuthenticated && (
             <div className="user-greeting">
               <span>Welcome, {user?.name || user?.email || 'User'}!</span>
               <button className="dashboard-btn" onClick={() => onNavigate("Dashboard")}>
                 Go to Dashboard
               </button>
             </div>
-          ) : (
-            <button className="login-btn" onClick={login}>
-              Log In
-            </button>
           )}
         </div>
 
