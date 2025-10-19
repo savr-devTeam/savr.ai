@@ -1,6 +1,7 @@
 import axios from 'axios'
 
-const API_BASE_URL = 'https://2bficji0m1.execute-api.us-east-2.amazonaws.com/prod'
+// Use environment variable or fallback to EC2 backend
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://3.136.22.169:3001'
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -71,7 +72,7 @@ api.interceptors.response.use(
  */
 export const generateMealPlan = async (preferences, userId) => {
     try {
-        const response = await api.post('/generate-plan', {
+        const response = await api.post('/api/generate-plan', {
             userId,
             preferences
         })
@@ -95,7 +96,7 @@ export const getMealPlans = async (userId, planDate = null) => {
         })
         if (planDate) params.append('planDate', planDate)
 
-        const response = await api.get(`/meal-plan?${params}`)
+        const response = await api.get(`/api/meal-plan?${params}`)
         return response.data
     } catch (error) {
         handleApiError(error, 'getMealPlans')
@@ -111,7 +112,7 @@ export const getMealPlans = async (userId, planDate = null) => {
  */
 export const getUploadUrl = async (fileName, contentType) => {
     try {
-        const response = await api.post('/upload', {
+        const response = await api.post('/api/upload', {
             fileName,
             contentType
         })
@@ -170,7 +171,7 @@ export const uploadReceipt = async (file) => {
  */
 export const parseReceipt = async (s3Key) => {
     try {
-        const response = await api.post('/parse-receipt', {
+        const response = await api.post('/api/parse-receipt', {
             s3Key
         })
         return response.data
@@ -188,7 +189,7 @@ export const parseReceipt = async (s3Key) => {
  */
 export const saveUserPreferences = async (userId, preferences) => {
     try {
-        const response = await api.post('/preferences/save', {
+        const response = await api.post('/api/preferences/save', {
             userId,
             preferences
         })
@@ -206,7 +207,7 @@ export const saveUserPreferences = async (userId, preferences) => {
  */
 export const getUserPreferences = async (userId) => {
     try {
-        const response = await api.get(`/preferences/get?userId=${userId}`)
+        const response = await api.get(`/api/preferences/get?userId=${userId}`)
         return response.data
     } catch (error) {
         handleApiError(error, 'getUserPreferences')
