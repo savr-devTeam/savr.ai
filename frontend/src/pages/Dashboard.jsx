@@ -3,8 +3,6 @@ import { useAuth } from "../context/AuthContext";
 import { generateMealPlan, getMealPlans, uploadReceipt, parseReceipt } from "../services/api";
 import { getUserId, saveUserPreferences } from "../utils/userUtils";
 import "./Dashboard.css";
-import { generateMealPlan, getMealPlans, uploadReceipt, parseReceipt } from '../services/api'
-import { getUserId, saveUserPreferences } from '../utils/userUtils'
 
 const Dashboard = ({ onNavigate }) => {
   const { user, isAuthenticated, logout, loading } = useAuth();
