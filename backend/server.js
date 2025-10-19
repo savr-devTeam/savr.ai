@@ -1,11 +1,7 @@
 import express from "express";
 import cors from "cors";
-import session from "express-session";
 import dotenv from "dotenv";
 import documentsRouter from "./routes/documents.js";
-import authRouter from "./routes/auth.js";
-import apiRouter from "./routes/api.js";
-import { attachUser } from "./middleware/authMiddleware.js";
 
 // Load environment variables
 dotenv.config();
@@ -24,22 +20,6 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Session configuration
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-  },
-}));
-
-// Attach user to request if session exists
-app.use(attachUser);
-
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({ 
@@ -47,8 +27,6 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     endpoints: {
       health: '/health',
-      auth: '/auth/*',
-      api: '/api/*',
       documents: '/documents'
     }
   });
@@ -60,8 +38,6 @@ app.get('/health', (req, res) => {
 });
 
 // Connect routes
-app.use("/auth", authRouter);
-app.use("/api", apiRouter);
 app.use("/documents", documentsRouter);
 
 // Error handling middleware
@@ -78,5 +54,4 @@ const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📍 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
-  console.log(`🔐 Cognito Domain: ${process.env.COGNITO_DOMAIN}`);
 });
