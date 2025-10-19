@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./Dashboard.css";
+import { getUserPreferences, saveUserPreferences } from "../services/api";
 
 const MEALPLAN_KEY = "mealPlan.v1";
 
@@ -48,9 +49,10 @@ const Dashboard = ({ onNavigate, sessionId }) => {
   const [newExpense, setNewExpense] = useState("");
   const [lastReset, setLastReset] = useState(null);
   const [expenseAdded, setExpenseAdded] = useState(false);
-
-  // NEW: meal plan state (null = no plan yet)
-  const [mealPlan, setMealPlan] = useState(null);
+  
+  // Loading and error states for API calls
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Popup toggles
   const toggleAllergyPopup = () => setShowAllergyPopup(!showAllergyPopup);
@@ -74,10 +76,23 @@ const Dashboard = ({ onNavigate, sessionId }) => {
     );
   };
 
-  // Save allergies to dashboard
-  const saveAllergies = () => {
+  // Save allergies to dashboard and backend
+  const saveAllergies = async () => {
     setSavedAllergies(selectedAllergies);
     toggleAllergyPopup();
+    
+    // Also save to backend
+    try {
+      await saveUserPreferences(sessionId, {
+        allergies: selectedAllergies,
+        budget,
+        spent
+      });
+      console.log('Allergies saved to backend');
+    } catch (err) {
+      console.error('Failed to save allergies to backend:', err);
+      setError('Failed to save allergies');
+    }
   };
 
   // Progress bar logic - allows over 100% for overspending
@@ -96,30 +111,81 @@ const Dashboard = ({ onNavigate, sessionId }) => {
   };
 
   // Reset budget spending
-  const handleResetBudget = () => {
+  const handleResetBudget = async () => {
     setSpent(0);
     setExpenseAdded(false);
     localStorage.setItem("spent", "0");
     localStorage.setItem("lastReset", new Date().toISOString());
+    try {
+      await saveUserPreferences(sessionId, {
+        allergies: selectedAllergies,
+        budget,
+        spent: 0
+      });
+    } catch (err) {
+      console.error('Failed to save budget reset to backend:', err);
+      setError('Failed to reset budget');
+    }
   };
 
-  // Load mealPlan (if any) + budget data; auto-reset spending weekly
+  // Load user preferences from backend on mount
   useEffect(() => {
-    // meal plan
-    const savedPlan = localStorage.getItem(MEALPLAN_KEY);
-    if (savedPlan) {
+    const loadPreferences = async () => {
       try {
-        setMealPlan(JSON.parse(savedPlan));
-      } catch {
-        setMealPlan(null);
+        setLoading(true);
+        setError(null);
+        
+        console.log('Loading preferences for sessionId:', sessionId);
+        
+        const response = await getUserPreferences(sessionId);
+        console.log('Loaded preferences:', response);
+        
+        if (response && response.preferences) {
+          const prefs = response.preferences;
+          
+          // Load allergies
+          if (prefs.allergies && Array.isArray(prefs.allergies)) {
+            setSavedAllergies(prefs.allergies);
+            setSelectedAllergies(prefs.allergies);
+          }
+          
+          // Load budget
+          if (prefs.budget) {
+            setBudget(Number(prefs.budget));
+          }
+          
+          // Load spent amount
+          if (prefs.spent) {
+            setSpent(Number(prefs.spent));
+          }
+          
+          console.log('Preferences loaded successfully');
+        }
+      } catch (err) {
+        console.error('Failed to load preferences:', err);
+        setError('Could not load preferences. Using defaults.');
+        // Fall back to localStorage
+        const savedBudget = localStorage.getItem("budget");
+        const savedSpent = localStorage.getItem("spent");
+        if (savedBudget) setBudget(Number(savedBudget));
+        if (savedSpent) setSpent(Number(savedSpent));
+      } finally {
+        setLoading(false);
       }
+    };
+    
+    if (sessionId) {
+      loadPreferences();
     }
+  }, [sessionId]);
 
-    // budget
-    const savedBudget = localStorage.getItem("budget");
-    const savedSpent = localStorage.getItem("spent");
-    if (savedBudget) setBudget(Number(savedBudget));
-    if (savedSpent) setSpent(Number(savedSpent));
+  // Load & auto-reset spending every 7 days
+useEffect(() => {
+  const savedBudget = localStorage.getItem("budget");
+  const savedSpent = localStorage.getItem("spent");
+
+  if (savedBudget) setBudget(Number(savedBudget));
+  if (savedSpent) setSpent(Number(savedSpent));
 
     const now = new Date();
     const savedLastReset = localStorage.getItem("lastReset");
@@ -484,12 +550,22 @@ const Dashboard = ({ onNavigate, sessionId }) => {
               </button>
               <button
                 className="save-btn"
-                onClick={() => {
+                onClick={async () => {
                   const budgetAmount = Number(newBudget);
                   if (budgetAmount >= 0) {
                     setBudget(budgetAmount);
                     setNewBudget("");
                     toggleBudgetPopup();
+                    try {
+                      await saveUserPreferences(sessionId, {
+                        allergies: selectedAllergies,
+                        budget: budgetAmount,
+                        spent
+                      });
+                    } catch (err) {
+                      console.error('Failed to save budget to backend:', err);
+                      setError('Failed to save budget');
+                    }
                   }
                 }}
                 disabled={!newBudget || Number(newBudget) < 0}
