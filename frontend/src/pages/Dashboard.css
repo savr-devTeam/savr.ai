@@ -534,6 +534,65 @@
   font-size: 0.9rem;
   margin-top: 0.3rem;
 }
+/* Modal input */
+.budget-input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 16px;
+  line-height: 1.2;
+  border: 2px solid #e5e7eb;          /* neutral border */
+  border-radius: 10px;
+  background: #fff;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s, background .15s;
+}
+
+/* Placeholder */
+.budget-input::placeholder {
+  color: #9ca3af;                      /* softer gray */
+}
+
+/* Focus ring */
+.budget-input:focus {
+  border-color: #111827;               /* dark slate */
+  box-shadow: 0 0 0 4px rgba(17,24,39,.08);
+}
+
+/* Error / valid states you can toggle with a class */
+.budget-input.error {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+.budget-input.valid {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+/* Remove number spinners */
+.budget-input[type="number"]::-webkit-outer-spin-button,
+.budget-input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.budget-input[type="number"] {
+  -moz-appearance: textfield;          /* Firefox */
+}
+
+.save-btn {
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: 0;
+  background: #f4b7a2;
+  font-weight: 600;
+  transition: filter .15s, transform .02s;
+}
+.save-btn:hover:not(:disabled) { filter: brightness(0.97); }
+.save-btn:active:not(:disabled) { transform: translateY(1px); }
+.save-btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
 
 /* Grocery List */
 .grocery-list {
@@ -594,7 +653,7 @@
 
 .view-more-btn:hover {
   font-weight: 800;
-  border-color: #f26d3dc1;
+  border-color: #e8d5cec1;
   padding: .6rem 1.8rem;
 }
 
@@ -741,7 +800,7 @@
   max-width: 100%;
 }
 
-/* Optional: center text */
+
 .allergy-section {
   text-align: center;
   margin-bottom: 2rem;
@@ -906,7 +965,7 @@ input[type=number] {
   font-weight: 500;
 }
 
-/ * Loading states for backend integration */ .action-btn:disabled {
+/* Loading states for backend integration */ .action-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -954,8 +1013,7 @@ input[type=number] {
   border-radius: 4px;
 }
 
-/* E
-nhanced ask section for interactive chat */
+/* Enhanced ask section for interactive chat */
 .ask-section form {
   display: flex;
   gap: 10px;
@@ -976,28 +1034,22 @@ nhanced ask section for interactive chat */
   transition: all 0.2s ease;
 }
 
-.attach-btn:hover:not(:disabled) {
-  background-color: #ff5555;
-  transform: translateY(-1px);
-}
 
 /* Enhanced meal plan interactions */
 .view-meal-btn {
-  transition: all 0.2s ease;
+  transition: all 0.1s ease;
 }
 
 .view-meal-btn:hover {
-  background-color: #ff5555;
   transform: translateY(-1px);
 }
 
 /* Enhanced grocery list */
 .view-more-btn {
-  transition: all 0.2s ease;
+  transition: all 0.1s ease;
 }
 
 .view-more-btn:hover {
-  background-color: #ff5555;
   color: white;
   transform: translateY(-1px);
 }

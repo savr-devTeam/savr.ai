@@ -367,17 +367,18 @@ useEffect(() => {
       {showBudgetPopup && (
         <div className="popup-overlay" onClick={toggleBudgetPopup}>
           <div className="popup-box" onClick={(e) => e.stopPropagation()}>
-            <h2>Edit Weekly Budget</h2>
+            <h2>Enter weekly budget for groceries</h2>
             <input
               type="number"
-              className="popup-input"
+              className="budget-input"
               placeholder="Enter new budget amount..."
               value={newBudget}
               onChange={(e) => setNewBudget(e.target.value)}
             />
             <div className="popup-buttons">
-              <button onClick={toggleBudgetPopup}>Cancel</button>
+              <button className= "cancel-btn" onClick={toggleBudgetPopup}>✖</button>
               <button
+              
                 className="save-btn"
                 onClick={() => {
                   const budgetAmount = Number(newBudget);
