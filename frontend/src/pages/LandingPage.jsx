@@ -55,7 +55,7 @@ const LandingPage = ({onNavigate}) => {
             <button className="btn" style={{ marginTop: "50px" }}
              onClick={handleGetStarted}
             >
-              Get Started
+              Start Planning
             </button>
           </div>
         </div>
