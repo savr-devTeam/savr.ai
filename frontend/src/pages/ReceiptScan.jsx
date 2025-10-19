@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { useNavigation } from '../hooks/useNavigation'
 import './ReceiptScan.css'
 
-const ReceiptScan = ({ onNavigate }) => {
+const ReceiptScan = () => {
+  const navigate = useNavigation();
   const [receiptFile, setReceiptFile] = useState(null)
   const [isProcessing, setIsProcessing] = useState(false)
 
@@ -22,14 +24,14 @@ const ReceiptScan = ({ onNavigate }) => {
   return (
     <div className="receipt-scan-page">
       <header className="header">
-        <div className="logo-container" onClick={() => onNavigate('home')}>
+        <div className="logo-container" onClick={() => navigate('home')}>
           <img src="/savricon.png" alt="Savr Logo" className="logo-image" />
           <h1 className="logo">Savr</h1>
         </div>
         <nav className="nav-menu">
-          <button onClick={() => onNavigate('home')} className="nav-link">Home</button>
-          <button onClick={() => onNavigate('about')} className="nav-link">About Us</button>
-          <button onClick={() => onNavigate('contact')} className="nav-link">Contact Us</button>
+          <button onClick={() => navigate('home')} className="nav-link">Home</button>
+          <button onClick={() => navigate('about')} className="nav-link">About Us</button>
+          <button onClick={() => navigate('contact')} className="nav-link">Contact Us</button>
         </nav>
       </header>
 
@@ -56,8 +58,8 @@ const ReceiptScan = ({ onNavigate }) => {
               </div>
             )}
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="submit-button"
               disabled={!receiptFile || isProcessing}
             >

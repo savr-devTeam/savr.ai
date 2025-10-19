@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { useNavigation } from '../hooks/useNavigation'
 import './MealPlan.css'
 
-const MealPlan = ({ onNavigate }) => {
+const MealPlan = () => {
+  const navigate = useNavigation();
   const [preferences, setPreferences] = useState({
     budget: '',
     dietaryRestrictions: '',
@@ -29,14 +31,14 @@ const MealPlan = ({ onNavigate }) => {
   return (
     <div className="meal-plan-page">
       <header className="header">
-        <div className="logo-container" onClick={() => onNavigate('home')}>
+        <div className="logo-container" onClick={() => navigate('home')}>
           <img src="/savricon.png" alt="Savr Logo" className="logo-image" />
           <h1 className="logo">Savr</h1>
         </div>
         <nav className="nav-menu">
-          <button onClick={() => onNavigate('home')} className="nav-link">Home</button>
-          <button onClick={() => onNavigate('about')} className="nav-link">About Us</button>
-          <button onClick={() => onNavigate('contact')} className="nav-link">Contact Us</button>
+          <button onClick={() => navigate('home')} className="nav-link">Home</button>
+          <button onClick={() => navigate('about')} className="nav-link">About Us</button>
+          <button onClick={() => navigate('contact')} className="nav-link">Contact Us</button>
         </nav>
       </header>
 

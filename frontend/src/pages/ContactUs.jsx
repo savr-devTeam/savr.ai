@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { useNavigation } from '../hooks/useNavigation'
 import './ContactUs.css'
 
-const ContactUs = ({ onNavigate }) => {
+const ContactUs = () => {
+  const navigate = useNavigation();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -23,7 +25,7 @@ const ContactUs = ({ onNavigate }) => {
     // TODO: Implement contact form submission logic
     console.log('Contact form submitted:', formData)
     setIsSubmitted(true)
-    
+
     // Reset form after 3 seconds
     setTimeout(() => {
       setFormData({ name: '', email: '', subject: '', message: '' })
@@ -34,14 +36,14 @@ const ContactUs = ({ onNavigate }) => {
   return (
     <div className="contact-page">
       <header className="header">
-        <div className="logo-container" onClick={() => onNavigate('home')}>
+        <div className="logo-container" onClick={() => navigate('home')}>
           <img src="/savricon.png" alt="Savr Logo" className="logo-image" />
           <h1 className="logo">Savr</h1>
         </div>
         <nav className="nav-menu">
-          <button onClick={() => onNavigate('home')} className="nav-link">Home</button>
-          <button onClick={() => onNavigate('about')} className="nav-link">About Us</button>
-          <button onClick={() => onNavigate('contact')} className="nav-link active">Contact Us</button>
+          <button onClick={() => navigate('home')} className="nav-link">Home</button>
+          <button onClick={() => navigate('about')} className="nav-link">About Us</button>
+          <button onClick={() => navigate('contact')} className="nav-link active">Contact Us</button>
         </nav>
       </header>
 
@@ -49,7 +51,7 @@ const ContactUs = ({ onNavigate }) => {
         <section className="contact-section">
           <h2>Contact Us</h2>
           <p className="contact-intro">
-            Have questions, feedback, or suggestions? We'd love to hear from you! 
+            Have questions, feedback, or suggestions? We'd love to hear from you!
             Fill out the form below and we'll get back to you as soon as possible.
           </p>
 

@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { useNavigation } from '../hooks/useNavigation'
 import './Allergies.css'
 
-const Allergies = ({ onNavigate }) => {
+const Allergies = () => {
+  const navigate = useNavigation();
   const [selectedAllergies, setSelectedAllergies] = useState([])
   const [customAllergy, setCustomAllergy] = useState('')
   const [isSaved, setIsSaved] = useState(false)
@@ -41,8 +43,8 @@ const Allergies = ({ onNavigate }) => {
   const additionalAllergies = allAllergies.filter(a => a.category === 'additional')
 
   const handleToggleAllergy = (allergyId) => {
-    setSelectedAllergies(prev => 
-      prev.includes(allergyId) 
+    setSelectedAllergies(prev =>
+      prev.includes(allergyId)
         ? prev.filter(id => id !== allergyId)
         : [...prev, allergyId]
     )
@@ -66,7 +68,7 @@ const Allergies = ({ onNavigate }) => {
     // TODO: Save allergies to backend/local storage
     console.log('Saved allergies:', selectedAllergies)
     setIsSaved(true)
-    
+
     setTimeout(() => {
       setIsSaved(false)
     }, 3000)
@@ -84,14 +86,14 @@ const Allergies = ({ onNavigate }) => {
   return (
     <div className="allergies-page">
       <header className="header">
-        <div className="logo-container" onClick={() => onNavigate('home')}>
+        <div className="logo-container" onClick={() => navigate('home')}>
           <img src="/savricon.png" alt="Savr Logo" className="logo-image" />
           <h1 className="logo">Savr</h1>
         </div>
         <nav className="nav-menu">
-          <button onClick={() => onNavigate('home')} className="nav-link">Home</button>
-          <button onClick={() => onNavigate('meal-plan')} className="nav-link">Meal Plan</button>
-          <button onClick={() => onNavigate('about')} className="nav-link">About Us</button>
+          <button onClick={() => navigate('home')} className="nav-link">Home</button>
+          <button onClick={() => navigate('meal-plan')} className="nav-link">Meal Plan</button>
+          <button onClick={() => navigate('about')} className="nav-link">About Us</button>
         </nav>
       </header>
 
@@ -157,7 +159,7 @@ const Allergies = ({ onNavigate }) => {
                 onChange={(e) => setCustomAllergy(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleAddCustomAllergy()}
               />
-              <button 
+              <button
                 className="btn-add"
                 onClick={handleAddCustomAllergy}
                 disabled={!customAllergy.trim()}
