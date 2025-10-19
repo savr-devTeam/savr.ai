@@ -126,9 +126,15 @@ export const AuthProvider = ({ children }) => {
       });
 
       console.log('Callback response:', response.data);
+      
+      // Handle both direct object and stringified body responses
+      let responseData = response.data;
+      if (typeof responseData === 'string') {
+        responseData = JSON.parse(responseData);
+      }
 
-      if (response.data.success) {
-        const { user: userData, tokens: tokenData } = response.data;
+      if (responseData.success) {
+        const { user: userData, tokens: tokenData } = responseData;
         
         console.log('Setting user and tokens:', { userData, tokenData });
         
@@ -146,7 +152,7 @@ export const AuthProvider = ({ children }) => {
 
         return true;
       } else {
-        throw new Error('Authentication failed');
+        throw new Error(responseData.error || 'Authentication failed');
       }
     } catch (err) {
       console.error('Callback handling failed:', err);
