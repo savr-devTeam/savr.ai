@@ -108,22 +108,4 @@ We use [Conventional Commits](https://www.conventionalcommits.org/).
 
 ---
 
-## 👥 Team
-
-**savr-devTeam** - Building the future of AI-powered meal planning
-
----
-
-## 📝 Status
-
-- ✅ Frontend structure
-- ✅ Infrastructure as Code (CDK)
-- ✅ CI/CD pipelines
-- ✅ S3 upload workflow
-- 🚧 Receipt parsing (in progress)
-- 🚧 AI meal planning (in progress)
-- 📋 Auth (planned)
-
----
-
 **Built with ❤️ using AWS, React, and AI**
