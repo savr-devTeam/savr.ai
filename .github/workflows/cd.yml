@@ -171,9 +171,9 @@ jobs:
         working-directory: ./frontend
         run: |
           if [ "${{ inputs.environment }}" == "production" ]; then
-            vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
+            vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
           else
-            vercel --token=${{ secrets.VERCEL_TOKEN }}
+            vercel --yes --token=${{ secrets.VERCEL_TOKEN }}
           fi
 
   # Post-deployment tests
