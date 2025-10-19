@@ -20,6 +20,7 @@ const Dashboard = ({ onNavigate }) => {
   const [todaysMeals, setTodaysMeals] = useState(null);
   const [groceryItems, setGroceryItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [askInput, setAskInput] = useState("");
 
 
   // Popup toggles
@@ -218,6 +219,53 @@ const Dashboard = ({ onNavigate }) => {
     }
   };
 
+  const handleAskSubmit = async (e) => {
+    e.preventDefault();
+    if (!askInput.trim()) return;
+
+    setIsLoading(true);
+    try {
+      // For now, we'll handle specific queries and generate meal plans based on the ask
+      const lowerInput = askInput.toLowerCase();
+
+      if (lowerInput.includes('meal') || lowerInput.includes('recipe') || lowerInput.includes('cook')) {
+        // Generate meal plan based on the question
+        const userId = getUserId(user);
+        const preferences = {
+          budget: budget,
+          dietaryRestrictions: savedAllergies.join(', '),
+          nutritionGoal: 'maintenance',
+          caloricTarget: 2000,
+          customRequest: askInput // Add the user's specific request
+        };
+
+        const response = await generateMealPlan(preferences, userId);
+
+        if (response.success) {
+          await loadTodaysMeals();
+          alert(`✅ Generated meal plan based on: "${askInput}"`);
+        } else {
+          alert('❌ Failed to generate meal plan');
+        }
+      } else if (lowerInput.includes('substitute') || lowerInput.includes('replace')) {
+        alert(`🤖 Savr AI: For ingredient substitutions, try our meal planning feature! We can suggest alternatives based on your dietary needs.`);
+      } else if (lowerInput.includes('budget') || lowerInput.includes('cost') || lowerInput.includes('price')) {
+        alert(`💰 Your current weekly budget is $${budget}. You've spent $${spent}, leaving $${budget - spent} remaining.`);
+      } else if (lowerInput.includes('allerg') || lowerInput.includes('dietary')) {
+        const allergyText = savedAllergies.length > 0 ? savedAllergies.join(', ') : 'none set';
+        alert(`🚫 Your current allergies/restrictions: ${allergyText}`);
+      } else {
+        alert(`🤖 Savr AI: "${askInput}" - I can help with meal planning, recipes, ingredient substitutes, budget tracking, and dietary restrictions!`);
+      }
+
+      setAskInput('');
+    } catch (error) {
+      alert(`❌ Error: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Don't render if not authenticated (will redirect)
   if (!isAuthenticated) {
     return null;
@@ -274,10 +322,24 @@ const Dashboard = ({ onNavigate }) => {
           </div>
 
           <div className="ask-section">
-            <input type="text" placeholder="Ask Anything" className="ask-input" />
-            <button className="attach-btn">
-              <img src="/attachclip.png" className="attach-icon" alt="Attach" /> Attach
-            </button>
+            <form onSubmit={handleAskSubmit}>
+              <input
+                type="text"
+                placeholder="Ask Anything"
+                className="ask-input"
+                value={askInput}
+                onChange={(e) => setAskInput(e.target.value)}
+                disabled={isLoading}
+              />
+              <button
+                type="submit"
+                className="attach-btn"
+                disabled={isLoading || !askInput.trim()}
+              >
+                <img src="/attachclip.png" className="attach-icon" alt="Ask" />
+                {isLoading ? 'Thinking...' : 'Ask'}
+              </button>
+            </form>
 
             {/* Hidden file input for receipt upload */}
             <input
@@ -342,7 +404,12 @@ const Dashboard = ({ onNavigate }) => {
               </div>
             </button>
 
-            <button className="view-meal-btn">View Meal Plan 🍽️</button>
+            <button
+              className="view-meal-btn"
+              onClick={() => onNavigate('meal-plan')}
+            >
+              View Meal Plan 🍽️
+            </button>
           </section>
 
           {/* Bottom Row */}
@@ -427,7 +494,12 @@ const Dashboard = ({ onNavigate }) => {
                   </>
                 )}
               </ul>
-              <button className="view-more-btn">View More</button>
+              <button
+                className="view-more-btn"
+                onClick={() => handleQuickAction('upload')}
+              >
+                Add More Items
+              </button>
             </section>
           </div>
         </div>

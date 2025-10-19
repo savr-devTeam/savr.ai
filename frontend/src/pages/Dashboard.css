@@ -895,4 +895,69 @@ input[type=number] {
 .grocery-list ul li:hover {
   background-color: rgba(255, 107, 107, 0.1);
   border-radius: 4px;
+}/* E
+nhanced ask section for interactive chat */
+.ask-section form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.ask-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.attach-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.attach-btn {
+  transition: all 0.2s ease;
+}
+
+.attach-btn:hover:not(:disabled) {
+  background-color: #ff5555;
+  transform: translateY(-1px);
+}
+
+/* Enhanced meal plan interactions */
+.view-meal-btn {
+  transition: all 0.2s ease;
+}
+
+.view-meal-btn:hover {
+  background-color: #ff5555;
+  transform: translateY(-1px);
+}
+
+/* Enhanced grocery list */
+.view-more-btn {
+  transition: all 0.2s ease;
+}
+
+.view-more-btn:hover {
+  background-color: #ff5555;
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* Loading states */
+.action-btn.loading {
+  position: relative;
+}
+
+.action-btn.loading::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
