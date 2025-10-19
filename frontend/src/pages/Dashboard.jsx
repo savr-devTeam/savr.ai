@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./Dashboard.css";
-import { getUserPreferences, saveUserPreferences } from "../services/api";
+import { getUserPreferences, saveUserPreferences, generateMealPlan } from "../services/api";
 
 const MEALPLAN_KEY = "mealPlan.v1";
 
@@ -49,10 +49,13 @@ const Dashboard = ({ onNavigate, sessionId }) => {
   const [newExpense, setNewExpense] = useState("");
   const [lastReset, setLastReset] = useState(null);
   const [expenseAdded, setExpenseAdded] = useState(false);
+  const [askAnything, setAskAnything] = useState("");
   
   // Loading and error states for API calls
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [mealPlanLoading, setMealPlanLoading] = useState(false);
+  const [mealPlanError, setMealPlanError] = useState(null);
 
   // Popup toggles
   const toggleAllergyPopup = () => setShowAllergyPopup(!showAllergyPopup);
@@ -215,19 +218,62 @@ useEffect(() => {
     localStorage.setItem("spent", spent.toString());
   }, [spent]);
 
-  // NEW: Today's meals from the plan
-  const todayMeals = (() => {
-    if (!mealPlan) return null;
-    const today = isoDate();
-    const day = mealPlan.days?.find((d) => d.date === today);
-    return day?.meals || null;
-  })();
+  // Handle "Start meal planning for next week" button
+  const handleMealPlanning = async () => {
+    setMealPlanLoading(true);
+    setMealPlanError(null);
+    
+    try {
+      const preferences = {
+        allergies: selectedAllergies,
+        budget: budget,
+        customPreferences: askAnything
+      };
+      
+      console.log('Generating meal plan with preferences:', preferences);
+      
+      const mealPlan = await generateMealPlan(preferences, sessionId);
+      console.log('✅ Meal plan generated:', mealPlan);
+      
+      // Clear the ask anything field after successful generation
+      setAskAnything("");
+      
+      // Navigate to meal plan page
+      onNavigate('meals');
+    } catch (err) {
+      console.error('❌ Error generating meal plan:', err);
+      setMealPlanError(err.message || 'Failed to generate meal plan. Please try again.');
+    } finally {
+      setMealPlanLoading(false);
+    }
+  };
 
-  // NEW: Start planning CTA action
-  const startPlanning = async () => {
-    const plan = await generateMealPlanStub(); // swap with AI call later
-    setMealPlan(plan);
-    localStorage.setItem(MEALPLAN_KEY, JSON.stringify(plan));
+  // Handle "Upload receipt" button
+  const handleUploadReceipt = () => {
+    onNavigate('receipts');
+  };
+
+  // Handle "Find a substitute ingredient" button
+  const handleFindSubstitute = async () => {
+    if (!askAnything.trim()) {
+      setMealPlanError('Please describe what substitute you\'re looking for.');
+      return;
+    }
+    
+    setMealPlanLoading(true);
+    setMealPlanError(null);
+    
+    try {
+      // This could be used for a future "ingredient substitute" feature
+      // For now, we'll show a simple alert
+      alert(`🔍 Searching for substitutes for: ${askAnything}`);
+      setAskAnything("");
+    } catch (err) {
+      console.error('Error finding substitutes:', err);
+      setMealPlanError('Failed to find substitutes. Please try again.');
+    } finally {
+      setMealPlanLoading(false);
+    }
   };
 
   return (
@@ -253,17 +299,49 @@ useEffect(() => {
             <img src="/savricon.png" alt="Savr Icon" className="help-icon" />
             <h3>How can I help you?</h3>
 
-            <button className="action-btn">Find a substitute ingredient</button>
-            <button className="action-btn">Start meal planning for next week</button>
-            <button className="action-btn">Upload receipt</button>
+            <button 
+              className="action-btn"
+              onClick={handleFindSubstitute}
+              disabled={mealPlanLoading}
+            >
+              Find a substitute ingredient
+            </button>
+            <button 
+              className="action-btn"
+              onClick={handleMealPlanning}
+              disabled={mealPlanLoading}
+            >
+              {mealPlanLoading ? '⏳ Generating...' : 'Start meal planning for next week'}
+            </button>
+            <button 
+              className="action-btn"
+              onClick={handleUploadReceipt}
+              disabled={mealPlanLoading}
+            >
+              Upload receipt
+            </button>
           </div>
 
           <div className="ask-section">
-            <input type="text" placeholder="Ask Anything" className="ask-input" />
-            <button className="attach-btn">
+            <input 
+              type="text" 
+              placeholder="Ask Anything" 
+              className="ask-input"
+              value={askAnything}
+              onChange={(e) => setAskAnything(e.target.value)}
+              disabled={mealPlanLoading}
+            />
+            <button className="attach-btn" disabled={mealPlanLoading}>
               <img src="/attachclip.png" className="attach-icon" alt="Attach" /> Attach
             </button>
           </div>
+
+          {/* Error message for meal plan generation */}
+          {mealPlanError && (
+            <div className="error-message" style={{ marginTop: '10px', padding: '10px', backgroundColor: '#fee', borderRadius: '5px', color: '#c00' }}>
+              ⚠️ {mealPlanError}
+            </div>
+          )}
         </div>
 
         {/* RIGHT PANEL */}

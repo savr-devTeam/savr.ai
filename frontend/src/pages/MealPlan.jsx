@@ -1,40 +1,32 @@
-import { useState } from 'react'
-import { useAuth } from '../context/AuthContext'
+import { useState, useEffect } from 'react'
 import { useNavigation } from '../hooks/useNavigation'
 import { generateMealPlan } from '../services/api'
 import './MealPlan.css'
 
-const MealPlan = () => {
+const MealPlan = ({ sessionId }) => {
   const navigate = useNavigation();
-  const { user } = useAuth();
-  const [preferences, setPreferences] = useState({
-    budget: '',
-    dietaryRestrictions: '',
-    nutritionGoal: 'none',
-    caloricTarget: '',
-    proteinTarget: '',
-    carbTarget: '',
-    fatTarget: ''
-  })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [generatedPlan, setGeneratedPlan] = useState(null)
+  const [userPreferences, setUserPreferences] = useState(null)
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setPreferences(prev => ({
-      ...prev,
-      [name]: value
-    }))
-    // Clear error when user starts editing
-    if (error) setError(null)
-  }
+  // Load preferences from props or generate new plan
+  useEffect(() => {
+    if (sessionId) {
+      console.log('MealPlan loaded with sessionId:', sessionId)
+    }
+  }, [sessionId])
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const handleGenerateNewPlan = async (e) => {
+    e?.preventDefault()
     
-    if (!user?.userId) {
-      setError('You must be logged in to generate a meal plan')
+    if (!sessionId) {
+      setError('Session ID is required to generate a meal plan')
+      return
+    }
+
+    if (!userPreferences || (!userPreferences.budget && !userPreferences.allergies?.length)) {
+      setError('Please set at least a budget or dietary preferences on the dashboard first')
       return
     }
 
@@ -42,7 +34,7 @@ const MealPlan = () => {
     setError(null)
 
     try {
-      const mealPlan = await generateMealPlan(preferences, user.userId)
+      const mealPlan = await generateMealPlan(userPreferences, sessionId)
       setGeneratedPlan(mealPlan)
       console.log('✅ Meal plan generated:', mealPlan)
     } catch (err) {
@@ -52,6 +44,10 @@ const MealPlan = () => {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleBackToDashboard = () => {
+    navigate('home')
   }
 
   return (
@@ -70,8 +66,12 @@ const MealPlan = () => {
 
       <main className="main-content">
         <section className="preferences-section">
-          <h2>Create Your Meal Plan</h2>
-          <p>Customize your meal plan based on your budget, dietary needs, and nutrition goals</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h2>Your Meal Plan</h2>
+            <button onClick={handleBackToDashboard} className="secondary-button">
+              ← Back to Dashboard
+            </button>
+          </div>
 
           {/* Error Alert */}
           {error && (
@@ -84,135 +84,88 @@ const MealPlan = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="preferences-form">
-
-            <div className="form-group">
-              <label htmlFor="budget">Weekly Budget ($)</label>
-              <input
-                type="number"
-                id="budget"
-                name="budget"
-                value={preferences.budget}
-                onChange={handleChange}
-                placeholder="Enter your weekly grocery budget (e.g., 100)"
-                min="0"
-                step="0.01"
-                required
-              />
-              <small className="form-hint">Enter your weekly grocery budget in dollars</small>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="dietaryRestrictions">Dietary Restrictions / Allergies</label>
-              <textarea
-                id="dietaryRestrictions"
-                name="dietaryRestrictions"
-                value={preferences.dietaryRestrictions}
-                onChange={handleChange}
-                placeholder="Enter any allergies or dietary restrictions (e.g., peanuts, gluten, dairy, vegetarian, vegan)"
-                rows="4"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="nutritionGoal">Nutrition Goal</label>
-              <select
-                id="nutritionGoal"
-                name="nutritionGoal"
-                value={preferences.nutritionGoal}
-                onChange={handleChange}
-                required
+          {!generatedPlan ? (
+            <>
+              <p>Start by setting your preferences on the Dashboard, then return here to generate your personalized meal plan.</p>
+              <button 
+                onClick={handleGenerateNewPlan} 
+                className="submit-button"
+                disabled={isLoading || !sessionId}
               >
-                <option value="none">No Specific Goal</option>
-                <option value="weight-loss">Weight Loss / Diet</option>
-                <option value="muscle-gain">Muscle Gain / Bodybuilding</option>
-                <option value="maintenance">Maintenance</option>
-              </select>
-            </div>
-
-            {preferences.nutritionGoal !== 'none' && (
-              <>
-                <div className="form-group">
-                  <label htmlFor="caloricTarget">Daily Caloric Target (kcal)</label>
-                  <input
-                    type="number"
-                    id="caloricTarget"
-                    name="caloricTarget"
-                    value={preferences.caloricTarget}
-                    onChange={handleChange}
-                    placeholder="e.g., 2000"
-                    min="0"
-                  />
-                </div>
-
-                <div className="macro-targets">
-                  <h3>Macro Targets (Optional)</h3>
-
-                  <div className="form-group">
-                    <label htmlFor="proteinTarget">Protein (g)</label>
-                    <input
-                      type="number"
-                      id="proteinTarget"
-                      name="proteinTarget"
-                      value={preferences.proteinTarget}
-                      onChange={handleChange}
-                      placeholder="e.g., 150"
-                      min="0"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="carbTarget">Carbohydrates (g)</label>
-                    <input
-                      type="number"
-                      id="carbTarget"
-                      name="carbTarget"
-                      value={preferences.carbTarget}
-                      onChange={handleChange}
-                      placeholder="e.g., 200"
-                      min="0"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="fatTarget">Fat (g)</label>
-                    <input
-                      type="number"
-                      id="fatTarget"
-                      name="fatTarget"
-                      value={preferences.fatTarget}
-                      onChange={handleChange}
-                      placeholder="e.g., 65"
-                      min="0"
-                    />
-                  </div>
-                </div>
-              </>
-            )}
-
-            <button type="submit" className="submit-button" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <span className="spinner"></span>
-                  Generating Meal Plan...
-                </>
-              ) : (
-                'Generate Meal Plan'
-              )}
-            </button>
-          </form>
+                {isLoading ? (
+                  <>
+                    <span className="spinner"></span>
+                    Generating Meal Plan...
+                  </>
+                ) : (
+                  '🍽️ Generate Meal Plan'
+                )}
+              </button>
+            </>
+          ) : null}
         </section>
 
         {/* Generated Meal Plan Display */}
         {generatedPlan && (
           <section className="meal-plan-results">
-            <h3>Your Generated Meal Plan ✅</h3>
-            <div className="meal-plan-content">
-              <pre className="code-block">
-                {JSON.stringify(generatedPlan, null, 2)}
-              </pre>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h3>✅ Your Generated Meal Plan</h3>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button onClick={() => setGeneratedPlan(null)} className="secondary-button">
+                  ← New Plan
+                </button>
+                <button onClick={handleBackToDashboard} className="submit-button">
+                  Back to Dashboard
+                </button>
+              </div>
             </div>
-            <button onClick={() => setGeneratedPlan(null)} className="secondary-button">
+            
+            <div className="meal-plan-content">
+              {/* Display meal plan data - handles various response formats */}
+              {generatedPlan.meals ? (
+                <div>
+                  <h4>Meals for the Week:</h4>
+                  {Array.isArray(generatedPlan.meals) ? (
+                    <ul style={{ listStyle: 'none', padding: 0 }}>
+                      {generatedPlan.meals.map((meal, idx) => (
+                        <li key={idx} style={{ 
+                          marginBottom: '15px', 
+                          padding: '15px', 
+                          backgroundColor: '#f5f5f5', 
+                          borderRadius: '8px',
+                          borderLeft: '4px solid #10b981'
+                        }}>
+                          <strong>{meal.name || meal.title || `Meal ${idx + 1}`}</strong>
+                          {meal.description && <p>{meal.description}</p>}
+                          {meal.ingredients && (
+                            <>
+                              <p><strong>Ingredients:</strong></p>
+                              <ul>{Array.isArray(meal.ingredients) ? 
+                                meal.ingredients.map((ing, i) => <li key={i}>{ing}</li>)
+                                : <li>{meal.ingredients}</li>
+                              }</ul>
+                            </>
+                          )}
+                          {meal.nutrition && (
+                            <p><strong>Nutrition:</strong> {typeof meal.nutrition === 'string' ? meal.nutrition : JSON.stringify(meal.nutrition)}</p>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <pre style={{ overflow: 'auto', backgroundColor: '#f9f9f9', padding: '15px', borderRadius: '8px' }}>
+                      {JSON.stringify(generatedPlan.meals, null, 2)}
+                    </pre>
+                  )}
+                </div>
+              ) : (
+                <pre style={{ overflow: 'auto', backgroundColor: '#f9f9f9', padding: '15px', borderRadius: '8px' }}>
+                  {JSON.stringify(generatedPlan, null, 2)}
+                </pre>
+              )}
+            </div>
+
+            <button onClick={() => setGeneratedPlan(null)} className="secondary-button" style={{ marginTop: '20px' }}>
               Generate Another Plan
             </button>
           </section>

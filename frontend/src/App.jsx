@@ -66,10 +66,12 @@ function App() {
         return <LandingPage onNavigate={navigate} />;
       case "Dashboard":
         return <Dashboard onNavigate={navigate} sessionId={sessionId} />;
-      case "receipt-scan":
-        return <ReceiptScan onNavigate={navigate} sessionId={sessionId} />;
+      case "meals":
       case "meal-plan":
         return <MealPlan onNavigate={navigate} sessionId={sessionId} />;
+      case "receipts":
+      case "receipt-scan":
+        return <ReceiptScan onNavigate={navigate} sessionId={sessionId} />;
       case "about":
         return <AboutUs onNavigate={navigate} />;
       case "contact":
