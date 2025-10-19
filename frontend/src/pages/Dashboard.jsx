@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigation } from "../hooks/useNavigation";
 import { generateMealPlan, getMealPlans, uploadReceipt, parseReceipt } from "../services/api";
 import { getUserId, saveUserPreferences } from "../utils/userUtils";
 import "./Dashboard.css";
 
-const Dashboard = () => {
-  const navigate = useNavigation();
+const Dashboard = ({ onNavigate }) => {
   const { user, isAuthenticated, logout, loading } = useAuth();
   const [showAllergyPopup, setShowAllergyPopup] = useState(false);
   const [showBudgetPopup, setShowBudgetPopup] = useState(false);
@@ -62,9 +60,9 @@ const Dashboard = () => {
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       // Redirect to landing page if not authenticated
-      navigate('LandingPage');
+      onNavigate('LandingPage');
     }
-  }, [isAuthenticated, loading, navigate]);
+  }, [isAuthenticated, loading, onNavigate]);
 
   // Load & auto-reset spending every 7 days
   useEffect(() => {
@@ -408,7 +406,7 @@ const Dashboard = () => {
 
             <button
               className="view-meal-btn"
-              onClick={() => navigate('meal-plan')}
+              onClick={() => onNavigate('meal-plan')}
             >
               View Meal Plan 🍽️
             </button>

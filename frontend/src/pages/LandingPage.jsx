@@ -1,17 +1,15 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigation } from "../hooks/useNavigation";
 import "./LandingPage.css";
 import laptopImage1 from "/laptop1.png";
 import laptopImage2 from "/laptop2.png";
 
-const LandingPage = () => {
+const LandingPage = ({ onNavigate }) => {
   const { isAuthenticated, login, user } = useAuth();
-  const navigate = useNavigation();
 
   const handleGetStarted = () => {
     if (isAuthenticated) {
-      navigate("Dashboard");
+      onNavigate("Dashboard");
     } else {
       login();
     }

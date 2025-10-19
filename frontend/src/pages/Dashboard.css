@@ -906,7 +906,8 @@ input[type=number] {
   font-weight: 500;
 }
 
-/ * Loading states for backend integration */ .action-btn:disabled {
+/* Loading states for backend integration */
+.action-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
