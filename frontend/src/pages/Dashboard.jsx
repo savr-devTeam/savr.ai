@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useNavigation } from "../hooks/useNavigation";
+import { generateMealPlan, getMealPlans, uploadReceipt, parseReceipt } from "../services/api";
+import { getUserId, saveUserPreferences } from "../utils/userUtils";
 import "./Dashboard.css";
 
-const Dashboard = ({ onNavigate }) => {
+const Dashboard = () => {
+  const navigate = useNavigation();
   const { user, isAuthenticated, logout, loading } = useAuth();
   const [showAllergyPopup, setShowAllergyPopup] = useState(false);
   const [showBudgetPopup, setShowBudgetPopup] = useState(false);
@@ -13,6 +17,13 @@ const Dashboard = ({ onNavigate }) => {
   const [spent, setSpent] = useState(0);
   const [newExpense, setNewExpense] = useState("");
   const [lastReset, setLastReset] = useState(null);
+
+  // Backend integration state
+  const [todaysMeals, setTodaysMeals] = useState(null);
+  const [groceryItems, setGroceryItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [askInput, setAskInput] = useState("");
+
 
   // Popup toggles
   const toggleAllergyPopup = () => setShowAllergyPopup(!showAllergyPopup);
@@ -28,8 +39,16 @@ const Dashboard = ({ onNavigate }) => {
   };
 
   // Save allergies to dashboard
-  const saveAllergies = () => {
+  const saveAllergies = async () => {
     setSavedAllergies(selectedAllergies);
+
+    // Save to backend
+    const preferences = {
+      dietaryRestrictions: selectedAllergies.join(', '),
+      budget: budget
+    };
+    saveUserPreferences(preferences);
+
     toggleAllergyPopup();
   };
 
@@ -43,37 +62,37 @@ const Dashboard = ({ onNavigate }) => {
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       // Redirect to landing page if not authenticated
-      onNavigate('LandingPage');
+      navigate('LandingPage');
     }
-  }, [isAuthenticated, loading, onNavigate]);
+  }, [isAuthenticated, loading, navigate]);
 
   // Load & auto-reset spending every 7 days
-useEffect(() => {
-  const savedBudget = localStorage.getItem("budget");
-  const savedSpent = localStorage.getItem("spent");
+  useEffect(() => {
+    const savedBudget = localStorage.getItem("budget");
+    const savedSpent = localStorage.getItem("spent");
 
-  if (savedBudget) setBudget(Number(savedBudget));
-  if (savedSpent) setSpent(Number(savedSpent));
+    if (savedBudget) setBudget(Number(savedBudget));
+    if (savedSpent) setSpent(Number(savedSpent));
 
-  const now = new Date();
-  const savedLastReset = localStorage.getItem("lastReset");
-  const lastResetDate = savedLastReset ? new Date(savedLastReset) : null;
+    const now = new Date();
+    const savedLastReset = localStorage.getItem("lastReset");
+    const lastResetDate = savedLastReset ? new Date(savedLastReset) : null;
 
-  // find the most recent Sunday 11:59:59 PM
-  const lastSunday = new Date(now);
-  lastSunday.setDate(now.getDate() - ((now.getDay() + 7) % 7)); // go back to Sunday
-  lastSunday.setHours(23, 59, 59, 999);
+    // find the most recent Sunday 11:59:59 PM
+    const lastSunday = new Date(now);
+    lastSunday.setDate(now.getDate() - ((now.getDay() + 7) % 7)); // go back to Sunday
+    lastSunday.setHours(23, 59, 59, 999);
 
-  // if last reset was before the most recent Sunday night → reset
-  if (!lastResetDate || lastResetDate < lastSunday) {
-    setSpent(0);
-    localStorage.setItem("spent", "0");
-    localStorage.setItem("lastReset", now.toISOString());
-    setLastReset(now);
-  } else {
-    setLastReset(lastResetDate);
-  }
-}, []);
+    // if last reset was before the most recent Sunday night → reset
+    if (!lastResetDate || lastResetDate < lastSunday) {
+      setSpent(0);
+      localStorage.setItem("spent", "0");
+      localStorage.setItem("lastReset", now.toISOString());
+      setLastReset(now);
+    } else {
+      setLastReset(lastResetDate);
+    }
+  }, []);
 
   // save updates to localStorage
   useEffect(() => {
@@ -83,6 +102,40 @@ useEffect(() => {
   useEffect(() => {
     localStorage.setItem("spent", spent.toString());
   }, [spent]);
+
+  // Load today's meals when user is available
+  useEffect(() => {
+    if (user && isAuthenticated) {
+      loadTodaysMeals();
+    }
+  }, [user, isAuthenticated]);
+
+  const loadTodaysMeals = async () => {
+    if (!user) return;
+
+    try {
+      const userId = getUserId(user);
+      const today = new Date().toISOString().split('T')[0];
+      const response = await getMealPlans(userId, today);
+
+      if (response.success && response.mealPlans?.length > 0) {
+        const todayPlan = response.mealPlans[0];
+        const weeklyPlan = todayPlan.mealPlan?.weeklyPlan;
+
+        if (weeklyPlan) {
+          const dayName = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+          setTodaysMeals(weeklyPlan[dayName]);
+        }
+
+        // Update grocery list from meal plan
+        if (todayPlan.mealPlan?.shoppingList) {
+          setGroceryItems(todayPlan.mealPlan.shoppingList.slice(0, 4));
+        }
+      }
+    } catch (error) {
+      console.error('Error loading meals:', error);
+    }
+  };
 
   // Show loading state while checking authentication
   if (loading) {
@@ -95,6 +148,125 @@ useEffect(() => {
       </div>
     );
   }
+
+  // Handler functions for backend integration
+  const handleQuickAction = async (action) => {
+    switch (action) {
+      case 'substitute':
+        alert('🤖 Ingredient substitution feature coming soon!');
+        break;
+
+      case 'meal-plan':
+        await generateQuickMealPlan();
+        break;
+
+      case 'upload':
+        document.getElementById('receipt-upload').click();
+        break;
+    }
+  };
+
+  const generateQuickMealPlan = async () => {
+    setIsLoading(true);
+    try {
+      const userId = getUserId(user);
+      const preferences = {
+        budget: budget,
+        dietaryRestrictions: savedAllergies.join(', '),
+        nutritionGoal: 'maintenance',
+        caloricTarget: 2000
+      };
+
+      saveUserPreferences(preferences);
+      const response = await generateMealPlan(preferences, userId);
+
+      if (response.success) {
+        await loadTodaysMeals();
+        alert('✅ New meal plan generated!');
+      } else {
+        alert('❌ Failed to generate meal plan');
+      }
+    } catch (error) {
+      alert(`❌ Error: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleReceiptUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsLoading(true);
+    try {
+      // Upload receipt
+      const uploadResult = await uploadReceipt(file);
+
+      // Parse receipt
+      const parseResult = await parseReceipt(uploadResult.s3Key);
+
+      if (parseResult.success) {
+        // Update grocery list with parsed items
+        const newItems = parseResult.result.items?.map(item => item.name) || [];
+        setGroceryItems(prev => [...new Set([...prev, ...newItems.slice(0, 4)])]);
+
+        alert(`✅ Receipt processed! Found ${parseResult.result.items?.length || 0} items`);
+      } else {
+        alert('❌ Failed to process receipt');
+      }
+    } catch (error) {
+      alert(`❌ Error: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAskSubmit = async (e) => {
+    e.preventDefault();
+    if (!askInput.trim()) return;
+
+    setIsLoading(true);
+    try {
+      // For now, we'll handle specific queries and generate meal plans based on the ask
+      const lowerInput = askInput.toLowerCase();
+
+      if (lowerInput.includes('meal') || lowerInput.includes('recipe') || lowerInput.includes('cook')) {
+        // Generate meal plan based on the question
+        const userId = getUserId(user);
+        const preferences = {
+          budget: budget,
+          dietaryRestrictions: savedAllergies.join(', '),
+          nutritionGoal: 'maintenance',
+          caloricTarget: 2000,
+          customRequest: askInput // Add the user's specific request
+        };
+
+        const response = await generateMealPlan(preferences, userId);
+
+        if (response.success) {
+          await loadTodaysMeals();
+          alert(`✅ Generated meal plan based on: "${askInput}"`);
+        } else {
+          alert('❌ Failed to generate meal plan');
+        }
+      } else if (lowerInput.includes('substitute') || lowerInput.includes('replace')) {
+        alert(`🤖 Savr AI: For ingredient substitutions, try our meal planning feature! We can suggest alternatives based on your dietary needs.`);
+      } else if (lowerInput.includes('budget') || lowerInput.includes('cost') || lowerInput.includes('price')) {
+        alert(`💰 Your current weekly budget is $${budget}. You've spent $${spent}, leaving $${budget - spent} remaining.`);
+      } else if (lowerInput.includes('allerg') || lowerInput.includes('dietary')) {
+        const allergyText = savedAllergies.length > 0 ? savedAllergies.join(', ') : 'none set';
+        alert(`🚫 Your current allergies/restrictions: ${allergyText}`);
+      } else {
+        alert(`🤖 Savr AI: "${askInput}" - I can help with meal planning, recipes, ingredient substitutes, budget tracking, and dietary restrictions!`);
+      }
+
+      setAskInput('');
+    } catch (error) {
+      alert(`❌ Error: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Don't render if not authenticated (will redirect)
   if (!isAuthenticated) {
@@ -110,7 +282,7 @@ useEffect(() => {
           <span className="user-name">
             {user?.name || user?.email?.split('@')[0] || 'User'}
           </span>
-          <button 
+          <button
             className="logout-btn"
             onClick={logout}
             title="Sign Out"
@@ -130,16 +302,55 @@ useEffect(() => {
             <img src="/savricon.png" alt="Savr Icon" className="help-icon" />
             <h3>How can I help you?</h3>
 
-            <button className="action-btn">Find a substitute ingredient</button>
-            <button className="action-btn">Start meal planning for next week</button>
-            <button className="action-btn">Upload receipt</button>
+            <button
+              className="action-btn"
+              onClick={() => handleQuickAction('substitute')}
+            >
+              Find a substitute ingredient
+            </button>
+            <button
+              className="action-btn"
+              onClick={() => handleQuickAction('meal-plan')}
+              disabled={isLoading}
+            >
+              {isLoading ? '🤖 Generating...' : 'Start meal planning for next week'}
+            </button>
+            <button
+              className="action-btn"
+              onClick={() => handleQuickAction('upload')}
+            >
+              Upload receipt
+            </button>
           </div>
 
           <div className="ask-section">
-            <input type="text" placeholder="Ask Anything" className="ask-input" />
-            <button className="attach-btn">
-              <img src="/attachclip.png" className="attach-icon" alt="Attach" /> Attach
-            </button>
+            <form onSubmit={handleAskSubmit}>
+              <input
+                type="text"
+                placeholder="Ask Anything"
+                className="ask-input"
+                value={askInput}
+                onChange={(e) => setAskInput(e.target.value)}
+                disabled={isLoading}
+              />
+              <button
+                type="submit"
+                className="attach-btn"
+                disabled={isLoading || !askInput.trim()}
+              >
+                <img src="/attachclip.png" className="attach-icon" alt="Ask" />
+                {isLoading ? 'Thinking...' : 'Ask'}
+              </button>
+            </form>
+
+            {/* Hidden file input for receipt upload */}
+            <input
+              type="file"
+              id="receipt-upload"
+              accept="image/*,.pdf"
+              style={{ display: 'none' }}
+              onChange={handleReceiptUpload}
+            />
           </div>
         </div>
 
@@ -155,8 +366,12 @@ useEffect(() => {
               <div className="meal-detail">
                 <div className="meal-image-placeholder">🍳</div>
                 <div>
-                  <p className="meal-name">Vegetable Omelette</p>
-                  <p className="ingredients">List ingredients here</p>
+                  <p className="meal-name">
+                    {todaysMeals?.breakfast?.name || "Vegetable Omelette"}
+                  </p>
+                  <p className="ingredients">
+                    {todaysMeals?.breakfast?.ingredients?.join(', ') || "List ingredients here"}
+                  </p>
                 </div>
               </div>
             </button>
@@ -166,8 +381,12 @@ useEffect(() => {
               <div className="meal-detail">
                 <div className="meal-image-placeholder">🌯</div>
                 <div>
-                  <p className="meal-name">Turkey and Avocado Wrap</p>
-                  <p className="ingredients">List ingredients here</p>
+                  <p className="meal-name">
+                    {todaysMeals?.lunch?.name || "Turkey and Avocado Wrap"}
+                  </p>
+                  <p className="ingredients">
+                    {todaysMeals?.lunch?.ingredients?.join(', ') || "List ingredients here"}
+                  </p>
                 </div>
               </div>
             </button>
@@ -177,13 +396,22 @@ useEffect(() => {
               <div className="meal-detail">
                 <div className="meal-image-placeholder">🍛</div>
                 <div>
-                  <p className="meal-name">Chickpea Curry</p>
-                  <p className="ingredients">List ingredients here</p>
+                  <p className="meal-name">
+                    {todaysMeals?.dinner?.name || "Chickpea Curry"}
+                  </p>
+                  <p className="ingredients">
+                    {todaysMeals?.dinner?.ingredients?.join(', ') || "List ingredients here"}
+                  </p>
                 </div>
               </div>
             </button>
 
-            <button className="view-meal-btn">View Meal Plan 🍽️</button>
+            <button
+              className="view-meal-btn"
+              onClick={() => navigate('meal-plan')}
+            >
+              View Meal Plan 🍽️
+            </button>
           </section>
 
           {/* Bottom Row */}
@@ -247,18 +475,33 @@ useEffect(() => {
                 </button>
               </div>
             </section>
-             {/* Grocery List Card */}
+            {/* Grocery List Card */}
             <section className="card grocery-list">
               <div className="card-header">
                 <h3>🛒 Grocery List</h3>
               </div>
               <ul>
-                <li><input type="checkbox" /> 1 lb Chicken breast</li>
-                <li><input type="checkbox" /> 5 lbs Russet Potatoes</li>
-                <li><input type="checkbox" /> 1 Garlic clove</li>
-                <li><input type="checkbox" /> 1 Roma Tomato</li>
+                {groceryItems.length > 0 ? (
+                  groceryItems.map((item, index) => (
+                    <li key={index}>
+                      <input type="checkbox" /> {item}
+                    </li>
+                  ))
+                ) : (
+                  <>
+                    <li><input type="checkbox" /> 1 lb Chicken breast</li>
+                    <li><input type="checkbox" /> 5 lbs Russet Potatoes</li>
+                    <li><input type="checkbox" /> 1 Garlic clove</li>
+                    <li><input type="checkbox" /> 1 Roma Tomato</li>
+                  </>
+                )}
               </ul>
-              <button className="view-more-btn">View More</button>
+              <button
+                className="view-more-btn"
+                onClick={() => handleQuickAction('upload')}
+              >
+                Add More Items
+              </button>
             </section>
           </div>
         </div>
@@ -294,9 +537,8 @@ useEffect(() => {
               ].map((item) => (
                 <button
                   key={item}
-                  className={`allergy-option ${
-                    selectedAllergies.includes(item) ? "selected" : ""
-                  }`}
+                  className={`allergy-option ${selectedAllergies.includes(item) ? "selected" : ""
+                    }`}
                   onClick={() => toggleAllergy(item)}
                 >
                   {item}

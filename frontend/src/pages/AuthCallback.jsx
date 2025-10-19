@@ -1,19 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigation } from '../hooks/useNavigation'
 import './AuthCallback.css';
 
-function AuthCallback({ onNavigate }) {
+function AuthCallback() {
+  const navigate = useNavigation();
   const { handleCallback } = useAuth();
   const [status, setStatus] = useState('processing');
   const [message, setMessage] = useState('Processing authentication...');
 
   useEffect(() => {
     let processed = false; // Guard to prevent multiple executions
-    
+
     const processCallback = async () => {
       if (processed) return; // Skip if already processing
       processed = true;
-      
+
       try {
         // Extract code and state from URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -26,7 +28,7 @@ function AuthCallback({ onNavigate }) {
           setStatus('error');
           setMessage(errorDescription || 'Authentication failed');
           setTimeout(() => {
-            onNavigate('LandingPage');
+            navigate('LandingPage');
           }, 3000);
           return;
         }
@@ -35,7 +37,7 @@ function AuthCallback({ onNavigate }) {
           setStatus('error');
           setMessage('No authorization code received');
           setTimeout(() => {
-            onNavigate('LandingPage');
+            navigate('LandingPage');
           }, 3000);
           return;
         }
@@ -48,16 +50,16 @@ function AuthCallback({ onNavigate }) {
         if (success) {
           setStatus('success');
           setMessage('Login successful! Redirecting to dashboard...');
-          
+
           // Redirect to dashboard after short delay
           setTimeout(() => {
-            onNavigate('Dashboard');
+            navigate('Dashboard');
           }, 1500);
         } else {
           setStatus('error');
           setMessage('Authentication failed. Please try again.');
           setTimeout(() => {
-            onNavigate('LandingPage');
+            navigate('LandingPage');
           }, 3000);
         }
       } catch (err) {
@@ -65,7 +67,7 @@ function AuthCallback({ onNavigate }) {
         setStatus('error');
         setMessage('An error occurred during authentication');
         setTimeout(() => {
-          onNavigate('LandingPage');
+          navigate('LandingPage');
         }, 3000);
       }
     };
@@ -82,30 +84,30 @@ function AuthCallback({ onNavigate }) {
           )}
           {status === 'success' && (
             <svg className="checkmark" viewBox="0 0 52 52">
-              <circle className="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
-              <path className="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+              <circle className="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
+              <path className="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
             </svg>
           )}
           {status === 'error' && (
             <svg className="error-icon" viewBox="0 0 52 52">
-              <circle className="error-circle" cx="26" cy="26" r="25" fill="none"/>
-              <path className="error-cross" fill="none" d="M16 16 36 36 M36 16 16 36"/>
+              <circle className="error-circle" cx="26" cy="26" r="25" fill="none" />
+              <path className="error-cross" fill="none" d="M16 16 36 36 M36 16 16 36" />
             </svg>
           )}
         </div>
-        
+
         <h2 className="auth-status-title">
           {status === 'processing' && 'Authenticating...'}
           {status === 'success' && 'Success!'}
           {status === 'error' && 'Error'}
         </h2>
-        
+
         <p className="auth-status-message">{message}</p>
-        
+
         {status === 'error' && (
-          <button 
+          <button
             className="auth-retry-button"
-            onClick={() => onNavigate('LandingPage')}
+            onClick={() => navigate('LandingPage')}
           >
             Return to Home
           </button>

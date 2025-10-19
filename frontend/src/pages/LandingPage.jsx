@@ -1,15 +1,17 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
+import { useNavigation } from "../hooks/useNavigation";
 import "./LandingPage.css";
 import laptopImage1 from "/laptop1.png";
 import laptopImage2 from "/laptop2.png";
 
-const LandingPage = ({onNavigate}) => {
+const LandingPage = () => {
   const { isAuthenticated, login, user } = useAuth();
+  const navigate = useNavigation();
 
   const handleGetStarted = () => {
     if (isAuthenticated) {
-      onNavigate("Dashboard");
+      navigate("Dashboard");
     } else {
       login();
     }
@@ -19,14 +21,14 @@ const LandingPage = ({onNavigate}) => {
     <div className="landing-container">
       <section className="section light-bg">
         <div className="content">
-        <div className="landing-header">
-          <h1 className="pacifico-regular savr-header">Savr</h1>
-          {isAuthenticated && (
-            <div className="user-greeting">
-              <span>Welcome, {user?.name || user?.email || 'User'}!</span>
-            </div>
-          )}
-        </div>
+          <div className="landing-header">
+            <h1 className="pacifico-regular savr-header">Savr</h1>
+            {isAuthenticated && (
+              <div className="user-greeting">
+                <span>Welcome, {user?.name || user?.email || 'User'}!</span>
+              </div>
+            )}
+          </div>
 
 
           <div className="anybody">
@@ -65,7 +67,7 @@ const LandingPage = ({onNavigate}) => {
             </p>
 
             <button className="btn" style={{ marginTop: "50px" }}
-             onClick={handleGetStarted}
+              onClick={handleGetStarted}
             >
               {isAuthenticated ? "Go to Dashboard" : "Get Started"}
             </button>
@@ -87,8 +89,8 @@ const LandingPage = ({onNavigate}) => {
             <img src="/savricon.png" alt="Savr Logo" className="savr-logo" />
             <h2>
               Hi, I’m <span className="highlight">Savr</span>,{" "}
-              the 
-              <br/>
+              the
+              <br />
               <span className="highlight">AI kitchen companion.</span>
             </h2>
           </div>
@@ -105,7 +107,7 @@ const LandingPage = ({onNavigate}) => {
           </p>
 
           <button className="btn" style={{ marginTop: "40px" }}
-           onClick={handleGetStarted}>
+            onClick={handleGetStarted}>
             {isAuthenticated ? "Go to Dashboard" : "Start Planning"}
           </button>
         </div>
