@@ -161,9 +161,9 @@ def generate_meal_plan_with_ai(preferences, grocery_items):
         # Create the prompt for Claude
         prompt = create_meal_plan_prompt(preferences, grocery_items)
         
-        # Call Bedrock Claude
+        # Call Bedrock Claude 4.5 Sonnet (most intelligent model)
         response = bedrock_runtime.invoke_model(
-            modelId='anthropic.claude-3-5-sonnet-20241022-v2:0',
+            modelId='us.anthropic.claude-sonnet-4-5-20250514-v1:0',
             body=json.dumps({
                 'anthropic_version': 'bedrock-2023-05-31',
                 'max_tokens': 4000,

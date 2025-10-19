@@ -109,9 +109,9 @@ def analyze_receipt_with_bedrock(receipt_data, user_preferences):
         # Create AI prompt
         prompt = create_analysis_prompt(items, user_preferences)
         
-        # Call Bedrock Claude
+        # Call Bedrock Claude 4.5 Sonnet (most intelligent model)
         response = bedrock_runtime.invoke_model(
-            modelId='anthropic.claude-3-5-sonnet-20241022-v2:0',
+            modelId='us.anthropic.claude-sonnet-4-5-20250514-v1:0',
             body=json.dumps({
                 'anthropic_version': 'bedrock-2023-05-31',
                 'max_tokens': 3000,
