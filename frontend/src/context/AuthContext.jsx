@@ -125,8 +125,12 @@ export const AuthProvider = ({ children }) => {
         state
       });
 
+      console.log('Callback response:', response.data);
+
       if (response.data.success) {
         const { user: userData, tokens: tokenData } = response.data;
+        
+        console.log('Setting user and tokens:', { userData, tokenData });
         
         // Store in state
         setUser(userData);
