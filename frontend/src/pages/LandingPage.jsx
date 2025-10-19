@@ -24,9 +24,6 @@ const LandingPage = ({onNavigate}) => {
           {isAuthenticated && (
             <div className="user-greeting">
               <span>Welcome, {user?.name || user?.email || 'User'}!</span>
-              <button className="dashboard-btn" onClick={() => onNavigate("Dashboard")}>
-                Go to Dashboard
-              </button>
             </div>
           )}
         </div>
