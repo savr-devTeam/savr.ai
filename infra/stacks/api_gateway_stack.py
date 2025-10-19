@@ -25,6 +25,23 @@ class ApiGatewayStack(Stack):
 
         if lambda_functions:
             # Create API resources and methods
+            
+            # /auth/login endpoint
+            auth_resource = self.api.root.add_resource("auth")
+            login_resource = auth_resource.add_resource("login")
+            login_integration = apigateway.LambdaIntegration(
+                lambda_functions.get("auth_login")
+            )
+            login_resource.add_method("GET", login_integration)
+            
+            # /auth/callback endpoint
+            callback_resource = auth_resource.add_resource("callback")
+            callback_integration = apigateway.LambdaIntegration(
+                lambda_functions.get("auth_callback")
+            )
+            callback_resource.add_method("POST", callback_integration)
+            callback_resource.add_method("GET", callback_integration)
+            
             # /generate-plan endpoint
             generate_plan_resource = self.api.root.add_resource("generate-plan")
             generate_plan_integration = apigateway.LambdaIntegration(

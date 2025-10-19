@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-// Use environment variable or fallback to EC2 backend
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://3.136.22.169:3001'
+// Use environment variable or fallback to Lambda API Gateway
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://2bficji0m1.execute-api.us-east-2.amazonaws.com/prod'
 
 const api = axios.create({
     baseURL: API_BASE_URL,

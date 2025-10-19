@@ -23,6 +23,40 @@ class LambdaStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
 
 
+        # Auth functions
+        self.auth_login_function = _lambda.Function(
+            self,
+            "AuthLoginFunction",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            handler="handler.lambda_handler",
+            code=_lambda.Code.from_asset("../backend/lambdas/auth_login"),
+            timeout=Duration.seconds(10),
+            memory_size=128,
+            role=iam_role,
+            environment={
+                "COGNITO_DOMAIN": "https://us-east-1lwfygbjd9.auth.us-east-1.amazoncognito.com",
+                "COGNITO_CLIENT_ID": "68r61tb357f3dgk0lpsors0bsk",
+                "REDIRECT_URI": "https://savr-ai-one.vercel.app/auth/callback",
+            },
+        )
+
+        self.auth_callback_function = _lambda.Function(
+            self,
+            "AuthCallbackFunction",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            handler="handler.lambda_handler",
+            code=_lambda.Code.from_asset("../backend/lambdas/auth_callback"),
+            timeout=Duration.seconds(10),
+            memory_size=128,
+            role=iam_role,
+            environment={
+                "COGNITO_DOMAIN": "https://us-east-1lwfygbjd9.auth.us-east-1.amazoncognito.com",
+                "COGNITO_CLIENT_ID": "68r61tb357f3dgk0lpsors0bsk",
+                "COGNITO_CLIENT_SECRET": "your_client_secret_here",  # Will be updated via env vars
+                "REDIRECT_URI": "https://savr-ai-one.vercel.app/auth/callback",
+            },
+        )
+
         self.api_upload_function = _lambda.Function(
             self,
             "ApiUploadFunction",
