@@ -52,7 +52,7 @@ class LambdaStack(Stack):
             environment={
                 "COGNITO_DOMAIN": "https://us-east-1lwfygbjd9.auth.us-east-1.amazoncognito.com",
                 "COGNITO_CLIENT_ID": "68r61tb357f3dgk0lpsors0bsk",
-                "COGNITO_CLIENT_SECRET": "your_client_secret_here",  # Will be updated via env vars
+                "COGNITO_CLIENT_SECRET": os.environ.get("COGNITO_CLIENT_SECRET", "your_client_secret_here"),
                 "REDIRECT_URI": "https://savr-ai-one.vercel.app/auth/callback",
             },
         )

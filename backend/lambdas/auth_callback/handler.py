@@ -15,10 +15,15 @@ def lambda_handler(event, context):
     Handle Cognito OAuth callback and exchange code for tokens
     """
     try:
-        # Get query parameters from event
+        # Get parameters - they could be in query string OR request body
         query_params = event.get('queryStringParameters', {}) or {}
-        code = query_params.get('code')
-        state = query_params.get('state')
+        body_params = json.loads(event.get('body', '{}')) if event.get('body') else {}
+        
+        # Try to get from query params first (for GET requests), then body (for POST requests)
+        code = query_params.get('code') or body_params.get('code')
+        state = query_params.get('state') or body_params.get('state')
+        code_verifier = body_params.get('codeVerifier')
+        
         error = query_params.get('error')
         error_description = query_params.get('error_description')
         
@@ -29,6 +34,9 @@ def lambda_handler(event, context):
         if not code or not state:
             return error_response(400, 'Missing code or state parameter')
         
+        if not code_verifier:
+            return error_response(400, 'Missing code verifier')
+        
         # Get environment variables
         cognito_domain = os.environ.get('COGNITO_DOMAIN')
         client_id = os.environ.get('COGNITO_CLIENT_ID')
@@ -37,13 +45,6 @@ def lambda_handler(event, context):
         
         if not all([cognito_domain, client_id, client_secret, redirect_uri]):
             return error_response(500, 'Missing Cognito configuration')
-        
-        # Get code_verifier from request body (frontend sends it)
-        body = json.loads(event.get('body', '{}')) if event.get('body') else {}
-        code_verifier = body.get('codeVerifier')
-        
-        if not code_verifier:
-            return error_response(400, 'Missing code verifier')
         
         # Exchange code for tokens
         token_endpoint = f"{cognito_domain}/oauth2/token"
@@ -95,10 +96,12 @@ def lambda_handler(event, context):
         except urllib.error.HTTPError as e:
             error_body = e.read().decode('utf-8')
             print(f"Token exchange failed: {error_body}")
-            return error_response(400, 'Failed to exchange authorization code for tokens')
+            return error_response(400, f'Failed to exchange authorization code for tokens: {error_body}')
     
     except Exception as e:
         print(f"Error in auth callback: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return error_response(500, str(e))
 
 
