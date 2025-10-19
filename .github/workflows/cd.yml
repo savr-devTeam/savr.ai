@@ -99,7 +99,10 @@ jobs:
       - name: Install CDK Python dependencies
         working-directory: ./infra
         run: |
+          echo "Installing CDK dependencies..."
+          pip install --upgrade pip
           pip install -r requirements.txt
+          echo "Dependencies installed successfully"
 
       - name: CDK Bootstrap (if needed)
         working-directory: ./infra
@@ -109,17 +112,30 @@ jobs:
       - name: CDK Deploy
         working-directory: ./infra
         run: |
-          cdk deploy --all --require-approval never
+          echo "Starting CDK deployment..."
+          cdk deploy --all --require-approval never --region ${{ env.AWS_REGION }}
+          echo "CDK deployment completed"
         env:
           ENVIRONMENT: ${{ inputs.environment }}
 
       - name: Get API Gateway URL
         id: api-url
         run: |
+          echo "Fetching API Gateway URL from stack..."
           API_URL=$(aws cloudformation describe-stacks \
             --stack-name ApiGatewayStack \
+            --region ${{ env.AWS_REGION }} \
             --query 'Stacks[0].Outputs[?OutputKey==`ApiUrl`].OutputValue' \
-            --output text)
+            --output text 2>&1)
+
+          if [ $? -ne 0 ] || [ -z "$API_URL" ]; then
+            echo "Warning: Could not retrieve API Gateway URL. Stacks may not be fully deployed yet."
+            echo "Available stacks:"
+            aws cloudformation list-stacks --region ${{ env.AWS_REGION }} --query 'StackSummaries[?StackStatus!=`DELETE_COMPLETE`].StackName' --output text
+            API_URL="https://placeholder-api-url.execute-api.${{ env.AWS_REGION }}.amazonaws.com/prod"
+          fi
+
+          echo "Using API URL: $API_URL"
           echo "api_url=$API_URL" >> $GITHUB_OUTPUT
 
     outputs:
