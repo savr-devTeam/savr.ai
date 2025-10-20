@@ -1,17 +1,15 @@
 import { useState } from 'react'
-import { useAuth } from '../context/AuthContext'
-import { useNavigation } from '../hooks/useNavigation'
-import { uploadReceipt, parseReceipt } from '../services/api'
+import { uploadReceipt, parseReceipt, analyzeReceiptAI } from '../services/api'
 import './ReceiptScan.css'
 
-const ReceiptScan = () => {
-  const navigate = useNavigation();
-  const { user } = useAuth();
+const ReceiptScan = ({ onNavigate, sessionId }) => {
   const [receiptFile, setReceiptFile] = useState(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
+  const [uploadStep, setUploadStep] = useState(null) // 'uploading', 'parsing', 'analyzing'
   const [error, setError] = useState(null)
   const [parsedData, setParsedData] = useState(null)
+  const [aiAnalysis, setAiAnalysis] = useState(null)
 
   const handleFileChange = (e) => {
     const file = e.target.files[0]
@@ -39,8 +37,8 @@ const ReceiptScan = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    if (!user?.userId) {
-      setError('You must be logged in to upload receipts')
+    if (!sessionId) {
+      setError('Session not initialized. Please refresh the page.')
       return
     }
 
@@ -52,23 +50,42 @@ const ReceiptScan = () => {
     setIsProcessing(true)
     setError(null)
     setUploadProgress(0)
+    setParsedData(null)
+    setAiAnalysis(null)
 
     try {
       // Step 1: Upload file to S3
       console.log('📤 Uploading receipt to S3...')
-      setUploadProgress(33)
-      const uploadResult = await uploadReceipt(receiptFile)
+      setUploadStep('uploading')
+      setUploadProgress(25)
+      const uploadResult = await uploadReceipt(receiptFile, sessionId)
       
       console.log('✅ Upload successful:', uploadResult)
-      setUploadProgress(66)
+      setUploadProgress(50)
 
       // Step 2: Parse receipt
       console.log('🔍 Parsing receipt...')
-      const parseResult = await parseReceipt(uploadResult.s3Key)
+      setUploadStep('parsing')
+      const parseResult = await parseReceipt(uploadResult.s3Key, sessionId)
       
       console.log('✅ Parse successful:', parseResult)
-      setUploadProgress(100)
       setParsedData(parseResult)
+      setUploadProgress(75)
+
+      // Step 3: AI Analysis
+      console.log('🤖 Running AI analysis...')
+      setUploadStep('analyzing')
+      try {
+        const analysisResult = await analyzeReceiptAI(uploadResult.s3Key, sessionId)
+        console.log('✅ AI analysis complete:', analysisResult)
+        setAiAnalysis(analysisResult)
+      } catch (aiErr) {
+        console.warn('⚠️ AI analysis skipped:', aiErr.message)
+        // Don't fail the whole process if AI analysis fails
+        setAiAnalysis({ error: 'AI analysis not available', message: aiErr.message })
+      }
+      
+      setUploadProgress(100)
       
       // Reset form
       setReceiptFile(null)
@@ -80,20 +97,21 @@ const ReceiptScan = () => {
     } finally {
       setIsProcessing(false)
       setUploadProgress(0)
+      setUploadStep(null)
     }
   }
 
   return (
     <div className="receipt-scan-page">
       <header className="header">
-        <div className="logo-container" onClick={() => navigate('home')}>
+        <div className="logo-container" onClick={() => onNavigate('home')}>
           <img src="/savricon.png" alt="Savr Logo" className="logo-image" />
           <h1 className="logo">Savr</h1>
         </div>
         <nav className="nav-menu">
-          <button onClick={() => navigate('home')} className="nav-link">Home</button>
-          <button onClick={() => navigate('about')} className="nav-link">About Us</button>
-          <button onClick={() => navigate('contact')} className="nav-link">Contact Us</button>
+          <button onClick={() => onNavigate('home')} className="nav-link">Home</button>
+          <button onClick={() => onNavigate('about')} className="nav-link">About Us</button>
+          <button onClick={() => onNavigate('contact')} className="nav-link">Contact Us</button>
         </nav>
       </header>
 
@@ -134,7 +152,7 @@ const ReceiptScan = () => {
               </div>
             )}
 
-            {/* Upload Progress Bar */}
+            {/* Upload Progress Bar with Steps */}
             {isProcessing && uploadProgress > 0 && (
               <div className="progress-container">
                 <div className="progress-bar">
@@ -144,8 +162,9 @@ const ReceiptScan = () => {
                   />
                 </div>
                 <p className="progress-text">
-                  {uploadProgress === 33 && '📤 Uploading...'}
-                  {uploadProgress === 66 && '🔍 Parsing...'}
+                  {uploadStep === 'uploading' && '📤 Uploading receipt...'}
+                  {uploadStep === 'parsing' && '🔍 Parsing receipt data...'}
+                  {uploadStep === 'analyzing' && '🤖 Running AI analysis...'}
                   {uploadProgress === 100 && '✅ Complete!'}
                 </p>
               </div>
@@ -177,7 +196,24 @@ const ReceiptScan = () => {
                 {JSON.stringify(parsedData, null, 2)}
               </pre>
             </div>
-            <button onClick={() => setParsedData(null)} className="secondary-button">
+
+            {/* AI Analysis Display */}
+            {aiAnalysis && (
+              <div className="ai-analysis-section">
+                <h4>🤖 AI Analysis</h4>
+                {aiAnalysis.error ? (
+                  <p className="ai-error">{aiAnalysis.message}</p>
+                ) : (
+                  <div className="ai-insights">
+                    <pre className="code-block">
+                      {JSON.stringify(aiAnalysis, null, 2)}
+                    </pre>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <button onClick={() => { setParsedData(null); setAiAnalysis(null); }} className="secondary-button">
               Scan Another Receipt
             </button>
           </section>
