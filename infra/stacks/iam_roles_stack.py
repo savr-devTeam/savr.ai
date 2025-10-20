@@ -99,7 +99,7 @@ class IamRolesStack(Stack):
             )
         )
 
-        # Bedrock permissions - Scoped to specific models
+        # Bedrock permissions - Scoped to specific models and inference profiles
         self.lambda_execution_role.add_to_policy(
             iam.PolicyStatement(
                 sid="BedrockAccess",
@@ -109,10 +109,24 @@ class IamRolesStack(Stack):
                     "bedrock:InvokeModelWithResponseStream",
                 ],
                 resources=[
-                    # Claude 3.5 Sonnet
-                    Fn.sub("arn:aws:bedrock:${AWS::Region}::foundation-model/anthropic.claude-3-5-sonnet-20240620-v1:0"),
-                    # Add other models as needed
+                    # Claude inference profiles (cross-region, need both us-east-1 and us-east-2)
+                    "arn:aws:bedrock:us-east-1:422228628828:inference-profile/us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+                    "arn:aws:bedrock:us-east-2:422228628828:inference-profile/us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+                    # Foundation models
+                    Fn.sub("arn:aws:bedrock:*::foundation-model/anthropic.claude-*"),
                 ]
+            )
+        )
+        
+        # AWS Marketplace permissions for Bedrock model access
+        self.lambda_execution_role.add_to_policy(
+            iam.PolicyStatement(
+                sid="BedrockMarketplaceAccess",
+                effect=iam.Effect.ALLOW,
+                actions=[
+                    "aws-marketplace:ViewSubscriptions",
+                ],
+                resources=["*"]
             )
         )
 
