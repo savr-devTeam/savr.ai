@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./Dashboard.css";
-import { getUserPreferences, saveUserPreferences, generateMealPlan } from "../services/api";
+import {
+  getUserPreferences,
+  saveUserPreferences,
+  generateMealPlan,
+} from "../services/api";
 
 const MEALPLAN_KEY = "mealPlan.v1";
 const GROCERY_KEY = "groceryList.v1";
@@ -10,16 +14,17 @@ function isoDate(d = new Date()) {
   const z = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
   return z.toISOString().slice(0, 10);
 }
-const uid = () =>
-  (crypto?.randomUUID?.() || `id-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+const uid =
+  () =>
+    (crypto?.randomUUID?.() ||
+      `id-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
 
-// Build a stable fingerprint of all ingredients in a plan
 function planSignature(plan) {
   if (!plan?.days?.length) return "";
   const all = [];
-  for (const d of plan.days) {
+  for (const day of plan.days) {
     for (const L of ["Breakfast", "Lunch", "Dinner"]) {
-      (d.meals?.[L]?.ingredients || []).forEach(x =>
+      (day.meals?.[L]?.ingredients || []).forEach((x) =>
         all.push(String(x).trim().toLowerCase())
       );
     }
@@ -27,46 +32,17 @@ function planSignature(plan) {
   return all.filter(Boolean).sort().join("|");
 }
 
-/* ---------- TEMP: stub meal-plan generator (replace with your AI) ---------- */
-async function generateMealPlanStub() {
-  const today = new Date();
-  const labels = ["Breakfast", "Lunch", "Dinner"];
-  const names = {
-    Breakfast: "Vegetable Omelette",
-    Lunch: "Turkey and Avocado Wrap",
-    Dinner: "Chickpea Curry",
-  };
-  const ingredients = {
-    Breakfast: ["eggs", "spinach", "tomato"],
-    Lunch: ["tortilla", "turkey", "avocado"],
-    Dinner: ["chickpeas", "onion", "curry paste"],
-  };
-
-  const days = [...Array(7)].map((_, i) => {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    const date = isoDate(d);
-    const meals = {};
-    labels.forEach((L) => {
-      meals[L] = { name: names[L], ingredients: ingredients[L] };
-    });
-    return { date, meals };
-  });
-  return { generatedAt: new Date().toISOString(), days };
-}
-
-/* ---------- Dashboard ---------- */
-const Dashboard = ({ onNavigate }) => {
-  /* popups */
+/* ---------- component ---------- */
 const Dashboard = ({ onNavigate, sessionId }) => {
+  // popups
   const [showAllergyPopup, setShowAllergyPopup] = useState(false);
   const [showBudgetPopup, setShowBudgetPopup] = useState(false);
 
-  /* allergies */
+  // allergies
   const [selectedAllergies, setSelectedAllergies] = useState([]);
   const [savedAllergies, setSavedAllergies] = useState([]);
 
-  /* budget */
+  // budget
   const [budget, setBudget] = useState(0);
   const [newBudget, setNewBudget] = useState("");
   const [spent, setSpent] = useState(0);
@@ -74,76 +50,26 @@ const Dashboard = ({ onNavigate, sessionId }) => {
   const [lastReset, setLastReset] = useState(null);
   const [expenseAdded, setExpenseAdded] = useState(false);
 
-  /* meal plan (null = none yet) */
-  const [askAnything, setAskAnything] = useState("");
-  
-  // Loading and error states for API calls
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // meal plan & UI state
   const [mealPlan, setMealPlan] = useState(null);
+  const [askAnything, setAskAnything] = useState("");
+  const [loadingPrefs, setLoadingPrefs] = useState(false);
+  const [error, setError] = useState("");
   const [mealPlanLoading, setMealPlanLoading] = useState(false);
-  const [mealPlanError, setMealPlanError] = useState(null);
+  const [mealPlanError, setMealPlanError] = useState("");
 
-  /* grocery list */
+  // grocery list
   const [groceryList, setGroceryList] = useState(() => {
-    try { return JSON.parse(localStorage.getItem(GROCERY_KEY)) ?? []; }
-    catch { return []; }
+    try {
+      return JSON.parse(localStorage.getItem(GROCERY_KEY)) ?? [];
+    } catch {
+      return [];
+    }
   });
   const [newItem, setNewItem] = useState("");
 
-  // persist groceries
-  useEffect(() => {
-    localStorage.setItem(GROCERY_KEY, JSON.stringify(groceryList));
-  }, [groceryList]);
-
-  /* ---------- UI toggle handlers ---------- */
-  const toggleAllergyPopup = () => setShowAllergyPopup((s) => !s);
-  const toggleBudgetPopup = () => setShowBudgetPopup((s) => !s);
-
-  /* ---------- Budget helpers ---------- */
-  const handleAddExpense = () => {
-    const expenseAmount = Number(newExpense);
-    if (expenseAmount && expenseAmount > 0) {
-      setSpent((prev) => prev + expenseAmount);
-      setNewExpense("");
-      setExpenseAdded(true);
-      setTimeout(() => setExpenseAdded(false), 2000);
-    }
-  };
-
+  /* ---------- derived ---------- */
   const getProgress = () => (budget === 0 ? 0 : (spent / budget) * 100);
-  // Select allergies
-  const toggleAllergy = (item) => {
-    setSelectedAllergies((prev) =>
-      prev.includes(item) ? prev.filter((a) => a !== item) : [...prev, item]
-    );
-  };
-
-  // Save allergies to dashboard and backend
-  const saveAllergies = async () => {
-    setSavedAllergies(selectedAllergies);
-    toggleAllergyPopup();
-    
-    // Also save to backend
-    try {
-      await saveUserPreferences(sessionId, {
-        allergies: selectedAllergies,
-        budget,
-        spent
-      });
-      console.log('Allergies saved to backend');
-    } catch (err) {
-      console.error('Failed to save allergies to backend:', err);
-      setError('Failed to save allergies');
-    }
-  };
-
-  // Progress bar logic - allows over 100% for overspending
-  const getProgress = () => {
-    if (budget === 0) return 0;
-    return (spent / budget) * 100;
-  };
-
   const getProgressColor = () => {
     const p = getProgress();
     if (p > 100) return "#dc2626";
@@ -152,107 +78,65 @@ const Dashboard = ({ onNavigate, sessionId }) => {
     return "#10b981";
   };
 
-  const handleResetBudget = () => {
-  // Reset budget spending
-  const handleResetBudget = async () => {
-    setSpent(0);
-    setExpenseAdded(false);
-    localStorage.setItem("spent", "0");
-    localStorage.setItem("lastReset", new Date().toISOString());
-    try {
-      await saveUserPreferences(sessionId, {
-        allergies: selectedAllergies,
-        budget,
-        spent: 0
-      });
-    } catch (err) {
-      console.error('Failed to save budget reset to backend:', err);
-      setError('Failed to reset budget');
-    }
-  };
+  const todayMeals = (() => {
+    if (!mealPlan) return null;
+    const today = isoDate();
+    const day = mealPlan.days?.find((d) => d.date === today) ?? mealPlan.days?.[0];
+    return day?.meals || null;
+  })();
 
-  /* ---------- Allergies ---------- */
-  const toggleAllergy = (item) => {
-    setSelectedAllergies((prev) =>
-      prev.includes(item) ? prev.filter((a) => a !== item) : [...prev, item]
-    );
-  };
-
-  const saveAllergies = () => {
-    setSavedAllergies(selectedAllergies);
-    toggleAllergyPopup();
-  };
-
-  /* ---------- Load persisted stuff & weekly auto-reset ---------- */
+  /* ---------- effects ---------- */
+  // Persist groceries
   useEffect(() => {
-    // meal plan
-    const savedPlan = localStorage.getItem(MEALPLAN_KEY);
-    if (savedPlan) {
-      try { setMealPlan(JSON.parse(savedPlan)); } catch { setMealPlan(null); }
-  // Load user preferences from backend on mount
+    localStorage.setItem(GROCERY_KEY, JSON.stringify(groceryList));
+  }, [groceryList]);
+
+  // Load prefs from backend (fallback to localStorage) + load meal plan if present
   useEffect(() => {
-    const loadPreferences = async () => {
+    const load = async () => {
       try {
-        setLoading(true);
-        setError(null);
-        
-        console.log('Loading preferences for sessionId:', sessionId);
-        
-        const response = await getUserPreferences(sessionId);
-        console.log('Loaded preferences:', response);
-        
-        if (response && response.preferences) {
-          const prefs = response.preferences;
-          
-          // Load allergies
-          if (prefs.allergies && Array.isArray(prefs.allergies)) {
+        setLoadingPrefs(true);
+        setError("");
+        // load backend prefs
+        if (sessionId) {
+          const res = await getUserPreferences(sessionId);
+          const prefs = res?.preferences || {};
+          if (Array.isArray(prefs.allergies)) {
             setSavedAllergies(prefs.allergies);
             setSelectedAllergies(prefs.allergies);
           }
-          
-          // Load budget
-          if (prefs.budget) {
-            setBudget(Number(prefs.budget));
-          }
-          
-          // Load spent amount
-          if (prefs.spent) {
-            setSpent(Number(prefs.spent));
-          }
-          
-          console.log('Preferences loaded successfully');
+          if (prefs.budget != null) setBudget(Number(prefs.budget));
+          if (prefs.spent != null) setSpent(Number(prefs.spent));
+        } else {
+          // fallback to localStorage
+          const savedBudget = localStorage.getItem("budget");
+          const savedSpent = localStorage.getItem("spent");
+          if (savedBudget) setBudget(Number(savedBudget));
+          if (savedSpent) setSpent(Number(savedSpent));
         }
-      } catch (err) {
-        console.error('Failed to load preferences:', err);
-        setError('Could not load preferences. Using defaults.');
-        // Fall back to localStorage
-        const savedBudget = localStorage.getItem("budget");
-        const savedSpent = localStorage.getItem("spent");
-        if (savedBudget) setBudget(Number(savedBudget));
-        if (savedSpent) setSpent(Number(savedSpent));
+        // meal plan from localStorage
+        const savedPlan = localStorage.getItem(MEALPLAN_KEY);
+        if (savedPlan) {
+          try {
+            setMealPlan(JSON.parse(savedPlan));
+          } catch {
+            setMealPlan(null);
+          }
+        }
+      } catch (e) {
+        setError("Could not load preferences. Using defaults.");
       } finally {
-        setLoading(false);
+        setLoadingPrefs(false);
       }
     };
-    
-    if (sessionId) {
-      loadPreferences();
-    }
+    load();
   }, [sessionId]);
 
-  // Load & auto-reset spending every 7 days
-useEffect(() => {
-  const savedBudget = localStorage.getItem("budget");
-  const savedSpent = localStorage.getItem("spent");
-
-  if (savedBudget) setBudget(Number(savedBudget));
-  if (savedSpent) setSpent(Number(savedSpent));
-
+  // Weekly auto-reset (most recent Sunday 11:59:59 PM)
+  useEffect(() => {
     const now = new Date();
     const savedLastReset = localStorage.getItem("lastReset");
     const lastResetDate = savedLastReset ? new Date(savedLastReset) : null;
-
-    // most recent Sunday 11:59:59 PM
     const lastSunday = new Date(now);
     lastSunday.setDate(now.getDate() - ((now.getDay() + 7) % 7));
     lastSunday.setHours(23, 59, 59, 999);
@@ -267,18 +151,81 @@ useEffect(() => {
     }
   }, []);
 
-  useEffect(() => { localStorage.setItem("budget", budget.toString()); }, [budget]);
-  useEffect(() => { localStorage.setItem("spent", spent.toString()); }, [spent]);
+  // Persist budget & spent
+  useEffect(() => {
+    localStorage.setItem("budget", String(budget));
+  }, [budget]);
+  useEffect(() => {
+    localStorage.setItem("spent", String(spent));
+  }, [spent]);
 
-  /* ---------- Today’s meals ---------- */
-  const todayMeals = (() => {
-    if (!mealPlan) return null;
-    const today = isoDate();
-    const day = mealPlan.days?.find((d) => d.date === today);
-    return day?.meals || null;
-  })();
+  // Auto-sync groceries when meal plan changes (dedupe)
+  useEffect(() => {
+    if (!mealPlan) return;
+    const sig = planSignature(mealPlan);
+    const prev = localStorage.getItem("mealPlan.ingredients.sig");
+    if (sig && sig !== prev) {
+      addItemsFromPlan(mealPlan);
+      localStorage.setItem("mealPlan.ingredients.sig", sig);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mealPlan]);
 
-  /* ---------- Grocery helpers ---------- */
+  /* ---------- handlers ---------- */
+  const toggleAllergyPopup = () => setShowAllergyPopup((s) => !s);
+  const toggleBudgetPopup = () => setShowBudgetPopup((s) => !s);
+
+  const toggleAllergy = (item) => {
+    setSelectedAllergies((prev) =>
+      prev.includes(item) ? prev.filter((a) => a !== item) : [...prev, item]
+    );
+  };
+
+  const saveAllergies = async () => {
+    setSavedAllergies(selectedAllergies);
+    setShowAllergyPopup(false);
+    try {
+      if (sessionId) {
+        await saveUserPreferences(sessionId, {
+          allergies: selectedAllergies,
+          budget,
+          spent,
+        });
+      }
+    } catch {
+      setError("Failed to save allergies");
+    }
+  };
+
+  const handleAddExpense = () => {
+    const amount = Number(newExpense);
+    if (amount > 0) {
+      setSpent((s) => s + amount);
+      setNewExpense("");
+      setExpenseAdded(true);
+      setTimeout(() => setExpenseAdded(false), 2000);
+    }
+  };
+
+  const handleResetBudget = async () => {
+    setSpent(0);
+    setExpenseAdded(false);
+    localStorage.setItem("spent", "0");
+    localStorage.setItem("lastReset", new Date().toISOString());
+    try {
+      if (sessionId) {
+        await saveUserPreferences(sessionId, {
+          allergies: selectedAllergies,
+          budget,
+          spent: 0,
+        });
+      }
+    } catch {
+      setError("Failed to reset budget");
+    }
+  };
+
+  // Grocery list helpers
   function addManualItem() {
     const text = newItem.trim();
     if (!text) return;
@@ -288,30 +235,22 @@ useEffect(() => {
     ]);
     setNewItem("");
   }
-
   function toggleGrocery(id) {
     setGroceryList((prev) =>
       prev.map((it) => (it.id === id ? { ...it, checked: !it.checked } : it))
     );
   }
-
   function removeGrocery(id) {
     setGroceryList((prev) => prev.filter((it) => it.id !== id));
   }
-
-  // NEW: Clear ALL items
   function clearAllItems() {
     setGroceryList([]);
-    localStorage.removeItem("mealPlan.ingredients.sig"); // so next plan sync repopulates
+    localStorage.removeItem("mealPlan.ingredients.sig");
   }
-
-  // Auto-add ingredients from a plan (deduped, case-insensitive)
   function addItemsFromPlan(plan) {
     if (!plan?.days?.length) return;
-
     const existing = new Set(groceryList.map((i) => i.text.toLowerCase()));
     const incoming = [];
-
     for (const day of plan.days) {
       for (const label of ["Breakfast", "Lunch", "Dinner"]) {
         const ings = day.meals?.[label]?.ingredients || [];
@@ -325,92 +264,33 @@ useEffect(() => {
         }
       }
     }
-
     if (incoming.length) setGroceryList((prev) => [...incoming, ...prev]);
   }
 
-  /* ---------- Auto-sync groceries whenever plan changes ---------- */
-  useEffect(() => {
-    if (!mealPlan) return;
-    const sig = planSignature(mealPlan);
-    const prev = localStorage.getItem("mealPlan.ingredients.sig");
-    if (sig && sig !== prev) {
-      addItemsFromPlan(mealPlan);
-      localStorage.setItem("mealPlan.ingredients.sig", sig);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mealPlan]);
-
-  /* ---------- Start planning (generate plan) ---------- */
-  const startPlanning = async () => {
-    const plan = await generateMealPlanStub(); // replace with AI call
-    setMealPlan(plan);
-    localStorage.setItem(MEALPLAN_KEY, JSON.stringify(plan));
-    // auto-sync effect will add groceries
-  // Handle "Start meal planning for next week" button
+  // Generate plan via backend
   const handleMealPlanning = async () => {
     setMealPlanLoading(true);
-    setMealPlanError(null);
-    
+    setMealPlanError("");
     try {
-      const preferences = {
+      const payload = {
         allergies: selectedAllergies,
-        budget: budget,
-        customPreferences: askAnything
+        budget: budget || undefined,
+        customPreferences: askAnything || undefined,
       };
-      
-      console.log('Generating meal plan with preferences:', preferences);
-      
-      const mealPlanData = await generateMealPlan(preferences, sessionId);
-      console.log('✅ Meal plan generated:', mealPlanData);
-      
-      // Save meal plan to state
-      setMealPlan(mealPlanData);
-      
-      // Clear the ask anything field after successful generation
+      const plan = await generateMealPlan(payload, sessionId);
+      setMealPlan(plan);
+      localStorage.setItem(MEALPLAN_KEY, JSON.stringify(plan));
       setAskAnything("");
-      
-      // Navigate to meal plan page
-      onNavigate('meals');
-    } catch (err) {
-      console.error('❌ Error generating meal plan:', err);
-      setMealPlanError(err.message || 'Failed to generate meal plan. Please try again.');
+      // navigate if you want
+      // onNavigate("meals");
+    } catch (e) {
+      setMealPlanError(e.message || "Failed to generate meal plan. Please try again.");
     } finally {
       setMealPlanLoading(false);
     }
   };
 
-  // Handle "Upload receipt" button
-  const handleUploadReceipt = () => {
-    onNavigate('receipts');
-  };
-
-  // Handle "Find a substitute ingredient" button
-  const handleFindSubstitute = async () => {
-    if (!askAnything.trim()) {
-      setMealPlanError('Please describe what substitute you\'re looking for.');
-      return;
-    }
-    
-    setMealPlanLoading(true);
-    setMealPlanError(null);
-    
-    try {
-      // This could be used for a future "ingredient substitute" feature
-      // For now, we'll show a simple alert
-      alert(`🔍 Searching for substitutes for: ${askAnything}`);
-      setAskAnything("");
-    } catch (err) {
-      console.error('Error finding substitutes:', err);
-      setMealPlanError('Failed to find substitutes. Please try again.');
-    } finally {
-      setMealPlanLoading(false);
-    }
-  };
-
-  // Get today's meals from the meal plan
-  const todayMeals = mealPlan?.days?.[0]?.meals || null;
-
+  /* ---------- render ---------- */
   return (
     <div className="dashboard-container">
       {/* Header */}
@@ -426,7 +306,6 @@ useEffect(() => {
 
       <hr className="divider" />
 
-      {/* Main Content */}
       <main className="dashboard-content">
         {/* LEFT PANEL */}
         <div className="left-panel">
@@ -434,38 +313,23 @@ useEffect(() => {
             <img src="/savricon.png" alt="Savr Icon" className="help-icon" />
             <h3>How can I help you?</h3>
 
-            <button className="action-btn">Find a substitute ingredient</button>
-            <button className="action-btn" onClick={startPlanning}>
-              Start meal planning for next week
-            </button>
-            <button className="action-btn">Upload receipt</button>
-            <button 
-              className="action-btn"
-              onClick={handleFindSubstitute}
-              disabled={mealPlanLoading}
-            >
-              Find a substitute ingredient
-            </button>
-            <button 
+            <button
               className="action-btn"
               onClick={handleMealPlanning}
               disabled={mealPlanLoading}
             >
-              {mealPlanLoading ? '⏳ Generating...' : 'Start meal planning for next week'}
+              {mealPlanLoading ? "⏳ Generating…" : "Start meal planning for next week"}
             </button>
-            <button 
-              className="action-btn"
-              onClick={handleUploadReceipt}
-              disabled={mealPlanLoading}
-            >
+
+            <button className="action-btn" onClick={() => onNavigate("receipts")}>
               Upload receipt
             </button>
           </div>
 
           <div className="ask-section">
-            <input 
-              type="text" 
-              placeholder="Ask Anything" 
+            <input
+              type="text"
+              placeholder="Ask Anything"
               className="ask-input"
               value={askAnything}
               onChange={(e) => setAskAnything(e.target.value)}
@@ -476,10 +340,18 @@ useEffect(() => {
             </button>
           </div>
 
-          {/* Error message for meal plan generation */}
-          {mealPlanError && (
-            <div className="error-message" style={{ marginTop: '10px', padding: '10px', backgroundColor: '#fee', borderRadius: '5px', color: '#c00' }}>
-              ⚠️ {mealPlanError}
+          {(error || mealPlanError) && (
+            <div
+              className="error-message"
+              style={{
+                marginTop: 10,
+                padding: 10,
+                backgroundColor: "#fee",
+                borderRadius: 6,
+                color: "#c00",
+              }}
+            >
+              ⚠️ {error || mealPlanError}
             </div>
           )}
         </div>
@@ -490,7 +362,11 @@ useEffect(() => {
           <section className="card meal-plan">
             <div
               className="card-header"
-              style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
             >
               <div>
                 <h2>Today's Meal</h2>
@@ -503,25 +379,26 @@ useEffect(() => {
                 </p>
               </div>
 
-              {mealPlan ? (
+              {mealPlan && (
                 <button className="view-meal-btn" onClick={() => onNavigate("MealPlan")}>
                   View Meal Plan 🍽️
                 </button>
-              ) : null}
+              )}
             </div>
 
-            {/* Empty state (default) */}
             {!mealPlan ? (
               <div className="empty-plan">
-                <p style={{ margin: "8px 0 16px", opacity: 0.8 }}>
-                  No meal plan yet.
-                </p>
-                <button className="primary-btn" onClick={handleMealPlanning}>
-                  Start planning with Savr
+                <p style={{ margin: "8px 0 16px", opacity: 0.8 }}>No meal plan yet.</p>
+                <button
+                  className="primary-btn"
+                  onClick={handleMealPlanning}
+                  disabled={mealPlanLoading}
+                >
+                  {mealPlanLoading ? "⏳ Generating…" : "Start planning with Savr"}
                 </button>
               </div>
             ) : !todayMeals ? (
-              <p>Loading today's meals…</p>
+              <p>Loading today’s meals…</p>
             ) : (
               <>
                 {["Breakfast", "Lunch", "Dinner"].map((label) => {
@@ -598,7 +475,7 @@ useEffect(() => {
                 <p className="remaining">
                   ${(budget - spent).toFixed(2)} remaining
                   {spent > 0 && (
-                    <span style={{ marginLeft: "8px", fontSize: "0.9em", opacity: 0.7 }}>
+                    <span style={{ marginLeft: 8, fontSize: "0.9em", opacity: 0.7 }}>
                       (${spent.toFixed(2)} spent)
                     </span>
                   )}
@@ -606,7 +483,7 @@ useEffect(() => {
               ) : (
                 <p className="remaining" style={{ color: "#dc2626" }}>
                   ${(spent - budget).toFixed(2)} over budget!
-                  <span style={{ marginLeft: "8px", fontSize: "0.9em", opacity: 0.7 }}>
+                  <span style={{ marginLeft: 8, fontSize: "0.9em", opacity: 0.7 }}>
                     (${spent.toFixed(2)} spent of ${budget.toFixed(2)})
                   </span>
                 </p>
@@ -618,7 +495,7 @@ useEffect(() => {
                   placeholder="Add expense..."
                   value={newExpense}
                   onChange={(e) => setNewExpense(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleAddExpense()}
+                  onKeyDown={(e) => e.key === "Enter" && handleAddExpense()}
                   className="popup-input"
                   min="0"
                   step="0.01"
@@ -629,18 +506,20 @@ useEffect(() => {
                   disabled={!newExpense || Number(newExpense) <= 0}
                   style={{
                     opacity: !newExpense || Number(newExpense) <= 0 ? 0.5 : 1,
-                    cursor: !newExpense || Number(newExpense) <= 0 ? "not-allowed" : "pointer",
+                    cursor:
+                      !newExpense || Number(newExpense) <= 0 ? "not-allowed" : "pointer",
                   }}
                 >
                   Add
                 </button>
               </div>
+
               {expenseAdded && (
                 <p
                   style={{
                     color: "#10b981",
                     fontSize: "0.9em",
-                    marginTop: "8px",
+                    marginTop: 8,
                     animation: "fadeIn 0.3s ease",
                   }}
                 >
@@ -653,15 +532,15 @@ useEffect(() => {
                   className="reset-budget-btn"
                   onClick={handleResetBudget}
                   style={{
-                    marginTop: "12px",
+                    marginTop: 12,
                     padding: "8px 16px",
                     backgroundColor: spent > budget ? "#dc2626" : "#667eea",
                     color: "white",
                     border: "none",
-                    borderRadius: "8px",
+                    borderRadius: 8,
                     cursor: "pointer",
                     fontSize: "0.9em",
-                    fontWeight: "500",
+                    fontWeight: 500,
                     transition: "all 0.2s ease",
                     width: "100%",
                   }}
@@ -673,23 +552,27 @@ useEffect(() => {
               )}
             </section>
 
-            {/* Grocery List Card */}
+            {/* Grocery List */}
             <section className="card grocery-list">
-              <div className="card-header" style={{display: "flex", alignItems: "center", justifyContent: "space-between"}}>
+              <div
+                className="card-header"
+                style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}
+              >
                 <h3>🛒 Grocery List</h3>
               </div>
 
-              {/* add item */}
-
-
-              {/* items */}
               {groceryList.length === 0 ? (
-                <p className="placeholder-text" style={{marginTop:6}}>No items yet.</p>
+                <p className="placeholder-text" style={{ marginTop: 6 }}>
+                  No items yet.
+                </p>
               ) : (
                 <div className="grocery-scroll">
                   <ul className="grocery-ul">
                     {groceryList.map((item) => (
-                      <li key={item.id} className={`grocery-li ${item.checked ? "checked" : ""}`}>
+                      <li
+                        key={item.id}
+                        className={`grocery-li ${item.checked ? "checked" : ""}`}
+                      >
                         <label className="grocery-row">
                           <input
                             type="checkbox"
@@ -699,7 +582,11 @@ useEffect(() => {
                           <span className="grocery-text">{item.text}</span>
                           {item.source === "ai" && <span className="chip"></span>}
                         </label>
-                        <button className="icon-btn" aria-label="Remove" onClick={() => removeGrocery(item.id)}>
+                        <button
+                          className="icon-btn"
+                          aria-label="Remove"
+                          onClick={() => removeGrocery(item.id)}
+                        >
                           ✕
                         </button>
                       </li>
@@ -707,7 +594,8 @@ useEffect(() => {
                   </ul>
                 </div>
               )}
-              <div style={{display:"flex", gap:8, margin:"8px 0 14px", marginTop: "auto"}}>
+
+              <div style={{ display: "flex", gap: 8, margin: "8px 0 14px", marginTop: "auto" }}>
                 <input
                   type="text"
                   className="ask-input"
@@ -720,26 +608,43 @@ useEffect(() => {
                   Add
                 </button>
               </div>
-              <div style={{display:"flex", gap:8, justifyContent:"space-between", marginTop:12}}>
-                <button className="mini-btn danger" onClick={clearAllItems}>Clear all</button>
+
+              <div style={{ display: "flex", gap: 8, justifyContent: "space-between", marginTop: 12 }}>
+                <button className="mini-btn danger" onClick={clearAllItems}>
+                  Clear all
+                </button>
               </div>
             </section>
           </div>
         </div>
       </main>
 
-      {/* POPUP: Edit Allergies */}
+      {/* POPUP: Allergies */}
       {showAllergyPopup && (
         <div className="popup-overlay" onClick={toggleAllergyPopup}>
           <div className="popup-box" onClick={(e) => e.stopPropagation()}>
-            <button className="cancel-btn" onClick={toggleAllergyPopup}>✖</button>
+            <button className="cancel-btn" onClick={toggleAllergyPopup}>
+              ✖
+            </button>
             <div className="allergy-section">
               <h2>Allergies</h2>
               <h3>We want every meal to be safe and delicious — select any allergies you have below.</h3>
             </div>
 
             <div className="allergy-options">
-              {["Peanuts","Tree Nuts","Gluten","Dairy","Shellfish","Eggs","Soy","Sesame","Fish","Wheat","Other"].map((item) => (
+              {[
+                "Peanuts",
+                "Tree Nuts",
+                "Gluten",
+                "Dairy",
+                "Shellfish",
+                "Eggs",
+                "Soy",
+                "Sesame",
+                "Fish",
+                "Wheat",
+                "Other",
+              ].map((item) => (
                 <button
                   key={item}
                   className={`allergy-option ${selectedAllergies.includes(item) ? "selected" : ""}`}
@@ -751,13 +656,15 @@ useEffect(() => {
             </div>
 
             <div className="popup-buttons">
-              <button className="save-btn" onClick={saveAllergies}>Save</button>
+              <button className="save-btn" onClick={saveAllergies}>
+                Save
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* POPUP: Edit Budget */}
+      {/* POPUP: Budget */}
       {showBudgetPopup && (
         <div className="popup-overlay" onClick={toggleBudgetPopup}>
           <div className="popup-box" onClick={(e) => e.stopPropagation()}>
@@ -770,31 +677,35 @@ useEffect(() => {
               onChange={(e) => setNewBudget(e.target.value)}
             />
             <div className="popup-buttons">
-              <button className="cancel-btn" onClick={toggleBudgetPopup}>✖</button>
+              <button className="cancel-btn" onClick={toggleBudgetPopup}>
+                ✖
+              </button>
               <button
                 className="save-btn"
                 onClick={async () => {
-                  const budgetAmount = Number(newBudget);
-                  if (budgetAmount >= 0) {
-                    setBudget(budgetAmount);
+                  const amount = Number(newBudget);
+                  if (amount >= 0) {
+                    setBudget(amount);
                     setNewBudget("");
-                    toggleBudgetPopup();
+                    setShowBudgetPopup(false);
                     try {
-                      await saveUserPreferences(sessionId, {
-                        allergies: selectedAllergies,
-                        budget: budgetAmount,
-                        spent
-                      });
-                    } catch (err) {
-                      console.error('Failed to save budget to backend:', err);
-                      setError('Failed to save budget');
+                      if (sessionId) {
+                        await saveUserPreferences(sessionId, {
+                          allergies: selectedAllergies,
+                          budget: amount,
+                          spent,
+                        });
+                      }
+                    } catch {
+                      setError("Failed to save budget");
                     }
                   }
                 }}
                 disabled={!newBudget || Number(newBudget) < 0}
                 style={{
                   opacity: !newBudget || Number(newBudget) < 0 ? 0.5 : 1,
-                  cursor: !newBudget || Number(newBudget) < 0 ? "not-allowed" : "pointer",
+                  cursor:
+                    !newBudget || Number(newBudget) < 0 ? "not-allowed" : "pointer",
                 }}
               >
                 Save
