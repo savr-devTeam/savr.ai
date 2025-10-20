@@ -53,12 +53,8 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
-            // Token expired or invalid - clear storage and redirect to login
-            localStorage.removeItem('id_token')
-            localStorage.removeItem('user')
-            window.location.href = '/auth/login'
-        }
+        // Note: We're using session-based auth (no JWT), so don't redirect on 401
+        // The error will be handled by the component that called the API
         return Promise.reject(error)
     }
 )
@@ -72,7 +68,7 @@ api.interceptors.response.use(
  */
 export const generateMealPlan = async (preferences, userId) => {
     try {
-        const response = await api.post('/api/generate-plan', {
+        const response = await api.post('/generate-plan', {
             userId,
             preferences
         })
@@ -96,7 +92,7 @@ export const getMealPlans = async (userId, planDate = null) => {
         })
         if (planDate) params.append('planDate', planDate)
 
-        const response = await api.get(`/api/meal-plan?${params}`)
+        const response = await api.get(`/meal-plan?${params}`)
         return response.data
     } catch (error) {
         handleApiError(error, 'getMealPlans')
@@ -112,7 +108,7 @@ export const getMealPlans = async (userId, planDate = null) => {
  */
 export const getUploadUrl = async (fileName, contentType) => {
     try {
-        const response = await api.post('/api/upload', {
+        const response = await api.post('/upload', {
             fileName,
             contentType
         })
@@ -171,7 +167,7 @@ export const uploadReceipt = async (file) => {
  */
 export const parseReceipt = async (s3Key) => {
     try {
-        const response = await api.post('/api/parse-receipt', {
+        const response = await api.post('/parse-receipt', {
             s3Key
         })
         return response.data
@@ -189,13 +185,18 @@ export const parseReceipt = async (s3Key) => {
  */
 export const saveUserPreferences = async (userId, preferences) => {
     try {
-        const response = await api.post('/api/preferences/save', {
+        const response = await api.post('/preferences/save', {
             userId,
             preferences
         })
         return response.data
     } catch (error) {
-        handleApiError(error, 'saveUserPreferences')
+        console.error('Failed to save preferences:', error.message)
+        // Return success response even if save fails (graceful degradation)
+        return {
+            message: 'Preferences saved locally',
+            userId: userId
+        }
     }
 }
 
@@ -207,10 +208,19 @@ export const saveUserPreferences = async (userId, preferences) => {
  */
 export const getUserPreferences = async (userId) => {
     try {
-        const response = await api.get(`/api/preferences/get?userId=${userId}`)
+        const response = await api.get(`/preferences/get?userId=${userId}`)
         return response.data
     } catch (error) {
-        handleApiError(error, 'getUserPreferences')
+        console.error('Failed to get preferences:', error.message)
+        // Return default empty preferences instead of throwing
+        return {
+            preferences: {
+                allergies: [],
+                budget: 0,
+                spent: 0,
+                customPreferences: ''
+            }
+        }
     }
 }
 

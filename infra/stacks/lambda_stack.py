@@ -94,11 +94,14 @@ class LambdaStack(Stack):
         meal_plans_table.grant_read_write_data(self.generate_plan_function)
         user_preferences_table.grant_read_data(self.generate_plan_function)
         receipts_table.grant_read_data(self.generate_plan_function)
-        # Bedrock invoke permissions
+        # Bedrock invoke permissions (Claude 4.5 Sonnet)
         self.generate_plan_function.add_to_role_policy(
             iam.PolicyStatement(
                 actions=["bedrock:InvokeModel", "bedrock:InvokeAgent"],
-                resources=["*"],
+                resources=[
+                    "arn:aws:bedrock:*::foundation-model/us.anthropic.claude-sonnet-4-5*",
+                    "arn:aws:bedrock:*::foundation-model/anthropic.claude-*"
+                ],
             )
         )
 
@@ -163,10 +166,30 @@ class LambdaStack(Stack):
         # DDB access
         receipts_table.grant_read_write_data(self.analyze_receipt_ai_function)
         user_preferences_table.grant_read_data(self.analyze_receipt_ai_function)
-        # Bedrock invoke permissions for AI analysis
+        # Bedrock invoke permissions for AI analysis (Claude 4.5 Sonnet)
         self.analyze_receipt_ai_function.add_to_role_policy(
             iam.PolicyStatement(
                 actions=["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"],
-                resources=["*"],
+                resources=[
+                    "arn:aws:bedrock:*::foundation-model/us.anthropic.claude-sonnet-4-5*",
+                    "arn:aws:bedrock:*::foundation-model/anthropic.claude-*"
+                ],
             )
         )
+
+        # Preferences Function (GET/POST user preferences)
+        self.preferences_function = _lambda.Function(
+            self,
+            "PreferencesFunction",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            handler="handler.lambda_handler",
+            code=_lambda.Code.from_asset("../backend/lambdas/preferences"),
+            timeout=Duration.seconds(10),
+            memory_size=128,
+            role=iam_role,
+            environment={
+                "USER_PREFERENCES_TABLE": user_preferences_table.table_name,
+            },
+        )
+        # DDB read/write access for preferences
+        user_preferences_table.grant_read_write_data(self.preferences_function)

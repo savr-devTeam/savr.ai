@@ -109,9 +109,9 @@ def analyze_receipt_with_bedrock(receipt_data, user_preferences):
         # Create AI prompt
         prompt = create_analysis_prompt(items, user_preferences)
         
-        # Call Bedrock Claude
+        # Call Bedrock Claude 4.5 Sonnet via inference profile (most intelligent available model)
         response = bedrock_runtime.invoke_model(
-            modelId='anthropic.claude-3-5-sonnet-20241022-v2:0',
+            modelId='us.anthropic.claude-sonnet-4-5-20250929-v1:0',
             body=json.dumps({
                 'anthropic_version': 'bedrock-2023-05-31',
                 'max_tokens': 3000,
@@ -273,11 +273,28 @@ def create_fallback_insights(items):
     }
 
 
+def convert_floats_to_decimal(obj):
+    """
+    Recursively convert all float values to Decimal for DynamoDB
+    """
+    if isinstance(obj, list):
+        return [convert_floats_to_decimal(item) for item in obj]
+    elif isinstance(obj, dict):
+        return {key: convert_floats_to_decimal(value) for key, value in obj.items()}
+    elif isinstance(obj, float):
+        return Decimal(str(obj))
+    else:
+        return obj
+
+
 def update_receipt_with_insights(user_id, receipt_id, insights):
     """
     Update receipt in DynamoDB with AI insights
     """
     try:
+        # Convert floats to Decimal for DynamoDB
+        insights_decimal = convert_floats_to_decimal(insights)
+        
         receipts_table.update_item(
             Key={
                 'user_id': user_id,
@@ -285,7 +302,7 @@ def update_receipt_with_insights(user_id, receipt_id, insights):
             },
             UpdateExpression='SET ai_insights = :insights, analyzed_at = :timestamp',
             ExpressionAttributeValues={
-                ':insights': insights,
+                ':insights': insights_decimal,
                 ':timestamp': datetime.now().isoformat()
             }
         )

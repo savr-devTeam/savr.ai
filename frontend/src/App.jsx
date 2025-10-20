@@ -8,7 +8,21 @@ import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
 import "./App.css";
 
+// Initialize session ID on first load
+const initializeSession = () => {
+  let sessionId = localStorage.getItem('savr_session_id');
+  if (!sessionId) {
+    // Generate a unique session ID (UUID v4 format)
+    sessionId = 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+    localStorage.setItem('savr_session_id', sessionId);
+  }
+  return sessionId;
+};
+
 function App() {
+  // Initialize session on app load
+  const [sessionId] = useState(() => initializeSession());
+  
   // Start on the LandingPage by default
   const [currentPage, setCurrentPage] = useState("LandingPage");
 

@@ -2,6 +2,7 @@ import json
 import boto3
 import os
 from datetime import datetime
+from decimal import Decimal
 
 # Initialize AWS clients
 textract_client = boto3.client('textract')
@@ -38,7 +39,7 @@ def lambda_handler(event, context):
                         'success': True,
                         'message': 'Receipt processed successfully',
                         'result': result
-                    })
+                    }, cls=DecimalEncoder)
                 }
         
         # Handle direct API call
@@ -52,7 +53,7 @@ def lambda_handler(event, context):
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*'
                 },
-                'body': json.dumps({'error': 's3Key is required'})
+                'body': json.dumps({'error': 's3Key is required'}, cls=DecimalEncoder)
             }
         
         # Process the receipt
@@ -68,7 +69,7 @@ def lambda_handler(event, context):
                 'success': True,
                 'message': 'Receipt processed successfully',
                 'result': result
-            })
+            }, cls=DecimalEncoder)
         }
         
     except Exception as e:
@@ -83,7 +84,7 @@ def lambda_handler(event, context):
                 'success': False,
                 'error': 'Failed to process receipt',
                 'details': str(e)
-            })
+            }, cls=DecimalEncoder)
         }
 
 
@@ -178,11 +179,11 @@ def parse_textract_response(response):
                             item['name'] = field_value
                         elif field_type == 'PRICE':
                             try:
-                                # Clean price string and convert to float
+                                # Clean price string and convert to Decimal
                                 price_str = field_value.replace('$', '').replace(',', '')
-                                item['price'] = float(price_str)
+                                item['price'] = Decimal(price_str)
                             except:
-                                item['price'] = 0.0
+                                item['price'] = Decimal('0')
                         elif field_type == 'QUANTITY':
                             try:
                                 item['quantity'] = int(field_value)
@@ -192,7 +193,7 @@ def parse_textract_response(response):
                     # Only add items with at least a name
                     if item.get('name'):
                         # Set defaults
-                        item.setdefault('price', 0.0)
+                        item.setdefault('price', Decimal('0'))
                         item.setdefault('quantity', 1)
                         items.append(item)
         
@@ -202,7 +203,7 @@ def parse_textract_response(response):
                 summary_fields = doc.get('SummaryFields', [])
                 
                 # This is a basic fallback - your friend can improve this
-                total_amount = 0.0
+                total_amount = Decimal('0')
                 vendor_name = 'Unknown Store'
                 
                 for field in summary_fields:
@@ -211,7 +212,7 @@ def parse_textract_response(response):
                     
                     if field_type == 'TOTAL':
                         try:
-                            total_amount = float(field_value.replace('$', '').replace(',', ''))
+                            total_amount = Decimal(field_value.replace('$', '').replace(',', ''))
                         except:
                             pass
                     elif field_type == 'VENDOR_NAME':
@@ -231,3 +232,11 @@ def parse_textract_response(response):
         items = []
     
     return items
+
+
+class DecimalEncoder(json.JSONEncoder):
+    """Helper to encode Decimal values from DynamoDB"""
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            return float(obj)
+        return super(DecimalEncoder, self).default(obj)

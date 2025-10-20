@@ -108,4 +108,4 @@ We use [Conventional Commits](https://www.conventionalcommits.org/).
 
 ---
 
-**Built with ❤️ using AWS, React, and AI**
+**Built with using AWS, React, and AI**
