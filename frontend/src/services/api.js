@@ -142,13 +142,14 @@ export const uploadToS3 = async (uploadUrl, file) => {
  * Full receipt upload: Get URL, upload to S3, return key
  * Combines getUploadUrl and uploadToS3 steps
  * @param {File} file - The file object to upload
+ * @param {string} userId - User session ID
  * @returns {Promise<Object>} Upload response with S3 key
  * @throws {Object} Error object with status and message
  */
-export const uploadReceipt = async (file) => {
+export const uploadReceipt = async (file, userId) => {
     try {
         // Step 1: Get presigned URL
-        const uploadData = await getUploadUrl(file.name, file.type)
+        const uploadData = await getUploadUrl(file.name, file.type, userId)
 
         // Step 2: Upload to S3
         await uploadToS3(uploadData.uploadUrl, file)
@@ -162,17 +163,38 @@ export const uploadReceipt = async (file) => {
 /**
  * Parse receipt image/PDF and extract items and prices
  * @param {string} s3Key - S3 key of the uploaded receipt file
+ * @param {string} userId - User session ID
  * @returns {Promise<Object>} Parsed receipt data with items, quantities, prices
  * @throws {Object} Error object with status and message
  */
-export const parseReceipt = async (s3Key) => {
+export const parseReceipt = async (s3Key, userId) => {
     try {
         const response = await api.post('/parse-receipt', {
-            s3Key
+            s3Key,
+            userId
         })
         return response.data
     } catch (error) {
         handleApiError(error, 'parseReceipt')
+    }
+}
+
+/**
+ * Run AI analysis on receipt to extract insights and recommendations
+ * @param {string} s3Key - S3 key of the uploaded receipt file
+ * @param {string} userId - User session ID
+ * @returns {Promise<Object>} AI analysis with insights and recommendations
+ * @throws {Object} Error object with status and message
+ */
+export const analyzeReceiptAI = async (s3Key, userId) => {
+    try {
+        const response = await api.post('/analyze-receipt', {
+            s3Key,
+            userId
+        })
+        return response.data
+    } catch (error) {
+        handleApiError(error, 'analyzeReceiptAI')
     }
 }
 

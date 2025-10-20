@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
-import { useNavigation } from '../hooks/useNavigation'
 import { generateMealPlan } from '../services/api'
+import MealCard from '../components/MealCard'
 import './MealPlan.css'
 
-const MealPlan = ({ sessionId }) => {
-  const navigate = useNavigation();
+const MealPlan = ({ sessionId, onNavigate }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [generatedPlan, setGeneratedPlan] = useState(null)
@@ -47,20 +46,20 @@ const MealPlan = ({ sessionId }) => {
   }
 
   const handleBackToDashboard = () => {
-    navigate('home')
+    onNavigate('home')
   }
 
   return (
     <div className="meal-plan-page">
       <header className="header">
-        <div className="logo-container" onClick={() => navigate('home')}>
+        <div className="logo-container" onClick={() => onNavigate('home')}>
           <img src="/savricon.png" alt="Savr Logo" className="logo-image" />
           <h1 className="logo">Savr</h1>
         </div>
         <nav className="nav-menu">
-          <button onClick={() => navigate('home')} className="nav-link">Home</button>
-          <button onClick={() => navigate('about')} className="nav-link">About Us</button>
-          <button onClick={() => navigate('contact')} className="nav-link">Contact Us</button>
+          <button onClick={() => onNavigate('home')} className="nav-link">Home</button>
+          <button onClick={() => onNavigate('about')} className="nav-link">About Us</button>
+          <button onClick={() => onNavigate('contact')} className="nav-link">Contact Us</button>
         </nav>
       </header>
 
@@ -121,47 +120,59 @@ const MealPlan = ({ sessionId }) => {
             </div>
             
             <div className="meal-plan-content">
-              {/* Display meal plan data - handles various response formats */}
-              {generatedPlan.meals ? (
+              {/* Display meal plan using MealCard component */}
+              {generatedPlan.meals && Array.isArray(generatedPlan.meals) ? (
+                <div className="meals-grid">
+                  {generatedPlan.meals.map((meal, idx) => (
+                    <MealCard
+                      key={idx}
+                      mealType={meal.type || meal.mealType || `Meal ${idx + 1}`}
+                      mealName={meal.name || meal.title || 'Untitled Meal'}
+                      ingredients={
+                        Array.isArray(meal.ingredients) 
+                          ? meal.ingredients 
+                          : meal.ingredients 
+                            ? [meal.ingredients] 
+                            : []
+                      }
+                      nutrition={meal.nutrition || {}}
+                      prepTime={meal.prepTime || meal.prep_time}
+                    />
+                  ))}
+                </div>
+              ) : generatedPlan.days && Array.isArray(generatedPlan.days) ? (
                 <div>
-                  <h4>Meals for the Week:</h4>
-                  {Array.isArray(generatedPlan.meals) ? (
-                    <ul style={{ listStyle: 'none', padding: 0 }}>
-                      {generatedPlan.meals.map((meal, idx) => (
-                        <li key={idx} style={{ 
-                          marginBottom: '15px', 
-                          padding: '15px', 
-                          backgroundColor: '#f5f5f5', 
-                          borderRadius: '8px',
-                          borderLeft: '4px solid #10b981'
-                        }}>
-                          <strong>{meal.name || meal.title || `Meal ${idx + 1}`}</strong>
-                          {meal.description && <p>{meal.description}</p>}
-                          {meal.ingredients && (
-                            <>
-                              <p><strong>Ingredients:</strong></p>
-                              <ul>{Array.isArray(meal.ingredients) ? 
-                                meal.ingredients.map((ing, i) => <li key={i}>{ing}</li>)
-                                : <li>{meal.ingredients}</li>
-                              }</ul>
-                            </>
-                          )}
-                          {meal.nutrition && (
-                            <p><strong>Nutrition:</strong> {typeof meal.nutrition === 'string' ? meal.nutrition : JSON.stringify(meal.nutrition)}</p>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <pre style={{ overflow: 'auto', backgroundColor: '#f9f9f9', padding: '15px', borderRadius: '8px' }}>
-                      {JSON.stringify(generatedPlan.meals, null, 2)}
-                    </pre>
-                  )}
+                  {generatedPlan.days.map((day, dayIdx) => (
+                    <div key={dayIdx} className="day-section">
+                      <h4>{day.date || `Day ${dayIdx + 1}`}</h4>
+                      <div className="meals-grid">
+                        {day.meals && Object.entries(day.meals).map(([mealType, meal], mealIdx) => (
+                          <MealCard
+                            key={`${dayIdx}-${mealIdx}`}
+                            mealType={mealType}
+                            mealName={meal?.name || 'TBD'}
+                            ingredients={
+                              Array.isArray(meal?.ingredients) 
+                                ? meal.ingredients 
+                                : meal?.ingredients 
+                                  ? [meal.ingredients] 
+                                  : []
+                            }
+                            nutrition={meal?.nutrition || {}}
+                            prepTime={meal?.prepTime || meal?.prep_time}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : (
-                <pre style={{ overflow: 'auto', backgroundColor: '#f9f9f9', padding: '15px', borderRadius: '8px' }}>
-                  {JSON.stringify(generatedPlan, null, 2)}
-                </pre>
+                <div className="fallback-display">
+                  <p>Meal plan data:</p>
+                  <pre style={{ overflow: 'auto', backgroundColor: '#f9f9f9', padding: '15px', borderRadius: '8px' }}>
+                    {JSON.stringify(generatedPlan, null, 2)}
+                  </pre>
+                </div>
               )}
             </div>
 
