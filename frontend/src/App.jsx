@@ -28,10 +28,11 @@ function App() {
 
   // Handle navigation between pages
   const navigate = (page) => {
-    console.log('Navigating to:', page);
+    console.log('🔀 Navigating to:', page);
     setCurrentPage(page);
     window.history.pushState({ page }, "", `#${page}`);
     window.scrollTo(0, 0);
+    console.log('✅ Navigation set to:', page, 'Hash:', window.location.hash);
   };
 
   // Handle browser back/forward navigation
