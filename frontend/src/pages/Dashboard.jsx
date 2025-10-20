@@ -254,7 +254,9 @@ useEffect(() => {
 
   // Handle "Upload receipt" button
   const handleUploadReceipt = () => {
+    console.log('📸 Upload receipt button clicked');
     onNavigate('receipts');
+    console.log('Navigate called with "receipts"');
   };
 
   // Handle "Find a substitute ingredient" button
@@ -373,7 +375,7 @@ useEffect(() => {
               {mealPlan ? (
                 <button
                   className="view-meal-btn"
-                  onClick={() => onNavigate("MealPlan")}
+                  onClick={() => onNavigate("meals")}
                 >
                   View Meal Plan 🍽️
                 </button>
