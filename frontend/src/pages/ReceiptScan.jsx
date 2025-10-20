@@ -26,7 +26,7 @@ const ReceiptScan = ({ onNavigate }) => {
       setError('Fetching Claude 4.5 results...')
       const userId = user?.userId || 'anonymous'
       const aiAnalysis = await analyzeReceipt(pendingReceiptId, userId)
-      console.log('✅ AI Results fetched:', aiAnalysis)
+      console.log('AI Results fetched:', aiAnalysis)
       setAiInsights(aiAnalysis.insights)
       setError(null)
       setPendingReceiptId(null)
@@ -60,7 +60,7 @@ const ReceiptScan = ({ onNavigate }) => {
         return
       }
       
-      console.log('✅ File validated and set')
+      console.log('File validated and set')
       setReceiptFile(file)
       setError(null)
     } else {
@@ -87,28 +87,28 @@ const ReceiptScan = ({ onNavigate }) => {
       const userId = user?.userId || 'anonymous'
       
       // Step 1: Upload file to S3
-      console.log('📤 Uploading receipt to S3...')
+      console.log('Uploading receipt to S3...')
       setUploadProgress(25)
       const uploadResult = await uploadReceipt(receiptFile)
       
-      console.log('✅ Upload successful:', uploadResult)
+      console.log('Upload successful:', uploadResult)
       setUploadProgress(50)
 
       // Step 2: Parse receipt with Textract
-      console.log('🔍 Parsing receipt with Textract...')
+      console.log('Parsing receipt with Textract...')
       const parseResult = await parseReceipt(uploadResult.s3Key)
       
-      console.log('✅ Parse successful:', parseResult)
+      console.log('Parse successful:', parseResult)
       setParsedData(parseResult)
       setUploadProgress(75)
 
       // Step 3: Analyze with Claude 4.5 AI
-      console.log('🤖 Analyzing with Claude 4.5 AI (this takes 30-60 seconds)...')
+      console.log('Analyzing with Claude 4.5 AI (this takes 30-60 seconds)...')
       const receiptId = parseResult.result?.receipt_id
       if (receiptId) {
         try {
           const aiAnalysis = await analyzeReceipt(receiptId, userId)
-          console.log('✅ AI Analysis complete:', aiAnalysis)
+          console.log('AI Analysis complete:', aiAnalysis)
           setAiInsights(aiAnalysis.insights)
         } catch (aiError) {
           console.warn('AI analysis timeout (expected - Claude 4.5 takes 30+ seconds)')
@@ -126,7 +126,7 @@ const ReceiptScan = ({ onNavigate }) => {
     } catch (err) {
       const errorMsg = err.message || 'Failed to process receipt. Please try again.'
       setError(errorMsg)
-      console.error('❌ Error processing receipt:', err)
+      console.error('Error processing receipt:', err)
     } finally {
       setIsProcessing(false)
       setUploadProgress(0)
@@ -156,7 +156,7 @@ const ReceiptScan = ({ onNavigate }) => {
           {/* Error Alert */}
           {error && (
             <div className="error-alert">
-              <span className="error-icon">⚠️</span>
+              <span className="error-icon">!</span>
               <div>
                 <strong>Error:</strong> {error}
               </div>
@@ -207,7 +207,14 @@ const ReceiptScan = ({ onNavigate }) => {
               )}
             </div>
 
-            {/* Upload Progress Bar with Steps */}
+            {receiptFile && (
+              <div className="file-info">
+                <p>Selected file: <strong>{receiptFile.name}</strong></p>
+                <p className="file-size">Size: {(receiptFile.size / 1024 / 1024).toFixed(2)}MB</p>
+              </div>
+            )}
+
+            {/* Upload Progress Bar */}
             {isProcessing && uploadProgress > 0 && (
               <div className="progress-container">
                 <div className="progress-bar">
@@ -217,10 +224,10 @@ const ReceiptScan = ({ onNavigate }) => {
                   />
                 </div>
                 <p className="progress-text">
-                  {uploadProgress === 25 && '📤 Uploading to S3...'}
-                  {uploadProgress === 50 && '🔍 Parsing with Textract...'}
-                  {uploadProgress === 75 && '🤖 Analyzing with Claude 4.5 AI...'}
-                  {uploadProgress === 100 && '✅ Analysis Complete!'}
+                  {uploadProgress === 25 && 'Uploading to S3...'}
+                  {uploadProgress === 50 && 'Parsing with Textract...'}
+                  {uploadProgress === 75 && 'Analyzing with Claude 4.5 AI...'}
+                  {uploadProgress === 100 && 'Analysis Complete!'}
                 </p>
               </div>
             )}
@@ -245,7 +252,7 @@ const ReceiptScan = ({ onNavigate }) => {
         {/* Parsed Receipt Data Display */}
         {parsedData && (
           <section className="parsed-receipt">
-            <h3>Parsed Receipt Data ✅</h3>
+            <h3>Parsed Receipt Data</h3>
             <div className="receipt-content">
               <pre className="code-block">
                 {JSON.stringify(parsedData, null, 2)}
@@ -259,7 +266,7 @@ const ReceiptScan = ({ onNavigate }) => {
                 className="fetch-results-btn"
                 disabled={isProcessing}
               >
-                {isProcessing ? 'Fetching...' : '🤖 Fetch Claude 4.5 Results'}
+                {isProcessing ? 'Fetching...' : 'Fetch Claude 4.5 Results'}
               </button>
             )}
           </section>
@@ -268,7 +275,7 @@ const ReceiptScan = ({ onNavigate }) => {
         {/* AI Insights Display */}
         {aiInsights && (
           <section className="ai-insights">
-            <h3>🤖 Claude 4.5 AI Analysis</h3>
+            <h3>Claude 4.5 AI Analysis</h3>
             
             {/* Health Score */}
             <div className="insight-card health-score">
