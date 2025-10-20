@@ -1,4 +1,4 @@
-# savr.ai - Autonomous Meal Planning Agent
+# savr.ai - autonomous meal planning agent
 
 **savr.ai** is an autonomous AI agent built on **AWS** that scans grocery receipts and generates personalized meal plans based on users' dietary restrictions, allergies, and fitness goals.  
 By combining **Amazon Textract**, **Amazon Bedrock (Claude 4.5 Sonnet)**, and **AgentCore**, the system intelligently extracts grocery data and turns it into actionable, health-conscious meal recommendations.
