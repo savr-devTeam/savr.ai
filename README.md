@@ -5,7 +5,7 @@ By combining **Amazon Textract**, **Amazon Bedrock (Claude 4.5 Sonnet)**, and **
 
 ---
 
-## 🚀 Features
+##  Features
 
 - **Receipt Scanning** - Extracts purchased items using **Amazon Textract**
 - **AI Reasoning Engine** - Generates meal plans via **Claude 4.5** on **Amazon Bedrock**
