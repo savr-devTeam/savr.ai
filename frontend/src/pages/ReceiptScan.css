@@ -68,7 +68,7 @@
 .main-content {
   flex: 1;
   padding: 3rem 2rem;
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
   width: 100%;
 }
@@ -102,23 +102,60 @@
   gap: 1.5rem;
 }
 
-.drag-drop-area {
-  border: 2px dashed #BC903A;
-  border-radius: 12px;
-  padding: 2rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background-color: #FFFFFF;
-  min-height: 250px;
+.form-group {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.drag-drop-area:hover {
+.form-group label {
+  font-weight: 600;
+  color: #000000;
+  font-family: 'Anybody', sans-serif;
+}
+
+.form-group input[type="file"],
+.file-input {
+  padding: 1.5rem;
+  border: 3px dashed #BC903A;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  font-size: 1rem;
+  display: block;
+}
+
+.form-group input[type="file"]:hover,
+.file-input:hover {
   border-color: #AA1235;
   background-color: #F4F0E5;
+  border-style: solid;
+}
+
+.form-group input[type="file"]:disabled,
+.file-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.form-group input[type="file"]::file-selector-button,
+.file-input::file-selector-button {
+  padding: 0.75rem 1.5rem;
+  margin-right: 1rem;
+  background-color: #BC903A;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Anybody', sans-serif;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.form-group input[type="file"]::file-selector-button:hover,
+.file-input::file-selector-button:hover {
+  background-color: #AA1235;
 }
 
 .drag-drop-area.active {
@@ -268,6 +305,375 @@
   font-weight: 400;
 }
 
+/* Progress Bar */
+.progress-container {
+  margin: 1rem 0;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #AA1235;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  text-align: center;
+  margin-top: 0.5rem;
+  font-family: 'Anybody', sans-serif;
+  color: #666;
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 0.6s linear infinite;
+  margin-right: 0.5rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Error Alert */
+.error-alert {
+  background-color: #fee;
+  border: 1px solid #fcc;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.error-icon {
+  font-size: 1.5rem;
+}
+
+.close-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+}
+
+/* Parsed Receipt */
+.parsed-receipt {
+  margin-top: 2rem;
+  background: #F4F0E5;
+  padding: 2rem;
+  border-radius: 16px;
+  border: 1px solid #BC903A;
+}
+
+.parsed-receipt h3 {
+  font-family: 'Anybody', sans-serif;
+  margin-bottom: 1rem;
+}
+
+.code-block {
+  background-color: #2d2d2d;
+  color: #f8f8f2;
+  padding: 1.5rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+/* AI Insights Section */
+.ai-insights {
+  margin-top: 2rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #F4F0E5 100%);
+  padding: 2rem;
+  border-radius: 16px;
+  border: 2px solid #BC903A;
+}
+
+.ai-insights h3 {
+  font-family: 'Anybody', sans-serif;
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: #AA1235;
+}
+
+.insight-card {
+  background: #FFFFFF;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #BC903A;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.insight-card h4 {
+  font-family: 'Anybody', sans-serif;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: #000;
+  font-weight: 700;
+}
+
+/* Health Score */
+.health-score .score-display {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.score-number {
+  font-size: 4rem;
+  font-weight: 700;
+  color: #AA1235;
+  font-family: 'Anybody', sans-serif;
+}
+
+.score-max {
+  font-size: 2rem;
+  color: #666;
+  font-family: 'Anybody', sans-serif;
+}
+
+.score-description {
+  color: #333;
+  line-height: 1.6;
+  margin: 1rem 0;
+  font-family: 'Anybody', sans-serif;
+}
+
+.item-counts {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+  font-family: 'Anybody', sans-serif;
+}
+
+.item-counts .healthy {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.item-counts .unhealthy {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+/* Budget */
+.budget p {
+  margin: 0.5rem 0;
+  font-family: 'Anybody', sans-serif;
+}
+
+.savings {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #BC903A;
+}
+
+.savings ul {
+  margin-top: 0.5rem;
+  padding-left: 1.5rem;
+}
+
+.savings li {
+  margin: 0.5rem 0;
+  font-family: 'Anybody', sans-serif;
+}
+
+/* Categories */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.category-section {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.category-section h5 {
+  font-family: 'Anybody', sans-serif;
+  color: #AA1235;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.category-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.category-section li {
+  padding: 0.25rem 0;
+  font-family: 'Anybody', sans-serif;
+  font-size: 0.9rem;
+}
+
+/* Recipes */
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.recipe-card {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #BC903A;
+}
+
+.recipe-card h5 {
+  font-family: 'Anybody', sans-serif;
+  color: #AA1235;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.recipe-card p {
+  margin: 0.5rem 0;
+  font-family: 'Anybody', sans-serif;
+}
+
+.ingredients {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.ingredients ul {
+  margin-top: 0.5rem;
+  padding-left: 1.5rem;
+}
+
+.ingredients li {
+  margin: 0.3rem 0;
+  font-family: 'Anybody', sans-serif;
+}
+
+/* Meal Plans and Health Tips */
+.meal-list,
+.tips-list {
+  list-style: none;
+  padding: 0;
+}
+
+.meal-list li,
+.tips-list li {
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #BC903A;
+  font-family: 'Anybody', sans-serif;
+}
+
+.tips-list li {
+  border-left-color: #AA1235;
+}
+
+/* Missing Items */
+.missing-items ul {
+  padding-left: 1.5rem;
+}
+
+.missing-items li {
+  margin: 0.5rem 0;
+  font-family: 'Anybody', sans-serif;
+  color: #666;
+}
+
+/* Secondary Button */
+.secondary-button {
+  padding: 0.75rem 2rem;
+  background-color: #BC903A;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Anybody', sans-serif;
+  margin-top: 1.5rem;
+}
+
+.secondary-button:hover {
+  background-color: #9a7530;
+  transform: scale(1.02);
+}
+
+/* Fetch Results Button */
+.fetch-results-btn {
+  width: 100%;
+  padding: 1rem 2rem;
+  background-color: #AA1235;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Anybody', sans-serif;
+  margin-top: 1.5rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.fetch-results-btn:hover:not(:disabled) {
+  background-color: #8a0e2a;
+  transform: scale(1.02);
+  box-shadow: 0 4px 16px rgba(170, 18, 53, 0.5);
+}
+
+.fetch-results-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  animation: none;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(170, 18, 53, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(170, 18, 53, 0);
+  }
+}
+
+.form-hint {
+  color: #666;
+  font-size: 0.85rem;
+  font-family: 'Anybody', sans-serif;
+}
+
+.file-size {
+  color: #999;
+  font-size: 0.9rem;
+}
+
 @media (max-width: 768px) {
   .header {
     padding: 1.5rem 1rem;
@@ -333,141 +739,15 @@
 
   .browse-btn {
     padding: 0.6rem 1.5rem;
-    font-size: 0.9rem;
+  font-size: 0.9rem;
   }
 
-  .hint-text {
-    font-size: 0.8rem;
+  .category-grid,
+  .recipe-grid {
+    grid-template-columns: 1fr;
   }
 
-  .file-icon {
-    font-size: 2.5rem;
-  }
-
-  .file-name {
-    font-size: 0.95rem;
-  }
-
-  .file-size {
-    font-size: 0.85rem;
-  }
-
-  .submit-button {
-    padding: 0.65rem 1.5rem;
-    font-size: 0.9rem;
-    letter-spacing: 0;
-  }
-
-  .progress-container {
-    padding: 1rem;
-  }
-
-  .progress-text {
-    font-size: 0.9rem;
-  }
-
-  .parsed-receipt {
-    padding: 1rem;
-  }
-
-  .parsed-receipt h3 {
-    font-size: 1.3rem;
-  }
-
-  .code-block {
-    font-size: 0.75rem;
-    padding: 0.75rem;
-  }
-
-  .footer {
-    padding: 1.5rem 1rem;
-  }
-
-  .footer p {
-    font-size: 0.85rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .header {
-    padding: 1rem 0.75rem;
-  }
-
-  .logo-container {
-    gap: 0.5rem;
-  }
-
-  .logo {
-    font-size: 1.5rem;
-  }
-
-  .logo-image {
-    width: 45px;
-    height: 40px;
-  }
-
-  .nav-menu {
-    gap: 0.2rem;
-  }
-
-  .nav-link {
-    padding: 0.3rem 0.5rem;
-    font-size: 0.7rem;
-  }
-
-  .main-content {
-    padding: 1rem 0.75rem;
-  }
-
-  .scan-section {
-    padding: 1rem 0.75rem;
-    border-radius: 10px;
-  }
-
-  .scan-section h2 {
-    font-size: 1.2rem;
-  }
-
-  .scan-section p {
-    font-size: 0.9rem;
-  }
-
-  .drag-drop-area {
-    padding: 1rem;
-    min-height: 180px;
-  }
-
-  .upload-icon {
-    font-size: 2rem;
-  }
-
-  .drag-text {
-    font-size: 0.95rem;
-  }
-
-  .browse-btn {
-    padding: 0.55rem 1rem;
-    font-size: 0.85rem;
-  }
-
-  .file-icon {
-    font-size: 2rem;
-  }
-
-  .submit-button {
-    padding: 0.6rem 1rem;
-    font-size: 0.85rem;
-  }
-
-  .error-alert {
-    font-size: 0.85rem;
-  }
-
-  .parsed-receipt h3 {
-    font-size: 1.1rem;
-  }
-
-  .ai-analysis-section h4 {
-    font-size: 1rem;
+  .score-number {
+    font-size: 3rem;
   }
 }

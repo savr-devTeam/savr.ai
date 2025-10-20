@@ -3,6 +3,11 @@ import axios from 'axios'
 // Use environment variable or fallback to Lambda API Gateway
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://2bficji0m1.execute-api.us-east-2.amazonaws.com/prod'
 
+console.log('API Configuration:', {
+    envVar: import.meta.env.VITE_API_URL,
+    baseURL: API_BASE_URL
+})
+
 const api = axios.create({
     baseURL: API_BASE_URL,
     timeout: 60000,
@@ -11,11 +16,32 @@ const api = axios.create({
     }
 })
 
+console.log('API instance created with baseURL:', api.defaults.baseURL)
+
 /**
  * Centralized error handler for API errors
  * Extracts meaningful error messages and logs them
  */
 const handleApiError = (error, context = '') => {
+    // Better error handling for network errors
+    if (error.code === 'ERR_NETWORK' || !error.response) {
+        console.error(`Network Error ${context}:`, {
+            message: error.message,
+            code: error.code,
+            config: {
+                url: error.config?.url,
+                method: error.config?.method,
+                baseURL: error.config?.baseURL
+            }
+        })
+        
+        throw {
+            status: 0,
+            message: `Network error: Unable to reach ${error.config?.baseURL}. Check API endpoint and CORS settings.`,
+            originalError: error
+        }
+    }
+    
     const errorMessage = error.response?.data?.message || 
                         error.response?.data?.error || 
                         error.message || 
@@ -24,7 +50,8 @@ const handleApiError = (error, context = '') => {
     console.error(`API Error ${context}:`, {
         status: error.response?.status,
         message: errorMessage,
-        data: error.response?.data
+        data: error.response?.data,
+        url: error.config?.url
     })
     
     throw {
@@ -35,13 +62,26 @@ const handleApiError = (error, context = '') => {
 }
 
 /**
- * Request interceptor: Attach JWT token to all requests
+ * Request interceptor: Attach JWT token to all requests and ensure baseURL
  */
 api.interceptors.request.use((config) => {
+    // Ensure baseURL is always set
+    if (!config.baseURL) {
+        config.baseURL = API_BASE_URL
+    }
+    
     const token = localStorage.getItem('id_token')
     if (token) {
         config.headers.Authorization = `Bearer ${token}`
     }
+    
+    console.log('Request config:', {
+        method: config.method,
+        url: config.url,
+        baseURL: config.baseURL,
+        fullURL: `${config.baseURL}${config.url}`
+    })
+    
     return config
 }, (error) => {
     return Promise.reject(error)
@@ -150,14 +190,21 @@ export const uploadToS3 = async (uploadUrl, file) => {
  */
 export const uploadReceipt = async (file, userId) => {
     try {
+        console.log('uploadReceipt called with:', { name: file.name, type: file.type, size: file.size })
+        
         // Step 1: Get presigned URL
-        const uploadData = await getUploadUrl(file.name, file.type, userId)
+        console.log('Calling getUploadUrl...')
+        const uploadData = await getUploadUrl(file.name, file.type)
+        console.log('Got upload URL:', uploadData)
 
         // Step 2: Upload to S3
+        console.log('Uploading to S3...')
         await uploadToS3(uploadData.uploadUrl, file)
+        console.log('S3 upload complete')
 
         return uploadData
     } catch (error) {
+        console.error('uploadReceipt error:', error)
         handleApiError(error, 'uploadReceipt')
     }
 }
@@ -172,8 +219,7 @@ export const uploadReceipt = async (file, userId) => {
 export const parseReceipt = async (s3Key, userId) => {
     try {
         const response = await api.post('/parse-receipt', {
-            s3Key,
-            userId
+            s3Key
         })
         return response.data
     } catch (error) {
@@ -182,21 +228,23 @@ export const parseReceipt = async (s3Key, userId) => {
 }
 
 /**
- * Run AI analysis on receipt to extract insights and recommendations
- * @param {string} s3Key - S3 key of the uploaded receipt file
- * @param {string} userId - User session ID
- * @returns {Promise<Object>} AI analysis with insights and recommendations
+ * Analyze receipt with Claude 4.5 Sonnet AI
+ * @param {string} receiptId - Receipt ID from parseReceipt
+ * @param {string} userId - User ID
+ * @returns {Promise<Object>} AI insights including health score, recipes, meal plans
  * @throws {Object} Error object with status and message
  */
-export const analyzeReceiptAI = async (s3Key, userId) => {
+export const analyzeReceipt = async (receiptId, userId) => {
     try {
         const response = await api.post('/analyze-receipt', {
-            s3Key,
+            receiptId,
             userId
+        }, {
+            timeout: 60000
         })
         return response.data
     } catch (error) {
-        handleApiError(error, 'analyzeReceiptAI')
+        handleApiError(error, 'analyzeReceipt')
     }
 }
 
@@ -209,7 +257,7 @@ export const analyzeReceiptAI = async (s3Key, userId) => {
  */
 export const saveUserPreferences = async (userId, preferences) => {
     try {
-        const response = await api.post('/preferences/save', {
+        const response = await api.post('/preferences', {
             userId,
             preferences
         })
@@ -225,14 +273,14 @@ export const saveUserPreferences = async (userId, preferences) => {
 }
 
 /**
- * Get user preferences from backend
- * @param {string} userId - AWS Cognito user ID
- * @returns {Promise<Object>} User preferences
+ * Get user preferences from backend including budget tracking
+ * @param {string} userId - User ID
+ * @returns {Promise<Object>} User preferences with budget data
  * @throws {Object} Error object with status and message
  */
 export const getUserPreferences = async (userId) => {
     try {
-        const response = await api.get(`/preferences/get?userId=${userId}`)
+        const response = await api.get(`/preferences?userId=${userId}`)
         return response.data
     } catch (error) {
         console.error('Failed to get preferences:', error.message)
@@ -245,6 +293,23 @@ export const getUserPreferences = async (userId) => {
                 customPreferences: ''
             }
         }
+    }
+}
+
+/**
+ * Reset weekly budget (clears total_spent)
+ * @param {string} userId - User ID
+ * @returns {Promise<Object>} Updated preferences
+ * @throws {Object} Error object with status and message
+ */
+export const resetWeeklyBudget = async (userId) => {
+    try {
+        const response = await api.post('/preferences/reset-budget', {
+            userId
+        })
+        return response.data
+    } catch (error) {
+        handleApiError(error, 'resetWeeklyBudget')
     }
 }
 

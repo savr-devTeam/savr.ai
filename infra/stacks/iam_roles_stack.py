@@ -125,6 +125,7 @@ class IamRolesStack(Stack):
                 effect=iam.Effect.ALLOW,
                 actions=[
                     "aws-marketplace:ViewSubscriptions",
+                    "aws-marketplace:Subscribe",
                 ],
                 resources=["*"]
             )

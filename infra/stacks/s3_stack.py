@@ -21,6 +21,15 @@ class S3Stack(Stack):
             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
             removal_policy=RemovalPolicy.DESTROY,       # safe cleanup for dev/demo
             auto_delete_objects=True,                   # delete all objects when stack is destroyed
+            cors=[
+                s3.CorsRule(
+                    allowed_methods=[s3.HttpMethods.GET, s3.HttpMethods.PUT, s3.HttpMethods.POST],
+                    allowed_origins=["*"],  # Allow all origins for development
+                    allowed_headers=["*"],
+                    exposed_headers=["ETag"],
+                    max_age=3000
+                )
+            ]
         )
 
         # This runs ParseReceiptFunction automatically whenever a file is uploaded
