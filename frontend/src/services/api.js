@@ -53,12 +53,8 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
-            // Token expired or invalid - clear storage and redirect to login
-            localStorage.removeItem('id_token')
-            localStorage.removeItem('user')
-            window.location.href = '/auth/login'
-        }
+        // Note: We're using session-based auth (no JWT), so don't redirect on 401
+        // The error will be handled by the component that called the API
         return Promise.reject(error)
     }
 )
