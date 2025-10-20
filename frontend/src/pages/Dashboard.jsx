@@ -389,11 +389,9 @@ const Dashboard = ({ onNavigate, sessionId }) => {
                   className="view-meal-btn"
                   onClick={() => onNavigate("meals")}
                 >
-              {mealPlan && (
-                <button className="view-meal-btn" onClick={() => onNavigate("MealPlan")}>
                   View Meal Plan 🍽️
                 </button>
-              )}
+              ) : null}
             </div>
 
             {!mealPlan ? (
