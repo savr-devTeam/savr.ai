@@ -43,7 +43,7 @@ lambda_functions = {
 }
 api_stack = ApiGatewayStack(app, "ApiGatewayStack", env=env, lambda_functions=lambda_functions)
 
-# Deploy EC2 backend
-ec2_stack = EC2BackendStack(app, "EC2BackendStack", env=env)
+# Deploy EC2 backend - DISABLED: All endpoints are now on Lambda + API Gateway
+# ec2_stack = EC2BackendStack(app, "EC2BackendStack", env=env)
 
 app.synth()
