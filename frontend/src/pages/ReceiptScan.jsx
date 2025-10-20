@@ -10,27 +10,54 @@ const ReceiptScan = ({ onNavigate, sessionId }) => {
   const [error, setError] = useState(null)
   const [parsedData, setParsedData] = useState(null)
   const [aiAnalysis, setAiAnalysis] = useState(null)
+  const [dragActive, setDragActive] = useState(false)
+
+  const validateFile = (file) => {
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf']
+    if (!allowedTypes.includes(file.type)) {
+      setError('Please upload a valid image (JPG, PNG) or PDF file')
+      setReceiptFile(null)
+      return false
+    }
+    
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setError('File size must be less than 10MB')
+      setReceiptFile(null)
+      return false
+    }
+    
+    setReceiptFile(file)
+    setError(null)
+    return true
+  }
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0]
+    const file = e.target.files?.[0]
     if (file) {
-      // Validate file type
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf']
-      if (!allowedTypes.includes(file.type)) {
-        setError('Please upload a valid image (JPG, PNG) or PDF file')
-        setReceiptFile(null)
-        return
-      }
-      
-      // Validate file size (max 10MB)
-      if (file.size > 10 * 1024 * 1024) {
-        setError('File size must be less than 10MB')
-        setReceiptFile(null)
-        return
-      }
-      
-      setReceiptFile(file)
-      setError(null)
+      validateFile(file)
+    }
+  }
+
+  const handleDrag = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true)
+    } else if (e.type === 'dragleave') {
+      setDragActive(false)
+    }
+  }
+
+  const handleDrop = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragActive(false)
+    
+    const file = e.dataTransfer.files?.[0]
+    if (file) {
+      validateFile(file)
     }
   }
 
@@ -132,25 +159,51 @@ const ReceiptScan = ({ onNavigate, sessionId }) => {
           )}
 
           <form onSubmit={handleSubmit} className="receipt-form">
-            <div className="form-group">
-              <label htmlFor="receipt-upload">Upload Receipt</label>
+            {/* Drag and Drop Area */}
+            <div
+              className={`drag-drop-area ${dragActive ? 'active' : ''} ${receiptFile ? 'has-file' : ''}`}
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
+              onDragOver={handleDrag}
+              onDrop={handleDrop}
+              onClick={() => document.getElementById('receipt-upload')?.click()}
+            >
               <input
                 type="file"
                 id="receipt-upload"
                 accept="image/*,.pdf"
                 onChange={handleFileChange}
-                required
                 disabled={isProcessing}
+                style={{ display: 'none' }}
               />
-              <small className="form-hint">JPG, PNG, or PDF (max 10MB)</small>
+              
+              {receiptFile ? (
+                <div className="file-selected">
+                  <div className="file-icon">📄</div>
+                  <p className="file-name">{receiptFile.name}</p>
+                  <p className="file-size">{(receiptFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                  <button 
+                    type="button" 
+                    className="change-file-btn"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      document.getElementById('receipt-upload').value = ''
+                      setReceiptFile(null)
+                    }}
+                  >
+                    Change File
+                  </button>
+                </div>
+              ) : (
+                <div className="drag-drop-content">
+                  <div className="upload-icon">📸</div>
+                  <p className="drag-text">Drag and drop your receipt here</p>
+                  <p className="or-text">or</p>
+                  <button type="button" className="browse-btn">Browse Device</button>
+                  <p className="hint-text">JPG, PNG, or PDF (max 10MB)</p>
+                </div>
+              )}
             </div>
-
-            {receiptFile && (
-              <div className="file-info">
-                <p>✓ Selected file: <strong>{receiptFile.name}</strong></p>
-                <p className="file-size">Size: {(receiptFile.size / 1024 / 1024).toFixed(2)}MB</p>
-              </div>
-            )}
 
             {/* Upload Progress Bar with Steps */}
             {isProcessing && uploadProgress > 0 && (
@@ -181,7 +234,7 @@ const ReceiptScan = ({ onNavigate, sessionId }) => {
                   Processing Receipt...
                 </>
               ) : (
-                'Scan Receipt'
+                '🔍 Scan Receipt'
               )}
             </button>
           </form>
