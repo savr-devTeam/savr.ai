@@ -54,6 +54,7 @@ const Dashboard = ({ onNavigate, sessionId }) => {
   // Loading and error states for API calls
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [mealPlan, setMealPlan] = useState(null);
   const [mealPlanLoading, setMealPlanLoading] = useState(false);
   const [mealPlanError, setMealPlanError] = useState(null);
 
@@ -232,8 +233,11 @@ useEffect(() => {
       
       console.log('Generating meal plan with preferences:', preferences);
       
-      const mealPlan = await generateMealPlan(preferences, sessionId);
-      console.log('✅ Meal plan generated:', mealPlan);
+      const mealPlanData = await generateMealPlan(preferences, sessionId);
+      console.log('✅ Meal plan generated:', mealPlanData);
+      
+      // Save meal plan to state
+      setMealPlan(mealPlanData);
       
       // Clear the ask anything field after successful generation
       setAskAnything("");
