@@ -17,6 +17,7 @@ def lambda_handler(event, context):
         body = json.loads(event.get('body', '{}'))
         file_name = body.get('fileName')
         content_type = body.get('contentType', 'image/jpeg')
+        user_id = body.get('userId', 'anonymous')
         
         if not file_name:
             return {
@@ -30,7 +31,6 @@ def lambda_handler(event, context):
         
         # Generate unique key for S3 object
         timestamp = datetime.now().strftime('%Y%m%d-%H%M%S')
-        user_id = event.get('requestContext', {}).get('authorizer', {}).get('claims', {}).get('sub', 'anonymous')
         s3_key = f"receipts/{user_id}/{timestamp}-{file_name}"
         
         # Generate presigned URL for upload
