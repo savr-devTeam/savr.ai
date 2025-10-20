@@ -280,6 +280,9 @@ useEffect(() => {
     }
   };
 
+  // Get today's meals from the meal plan
+  const todayMeals = mealPlan?.days?.[0]?.meals || null;
+
   return (
     <div className="dashboard-container">
       {/* Header */}
@@ -383,12 +386,12 @@ useEffect(() => {
                 <p style={{ margin: "8px 0 16px", opacity: 0.8 }}>
                   No meal plan yet.
                 </p>
-                <button className="primary-btn" onClick={startPlanning}>
+                <button className="primary-btn" onClick={handleMealPlanning}>
                   Start planning with Savr
                 </button>
               </div>
             ) : !todayMeals ? (
-              <p>Loading today’s meals…</p>
+              <p>Loading today's meals…</p>
             ) : (
               <>
                 {["Breakfast", "Lunch", "Dinner"].map((label) => {
