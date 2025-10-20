@@ -54,7 +54,7 @@ function App() {
         return <Dashboard onNavigate={navigate} />;
       case "receipt-scan":
         return <ReceiptScan onNavigate={navigate} />;
-      case "meal-plan":
+      case "MealPlan":
         return <MealPlan onNavigate={navigate} />;
       case "about":
         return <AboutUs onNavigate={navigate} />;

@@ -2,14 +2,31 @@ import React, { useState, useEffect } from "react";
 import "./Dashboard.css";
 
 const MEALPLAN_KEY = "mealPlan.v1";
+const GROCERY_KEY = "groceryList.v1";
 
-// Format YYYY-MM-DD in local time
+/* ---------- utils ---------- */
 function isoDate(d = new Date()) {
   const z = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
   return z.toISOString().slice(0, 10);
 }
+const uid = () =>
+  (crypto?.randomUUID?.() || `id-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
 
-// TODO: Replace with your AI-backed generator later
+// Build a stable fingerprint of all ingredients in a plan
+function planSignature(plan) {
+  if (!plan?.days?.length) return "";
+  const all = [];
+  for (const d of plan.days) {
+    for (const L of ["Breakfast", "Lunch", "Dinner"]) {
+      (d.meals?.[L]?.ingredients || []).forEach(x =>
+        all.push(String(x).trim().toLowerCase())
+      );
+    }
+  }
+  return all.filter(Boolean).sort().join("|");
+}
+
+/* ---------- TEMP: stub meal-plan generator (replace with your AI) ---------- */
 async function generateMealPlanStub() {
   const today = new Date();
   const labels = ["Breakfast", "Lunch", "Dinner"];
@@ -23,6 +40,7 @@ async function generateMealPlanStub() {
     Lunch: ["tortilla", "turkey", "avocado"],
     Dinner: ["chickpeas", "onion", "curry paste"],
   };
+
   const days = [...Array(7)].map((_, i) => {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
@@ -36,12 +54,17 @@ async function generateMealPlanStub() {
   return { generatedAt: new Date().toISOString(), days };
 }
 
+/* ---------- Dashboard ---------- */
 const Dashboard = ({ onNavigate }) => {
+  /* popups */
   const [showAllergyPopup, setShowAllergyPopup] = useState(false);
   const [showBudgetPopup, setShowBudgetPopup] = useState(false);
+
+  /* allergies */
   const [selectedAllergies, setSelectedAllergies] = useState([]);
   const [savedAllergies, setSavedAllergies] = useState([]);
 
+  /* budget */
   const [budget, setBudget] = useState(0);
   const [newBudget, setNewBudget] = useState("");
   const [spent, setSpent] = useState(0);
@@ -49,14 +72,26 @@ const Dashboard = ({ onNavigate }) => {
   const [lastReset, setLastReset] = useState(null);
   const [expenseAdded, setExpenseAdded] = useState(false);
 
-  // NEW: meal plan state (null = no plan yet)
+  /* meal plan (null = none yet) */
   const [mealPlan, setMealPlan] = useState(null);
 
-  // Popup toggles
-  const toggleAllergyPopup = () => setShowAllergyPopup(!showAllergyPopup);
-  const toggleBudgetPopup = () => setShowBudgetPopup(!showBudgetPopup);
+  /* grocery list */
+  const [groceryList, setGroceryList] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(GROCERY_KEY)) ?? []; }
+    catch { return []; }
+  });
+  const [newItem, setNewItem] = useState("");
 
-  // Add expense handler
+  // persist groceries
+  useEffect(() => {
+    localStorage.setItem(GROCERY_KEY, JSON.stringify(groceryList));
+  }, [groceryList]);
+
+  /* ---------- UI toggle handlers ---------- */
+  const toggleAllergyPopup = () => setShowAllergyPopup((s) => !s);
+  const toggleBudgetPopup = () => setShowBudgetPopup((s) => !s);
+
+  /* ---------- Budget helpers ---------- */
   const handleAddExpense = () => {
     const expenseAmount = Number(newExpense);
     if (expenseAmount && expenseAmount > 0) {
@@ -67,35 +102,16 @@ const Dashboard = ({ onNavigate }) => {
     }
   };
 
-  // Select allergies
-  const toggleAllergy = (item) => {
-    setSelectedAllergies((prev) =>
-      prev.includes(item) ? prev.filter((a) => a !== item) : [...prev, item]
-    );
-  };
+  const getProgress = () => (budget === 0 ? 0 : (spent / budget) * 100);
 
-  // Save allergies to dashboard
-  const saveAllergies = () => {
-    setSavedAllergies(selectedAllergies);
-    toggleAllergyPopup();
-  };
-
-  // Progress bar logic - allows over 100% for overspending
-  const getProgress = () => {
-    if (budget === 0) return 0;
-    return (spent / budget) * 100;
-  };
-
-  // Get progress bar color based on spending
   const getProgressColor = () => {
-    const progress = getProgress();
-    if (progress > 100) return "#dc2626"; // darker red for over budget
-    if (progress >= 90) return "#ef4444"; // red
-    if (progress >= 70) return "#f59e0b"; // orange
-    return "#10b981"; // green
+    const p = getProgress();
+    if (p > 100) return "#dc2626";
+    if (p >= 90) return "#ef4444";
+    if (p >= 70) return "#f59e0b";
+    return "#10b981";
   };
 
-  // Reset budget spending
   const handleResetBudget = () => {
     setSpent(0);
     setExpenseAdded(false);
@@ -103,16 +119,24 @@ const Dashboard = ({ onNavigate }) => {
     localStorage.setItem("lastReset", new Date().toISOString());
   };
 
-  // Load mealPlan (if any) + budget data; auto-reset spending weekly
+  /* ---------- Allergies ---------- */
+  const toggleAllergy = (item) => {
+    setSelectedAllergies((prev) =>
+      prev.includes(item) ? prev.filter((a) => a !== item) : [...prev, item]
+    );
+  };
+
+  const saveAllergies = () => {
+    setSavedAllergies(selectedAllergies);
+    toggleAllergyPopup();
+  };
+
+  /* ---------- Load persisted stuff & weekly auto-reset ---------- */
   useEffect(() => {
     // meal plan
     const savedPlan = localStorage.getItem(MEALPLAN_KEY);
     if (savedPlan) {
-      try {
-        setMealPlan(JSON.parse(savedPlan));
-      } catch {
-        setMealPlan(null);
-      }
+      try { setMealPlan(JSON.parse(savedPlan)); } catch { setMealPlan(null); }
     }
 
     // budget
@@ -140,16 +164,10 @@ const Dashboard = ({ onNavigate }) => {
     }
   }, []);
 
-  // save updates to localStorage
-  useEffect(() => {
-    localStorage.setItem("budget", budget.toString());
-  }, [budget]);
+  useEffect(() => { localStorage.setItem("budget", budget.toString()); }, [budget]);
+  useEffect(() => { localStorage.setItem("spent", spent.toString()); }, [spent]);
 
-  useEffect(() => {
-    localStorage.setItem("spent", spent.toString());
-  }, [spent]);
-
-  // NEW: Today's meals from the plan
+  /* ---------- Today’s meals ---------- */
   const todayMeals = (() => {
     if (!mealPlan) return null;
     const today = isoDate();
@@ -157,11 +175,75 @@ const Dashboard = ({ onNavigate }) => {
     return day?.meals || null;
   })();
 
-  // NEW: Start planning CTA action
+  /* ---------- Grocery helpers ---------- */
+  function addManualItem() {
+    const text = newItem.trim();
+    if (!text) return;
+    setGroceryList((prev) => [
+      { id: uid(), text, checked: false, source: "manual" },
+      ...prev,
+    ]);
+    setNewItem("");
+  }
+
+  function toggleGrocery(id) {
+    setGroceryList((prev) =>
+      prev.map((it) => (it.id === id ? { ...it, checked: !it.checked } : it))
+    );
+  }
+
+  function removeGrocery(id) {
+    setGroceryList((prev) => prev.filter((it) => it.id !== id));
+  }
+
+  // NEW: Clear ALL items
+  function clearAllItems() {
+    setGroceryList([]);
+    localStorage.removeItem("mealPlan.ingredients.sig"); // so next plan sync repopulates
+  }
+
+  // Auto-add ingredients from a plan (deduped, case-insensitive)
+  function addItemsFromPlan(plan) {
+    if (!plan?.days?.length) return;
+
+    const existing = new Set(groceryList.map((i) => i.text.toLowerCase()));
+    const incoming = [];
+
+    for (const day of plan.days) {
+      for (const label of ["Breakfast", "Lunch", "Dinner"]) {
+        const ings = day.meals?.[label]?.ingredients || [];
+        for (const raw of ings) {
+          const t = String(raw).trim();
+          if (!t) continue;
+          const k = t.toLowerCase();
+          if (existing.has(k)) continue;
+          existing.add(k);
+          incoming.push({ id: uid(), text: t, checked: false, source: "ai" });
+        }
+      }
+    }
+
+    if (incoming.length) setGroceryList((prev) => [...incoming, ...prev]);
+  }
+
+  /* ---------- Auto-sync groceries whenever plan changes ---------- */
+  useEffect(() => {
+    if (!mealPlan) return;
+    const sig = planSignature(mealPlan);
+    const prev = localStorage.getItem("mealPlan.ingredients.sig");
+    if (sig && sig !== prev) {
+      addItemsFromPlan(mealPlan);
+      localStorage.setItem("mealPlan.ingredients.sig", sig);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mealPlan]);
+
+  /* ---------- Start planning (generate plan) ---------- */
   const startPlanning = async () => {
-    const plan = await generateMealPlanStub(); // swap with AI call later
+    const plan = await generateMealPlanStub(); // replace with AI call
     setMealPlan(plan);
     localStorage.setItem(MEALPLAN_KEY, JSON.stringify(plan));
+    // auto-sync effect will add groceries
   };
 
   return (
@@ -188,7 +270,9 @@ const Dashboard = ({ onNavigate }) => {
             <h3>How can I help you?</h3>
 
             <button className="action-btn">Find a substitute ingredient</button>
-            <button className="action-btn">Start meal planning for next week</button>
+            <button className="action-btn" onClick={startPlanning}>
+              Start meal planning for next week
+            </button>
             <button className="action-btn">Upload receipt</button>
           </div>
 
@@ -220,10 +304,7 @@ const Dashboard = ({ onNavigate }) => {
               </div>
 
               {mealPlan ? (
-                <button
-                  className="view-meal-btn"
-                  onClick={() => onNavigate("MealPlan")}
-                >
+                <button className="view-meal-btn" onClick={() => onNavigate("MealPlan")}>
                   View Meal Plan 🍽️
                 </button>
               ) : null}
@@ -232,9 +313,7 @@ const Dashboard = ({ onNavigate }) => {
             {/* Empty state (default) */}
             {!mealPlan ? (
               <div className="empty-plan">
-                <p style={{ margin: "8px 0 16px", opacity: 0.8 }}>
-                  No meal plan yet.
-                </p>
+                <p style={{ margin: "8px 0 16px", opacity: 0.8 }}>No meal plan yet.</p>
                 <button className="primary-btn" onClick={startPlanning}>
                   Start planning with Savr
                 </button>
@@ -394,24 +473,54 @@ const Dashboard = ({ onNavigate }) => {
 
             {/* Grocery List Card */}
             <section className="card grocery-list">
-              <div className="card-header">
+              <div className="card-header" style={{display: "flex", alignItems: "center", justifyContent: "space-between"}}>
                 <h3>🛒 Grocery List</h3>
               </div>
-              <ul>
-                <li>
-                  <input type="checkbox" /> 1 lb Chicken breast
-                </li>
-                <li>
-                  <input type="checkbox" /> 5 lbs Russet Potatoes
-                </li>
-                <li>
-                  <input type="checkbox" /> 1 Garlic clove
-                </li>
-                <li>
-                  <input type="checkbox" /> 1 Roma Tomato
-                </li>
-              </ul>
-              <button className="view-more-btn">View More</button>
+
+              {/* add item */}
+
+
+              {/* items */}
+              {groceryList.length === 0 ? (
+                <p className="placeholder-text" style={{marginTop:6}}>No items yet.</p>
+              ) : (
+                <div className="grocery-scroll">
+                  <ul className="grocery-ul">
+                    {groceryList.map((item) => (
+                      <li key={item.id} className={`grocery-li ${item.checked ? "checked" : ""}`}>
+                        <label className="grocery-row">
+                          <input
+                            type="checkbox"
+                            checked={item.checked}
+                            onChange={() => toggleGrocery(item.id)}
+                          />
+                          <span className="grocery-text">{item.text}</span>
+                          {item.source === "ai" && <span className="chip"></span>}
+                        </label>
+                        <button className="icon-btn" aria-label="Remove" onClick={() => removeGrocery(item.id)}>
+                          ✕
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <div style={{display:"flex", gap:8, margin:"8px 0 14px", marginTop: "auto"}}>
+                <input
+                  type="text"
+                  className="ask-input"
+                  placeholder="Add an item..."
+                  value={newItem}
+                  onChange={(e) => setNewItem(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && addManualItem()}
+                />
+                <button className="save-btn" onClick={addManualItem} disabled={!newItem.trim()}>
+                  Add
+                </button>
+              </div>
+              <div style={{display:"flex", gap:8, justifyContent:"space-between", marginTop:12}}>
+                <button className="mini-btn danger" onClick={clearAllItems}>Clear all</button>
+              </div>
             </section>
           </div>
         </div>
@@ -421,35 +530,17 @@ const Dashboard = ({ onNavigate }) => {
       {showAllergyPopup && (
         <div className="popup-overlay" onClick={toggleAllergyPopup}>
           <div className="popup-box" onClick={(e) => e.stopPropagation()}>
-            <button className="cancel-btn" onClick={toggleAllergyPopup}>
-              ✖
-            </button>
+            <button className="cancel-btn" onClick={toggleAllergyPopup}>✖</button>
             <div className="allergy-section">
               <h2>Allergies</h2>
-              <h3>
-                We want every meal to be safe and delicious — select any allergies you have below.
-              </h3>
+              <h3>We want every meal to be safe and delicious — select any allergies you have below.</h3>
             </div>
 
             <div className="allergy-options">
-              {[
-                "Peanuts",
-                "Tree Nuts",
-                "Gluten",
-                "Dairy",
-                "Shellfish",
-                "Eggs",
-                "Soy",
-                "Sesame",
-                "Fish",
-                "Wheat",
-                "Other",
-              ].map((item) => (
+              {["Peanuts","Tree Nuts","Gluten","Dairy","Shellfish","Eggs","Soy","Sesame","Fish","Wheat","Other"].map((item) => (
                 <button
                   key={item}
-                  className={`allergy-option ${
-                    selectedAllergies.includes(item) ? "selected" : ""
-                  }`}
+                  className={`allergy-option ${selectedAllergies.includes(item) ? "selected" : ""}`}
                   onClick={() => toggleAllergy(item)}
                 >
                   {item}
@@ -458,9 +549,7 @@ const Dashboard = ({ onNavigate }) => {
             </div>
 
             <div className="popup-buttons">
-              <button className="save-btn" onClick={saveAllergies}>
-                Save
-              </button>
+              <button className="save-btn" onClick={saveAllergies}>Save</button>
             </div>
           </div>
         </div>
@@ -479,9 +568,7 @@ const Dashboard = ({ onNavigate }) => {
               onChange={(e) => setNewBudget(e.target.value)}
             />
             <div className="popup-buttons">
-              <button className="cancel-btn" onClick={toggleBudgetPopup}>
-                ✖
-              </button>
+              <button className="cancel-btn" onClick={toggleBudgetPopup}>✖</button>
               <button
                 className="save-btn"
                 onClick={() => {
