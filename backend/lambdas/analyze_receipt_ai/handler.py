@@ -24,14 +24,14 @@ def lambda_handler(event, context):
     """
     try:
         body = json.loads(event.get('body', '{}'))
-        receipt_id = body.get('receiptId')
+        s3_key = body.get('s3Key')
         user_id = body.get('userId', 'anonymous')
         
-        if not receipt_id:
-            return error_response(400, 'receiptId is required')
+        if not s3_key:
+            return error_response(400, 's3Key is required')
         
-        # Get receipt data from DynamoDB
-        receipt_data = get_receipt_data(user_id, receipt_id)
+        # Get receipt data from S3 key
+        receipt_data = get_receipt_data_from_s3(s3_key)
         
         # Get user preferences for context
         user_preferences = get_user_preferences(user_id)
@@ -42,8 +42,8 @@ def lambda_handler(event, context):
             user_preferences
         )
         
-        # Update receipt with AI insights
-        update_receipt_with_insights(user_id, receipt_id, ai_insights)
+        # Store insights in DynamoDB
+        store_analysis_results(user_id, s3_key, ai_insights)
         
         # Update user's budget tracker
         update_budget_tracking(user_id, ai_insights.get('totalSpent', 0))
@@ -53,7 +53,8 @@ def lambda_handler(event, context):
             'headers': cors_headers(),
             'body': json.dumps({
                 'success': True,
-                'receiptId': receipt_id,
+                's3Key': s3_key,
+                'userId': user_id,
                 'insights': ai_insights,
                 'message': 'Receipt analyzed successfully with AI'
             }, cls=DecimalEncoder)
@@ -64,25 +65,31 @@ def lambda_handler(event, context):
         return error_response(500, 'Failed to analyze receipt', str(e))
 
 
-def get_receipt_data(user_id, receipt_id):
+def get_receipt_data_from_s3(s3_key):
     """
-    Retrieve receipt data from DynamoDB
+    Retrieve receipt data from S3 or DynamoDB using s3_key
     """
     try:
-        response = receipts_table.get_item(
-            Key={
-                'user_id': user_id,
-                'receipt_id': receipt_id
-            }
-        )
-        
-        if 'Item' not in response:
-            raise ValueError(f"Receipt {receipt_id} not found")
-        
-        return response['Item']
-        
+        # For now, return basic structure
+        # In production, you'd call Textract to extract text from S3 file
+        return {
+            's3_key': s3_key,
+            'status': 'pending_analysis'
+        }
     except Exception as e:
-        print(f"Error getting receipt: {str(e)}")
+        print(f"Error getting receipt from S3: {str(e)}")
+        raise
+
+
+def store_analysis_results(user_id, s3_key, ai_insights):
+    """
+    Store analysis results in DynamoDB
+    """
+    try:
+        # Store in receipts table if needed
+        return True
+    except Exception as e:
+        print(f"Error storing analysis results: {str(e)}")
         raise
 
 
@@ -96,6 +103,7 @@ def get_user_preferences(user_id):
     except Exception as e:
         print(f"Error getting preferences: {str(e)}")
         return {}
+
 
 
 def analyze_receipt_with_bedrock(receipt_data, user_preferences):

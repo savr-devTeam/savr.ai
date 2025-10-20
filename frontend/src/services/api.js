@@ -100,17 +100,19 @@ export const getMealPlans = async (userId, planDate = null) => {
 }
 
 /**
- * Step 1 of receipt upload: Get presigned S3 URL
+ * Step 1 of receipt upload: Get presigned URL for S3 upload
  * @param {string} fileName - Name of the file to upload
  * @param {string} contentType - MIME type of the file (e.g., 'image/jpeg')
+ * @param {string} userId - User session ID
  * @returns {Promise<Object>} Presigned URL and S3 key
  * @throws {Object} Error object with status and message
  */
-export const getUploadUrl = async (fileName, contentType) => {
+export const getUploadUrl = async (fileName, contentType, userId) => {
     try {
         const response = await api.post('/upload', {
             fileName,
-            contentType
+            contentType,
+            userId
         })
         return response.data
     } catch (error) {
