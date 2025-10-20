@@ -65,11 +65,13 @@ function App() {
       case "home":
         return <LandingPage onNavigate={navigate} />;
       case "Dashboard":
-        return <Dashboard onNavigate={navigate} />;
+        return <Dashboard onNavigate={navigate} sessionId={sessionId} />;
+      case "receipts":
       case "receipt-scan":
-        return <ReceiptScan onNavigate={navigate} />;
+        return <ReceiptScan onNavigate={navigate} sessionId={sessionId} />;
+      case "meals":
       case "MealPlan":
-        return <MealPlan onNavigate={navigate} />;
+        return <MealPlan onNavigate={navigate} sessionId={sessionId} />;
       case "about":
         return <AboutUs onNavigate={navigate} />;
       case "contact":
