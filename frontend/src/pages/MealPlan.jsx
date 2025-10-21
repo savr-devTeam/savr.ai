@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./MealPlan.css";
 
 /* ---------- Inline SVG icons ---------- */
@@ -99,38 +99,101 @@ const DayColumn = ({ label, items }) => (
   </section>
 );
 
-/* ---------- Single export with topbar + layout ---------- */
+/* ---------- Main component ---------- */
 export default function MealPlan() {
+  // Start pantry empty and show a placeholder message
+  const [pantryItems, setPantryItems] = useState([]);
+  const [newItem, setNewItem] = useState("");
+  const addPantryItem = () => {
+  const label = newItem.trim();
+  if (!label) return;
+  setPantryItems(prev => [label, ...prev]); // add to top
+  setNewItem("");
+};
+
+  const removePantryItem = (idx) => {
+    setPantryItems((prev) => prev.filter((_, i) => i !== idx));
+  };
+
   return (
     <>
       {/* Brand header */}
       <header className="mp-topbar">
         <img src="/savricon.png" alt="Logo" className="mp-brand-logo" />
-        <div className="mp-brand-name" />
+        <div className="mp-brand-name">
           <span className="pacifico-regular">Savr</span>
+        </div>
       </header>
 
       {/* Page layout */}
       <div className="mp-root">
         {/* Sidebar */}
         <aside className="mp-sidebar">
-          <div className="mp-sidebar-section">
+          <div className="mp-sidecard">
             <h4 className="mp-sidebar-title">Quick Buttons</h4>
             <div className="mp-quick-buttons">
-              <button className="mp-btn ghost"> 
-                <img src="/savricon.png" className= "mp-savr-icon"/>
-                        Generate Meal Plan </button>
+              <button className="mp-btn ghost">
+                <img src="/savricon.png" alt="" className="mp-savr-icon" />
+                Generate Meal Plan
+              </button>
               <button className="mp-btn ghost">Clear Week</button>
-              <button className="mp-btn ghost"> + Add Receipt</button>
+              <button className="mp-btn ghost">+ Add Receipt</button>
             </div>
           </div>
 
-          <div className="mp-sidebar-section">
-            <h4 className="mp-sidebar-title">Pages</h4>
-            <button className="mp-link">🍌 Groceries</button>
+          <div className="mp-sidecard vp">
+            <h4 className="mp-sidecard-title">Virtual Pantry</h4>
+
+            {pantryItems.length === 0 ? (
+              <div className="mp-empty" aria-live="polite">
+                No items in Virtual Pantry
+              </div>
+            ) : (
+              <ul className="mp-pantry-list">
+                {pantryItems.map((label, idx) => (
+                  <li key={idx} className="mp-pantry-item">
+                    <span className="mp-pantry-text">{label}</span>
+                    <button
+                      className="mp-icon-btn mp-icon-del"
+                      aria-label={`Remove ${label}`}
+                      title="Remove"
+                      onClick={() => removePantryItem(idx)}
+                    >
+                      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden>
+                        <path
+                          fill="currentColor"
+                          d="M18.3 5.7a1 1 0 0 0-1.4 0L12 10.6 7.1 5.7A1 1 0 0 0 5.7 7.1L10.6 12l-4.9 4.9a1 1 0 1 0 1.4 1.4L12 13.4l4.9 4.9a1 1 0 0 0 1.4-1.4L13.4 12l4.9-4.9a1 1 0 0 0 0-1.4z"
+                        />
+                      </svg>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+                    <div
+                      className="mp-quickadd"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") addPantryItem();
+                      }}
+                    >
+                      <input
+                        className="mp-input"
+                        placeholder="Add Item"
+                        value={newItem}
+                        onChange={(e) => setNewItem(e.target.value)}
+                      />
+                      <button
+                        className="mp-add-btn"
+                        aria-label="Add item"
+                        onClick={addPantryItem}
+                        disabled={!newItem.trim()}
+                      >
+                        +
+                      </button>
+                    </div>
+
           </div>
         </aside>
-
 
         {/* Main */}
         <main className="mp-main">
@@ -141,9 +204,10 @@ export default function MealPlan() {
                 <CalendarIcon />
                 <span>Weekly Plan</span>
               </button>
-              <button className="mp-chip"> 
-                <img src="/savricon.png" className= "mp-savr-icon"/>
-                Generate Meal Plan </button>
+              <button className="mp-chip">
+                <img src="/savricon.png" className="mp-savr-icon" alt="" />
+                Generate Meal Plan
+              </button>
               <div className="mp-toolbar-spacer" />
             </div>
           </header>

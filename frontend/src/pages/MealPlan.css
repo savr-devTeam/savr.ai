@@ -23,6 +23,8 @@
 
   /* width cap for the horizontal week box */
   --weekbox-w: 1180px;
+
+  --topbar-h: 64px;       /* height of the top navigation bar */
 }
 
 /* Optional landing font helper (safe default size) */
@@ -33,7 +35,7 @@
   font-style: normal;
 }
 .mp-topbar{
-  position: sticky;
+  position: fixed;
   top: 0;
   height: var(--topbar-h);
   z-index: 50;
@@ -43,7 +45,7 @@
   background: var(--panel);
   background-color: #f3f4f6;
   border-bottom: 1px solid var(--line);
-  padding: 16px 24px;
+  padding: 8px 24px;
   box-shadow: 0 1px 0 rgba(0,0,0,0.02);
 }
 
@@ -69,14 +71,15 @@
   display: block;
   padding: 24px;
   padding-left: 320px;
-  padding-top: calc(var(--topbar-h) + 16px);
   min-height: 100vh;
   background: var(--bg);
   color: var(--ink);
   box-sizing: border-box;
+  padding-top: calc(var(--topbar-h) -0px);
 }
 
-/* Fixed sidebar (stays visible while you scroll horizontally) */
+/* ===== SIDEBAR (updated) ===== */
+/* Sidebar is now a container; each inner card uses .mp-sidecard */
 .mp-sidebar{
   position: fixed;
   margin-top: 10px;
@@ -85,6 +88,53 @@
   width: 280px;
   z-index: 20;
 
+  /* container-only */
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* space between boxes */
+}
+/* ===== SIDEBAR (container) ===== */
+.mp-sidebar{
+  position: fixed;
+  top: calc(var(--topbar-h) + 16px);
+  left: 24px;
+  width: 280px;
+  z-index: 20;
+
+  /* stack inner cards */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  /* cap height to viewport below the topbar */
+  max-height: calc(100vh - (var(--topbar-h) + 32px));
+
+  /* allow the sidebar itself to scroll if needed */
+  overflow: auto;
+
+  /* container visuals off (each card is boxed) */
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+/* optional: thinner sidebar scrollbar */
+.mp-sidebar::-webkit-scrollbar { width: 10px; }
+.mp-sidebar::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 6px;
+}
+
+/* Boxed panels inside the sidebar */
+.mp-sidecard{
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -92,6 +142,14 @@
   padding: 16px;
 }
 
+.mp-sidecard-title{
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+
+/* (Retain older helper if still used somewhere) */
 .mp-sidebar-section + .mp-sidebar-section{ margin-top: 20px; }
 .mp-sidebar-title{
   font-size: 14px; color: var(--muted);
@@ -121,7 +179,7 @@
 .mp-toolbar{ display: flex; align-items: center; gap: 8px; }
 .mp-toolbar-spacer{ width: 8px; }
 
-/* Buttons */
+/* ===== Sidebar buttons & layouts ===== */
 /* 1) Stack buttons vertically */
 .mp-sidebar .mp-quick-buttons {
   display: flex;
@@ -142,25 +200,41 @@
   background: var(--panel);
   border-radius: 10px;
   cursor: pointer;
-}
 
-.mp-sidebar .mp-btn {
-  white-space: nowrap;      
-  overflow: visible;        
+  white-space: nowrap;
+  overflow: visible;
   text-overflow: unset;
 }
 
-.mp-sidebar .mp-btn.ghost {
-  background: transparent;
-}
-.mp-sidebar .mp-btn.ghost:hover {
-  border-color: blue;
+.mp-sidebar .mp-btn.ghost { background: transparent; }
+.mp-sidebar .mp-btn.ghost:hover{
+  border-color:#0f62fe;
+  background:#f7faff;
 }
 
 .mp-savr-icon{
   height:18px;
   width:18px;
 }
+
+/* Inputs & lists for Virtual Pantry box */
+.mp-input{
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.mp-pantry-list{
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px;
+  display: grid;
+  gap: 6px;
+}
+
 .mp-chip{
   display:flex; align-items:center; gap:8px;
   border:1px solid var(--line); background:var(--panel);
@@ -280,6 +354,8 @@
   .mp-sidebar{
     position: static;
     width: auto;
+    padding: 0;
+    gap: 16px;
     margin-bottom: 16px;
   }
   .mp-root{
@@ -295,13 +371,14 @@
 @media (max-height: 820px){
   :root{ --img-h: 140px; }
 }
+
 /* ===== Mobile / narrow screens: fixed left sidebar + stacked days ===== */
 @media (max-width: 900px) {
   /* Sidebar stays pinned on the left */
   :root { --sb-w: 220px; }                /* sidebar width on small screens */
   .mp-sidebar{
     position: fixed;
-    top: var(--topbar-h, 0px) + 12px; /* if you don’t have a topbar, remove the calc() */
+    top: calc(var(--topbar-h, 0px) + 12px);
     left: 12px;
     width: var(--sb-w);
     z-index: 40;
@@ -333,5 +410,127 @@
   .mp-pill{ font-size: 11px; }
   .mp-macros{ font-size: 12px; }
 }
+/* Pantry list items: label + delete button inline */
+.mp-pantry-item{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
 
-/* Ultra-small phones: make the sidebar even narrower if ne*
+/* Ensure long item names wrap nicely */
+.mp-pantry-text{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Small icon button for delete */
+/* Pantry list row (keeps the X perfectly centered vertically) */
+.mp-pantry-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+/* Delete button: no border/box, centered icon */
+.mp-icon-del{
+  all: unset;                 /* clear UA + inherited btn styles */
+  display: grid;
+  place-items: center;        /* centers the X */
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: transparent;    /* no background box */
+}
+
+/* Size the X icon */
+.mp-icon-del svg{
+  width: 16px;
+  height: 16px;
+}
+
+/* Hover/active states (just tint the X) */
+.mp-icon-del:hover svg{ color:#dc2626; }
+.mp-icon-del:active svg{ transform: scale(0.95); }
+
+/* Optional: a subtle keyboard focus without a box */
+.mp-icon-del:focus-visible svg{
+  color:#dc2626;
+}
+.mp-empty{
+  color: var(--muted);
+  font-size: 14px;
+  padding: 12px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  background: #fafafa;
+}
+/* Quick-add row */
+.mp-quickadd{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 12px;
+}
+
+/* Input should fill the row */
+.mp-quickadd .mp-input{
+  flex: 1;
+  margin: 0;          /* in case your input has default margins */
+}
+
+/* Square + button */
+.mp-add-btn{
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 12px;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mp-add-btn:hover{ background:#f9fafb; }
+.mp-add-btn:disabled{ opacity:.5; cursor:not-allowed; }
+/* Limit the whole sidebar height to the viewport (below the topbar) */
+
+
+/* The pantry card should fill the leftover space inside the sidebar */
+.mp-sidecard.vp{
+  flex: 1 1 auto;                 /* grow to take remaining height */
+  display: flex;
+  flex-direction: column;
+  min-height: 0;                  /* <-- critical so the list can scroll */
+}
+
+/* Make the list area scroll within the pantry card */
+.mp-pantry-list{
+  flex: 1 1 auto;                 /* consume vertical space inside card */
+  overflow-y: auto;               /* internal scroll */
+  margin: 10px 0;
+  padding: 0;
+}
+
+/* (Nice but optional) keep the empty-state box from getting huge */
+.mp-pantry-empty{
+  flex: 0 0 auto;
+}
+
+/* Keep the add-item input/row from stretching */
+.mp-quickadd, .mp-input, .mp-btn.ghost{
+  flex: 0 0 auto;
+}
+
+
