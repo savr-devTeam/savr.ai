@@ -91,24 +91,6 @@ If you hit a 404 for `/upload` or other endpoints, confirm `VITE_API_URL` points
 
 ---
 
-## Development notes & design decisions (for judges)
-
-- Session-based lightweight user identification (no strict auth) to keep the demo friction-free
-- Serverless-first architecture for rapid iteration and low-cost demo hosting
-- Uses Bedrock Claude for high-level reasoning and recipe suggestions — decoupled from OCR pipeline so each piece can be demonstrated independently
-
----
-
-## How to present (2–3 minute flow for judges)
-
-1. Open the frontend (Vercel preview / local dev)
-2. Show the Dashboard and preference settings
-3. Click Upload receipt → pick a photo of a grocery receipt
-4. Demonstrate parsing (Textract) and AI insights (Claude) and the generated meal suggestions
-5. Generate a meal plan and show it rendered with MealCard grid
-
----
-
 ## Contributing
 
 1. Fork the repo
