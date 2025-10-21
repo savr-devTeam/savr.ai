@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import ReceiptScan from "./pages/ReceiptScan";
-import MealPlan from "./pages/MealPlan";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 import Allergies from "./pages/Allergies";
