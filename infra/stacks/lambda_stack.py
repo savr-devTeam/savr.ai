@@ -165,7 +165,7 @@ class LambdaStack(Stack):
         )
         # DDB access
         receipts_table.grant_read_write_data(self.analyze_receipt_ai_function)
-        user_preferences_table.grant_read_data(self.analyze_receipt_ai_function)
+        user_preferences_table.grant_read_write_data(self.analyze_receipt_ai_function)  # Write access for budget tracking
         # Bedrock invoke permissions for AI analysis (Claude 4.5 Sonnet)
         self.analyze_receipt_ai_function.add_to_role_policy(
             iam.PolicyStatement(
@@ -177,19 +177,20 @@ class LambdaStack(Stack):
             )
         )
 
-        # Preferences Function (GET/POST user preferences)
+
+        # User Preferences Function (Budget tracking)
         self.preferences_function = _lambda.Function(
             self,
             "PreferencesFunction",
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_11,
             handler="handler.lambda_handler",
             code=_lambda.Code.from_asset("../backend/lambdas/preferences"),
             timeout=Duration.seconds(10),
-            memory_size=128,
+            memory_size=256,
             role=iam_role,
             environment={
                 "USER_PREFERENCES_TABLE": user_preferences_table.table_name,
             },
         )
-        # DDB read/write access for preferences
+        # DDB access
         user_preferences_table.grant_read_write_data(self.preferences_function)

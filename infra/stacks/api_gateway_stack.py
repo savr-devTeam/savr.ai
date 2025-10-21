@@ -77,19 +77,20 @@ class ApiGatewayStack(Stack):
             )
             analyze_receipt_resource.add_method("POST", analyze_receipt_integration)
 
-            # /preferences resource with /save and /get endpoints
+            # /preferences endpoint for user preferences and budget tracking
             preferences_resource = self.api.root.add_resource("preferences")
             preferences_integration = apigateway.LambdaIntegration(
                 lambda_functions.get("preferences")
             )
+            preferences_resource.add_method("GET", preferences_integration)
+            preferences_resource.add_method("POST", preferences_integration)
             
-            # POST /preferences/save
-            save_resource = preferences_resource.add_resource("save")
-            save_resource.add_method("POST", preferences_integration)
-            
-            # GET /preferences/get
-            get_resource = preferences_resource.add_resource("get")
-            get_resource.add_method("GET", preferences_integration)
+            # /preferences/reset-budget endpoint
+            reset_budget_resource = preferences_resource.add_resource("reset-budget")
+            reset_budget_integration = apigateway.LambdaIntegration(
+                lambda_functions.get("preferences")
+            )
+            reset_budget_resource.add_method("POST", reset_budget_integration)
 
         # Output the API Gateway URL
         from aws_cdk import CfnOutput

@@ -110,8 +110,8 @@ def process_receipt(bucket, key):
         # Parse Textract response
         parsed_items = parse_textract_response(response)
         
-        # Generate receipt ID
-        receipt_id = f"{datetime.now().strftime('%Y%m%d-%H%M%S')}-{key.split('/')[-1]}"
+        # Generate receipt ID (use filename from S3 key which already has timestamp)
+        receipt_id = key.split('/')[-1]  # Just use the filename
         
         # Save to DynamoDB
         receipts_table.put_item(

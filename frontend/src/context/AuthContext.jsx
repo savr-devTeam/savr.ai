@@ -6,7 +6,8 @@ const AuthContext = createContext(null);
 // Configure axios defaults
 const API_URL = import.meta.env.VITE_API_URL || 'https://2bficji0m1.execute-api.us-east-2.amazonaws.com/prod';
 
-axios.defaults.withCredentials = true;
+// Don't set global withCredentials - it breaks CORS with AWS API Gateway
+// We'll handle credentials per-request if needed
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -32,28 +33,29 @@ export const AuthProvider = ({ children }) => {
         setUser(JSON.parse(storedUser));
       }
 
-      // Verify with backend - add timeout
-      const response = await axios.get(`${API_URL}/auth/user`, {
-        timeout: 5000
-      });
-      
-      if (response.data.authenticated) {
-        setUser(response.data.user);
-      } else if (storedUser) {
-        // Clear local storage if backend says not authenticated
-        localStorage.removeItem('savr_tokens');
-        localStorage.removeItem('savr_user');
-        setUser(null);
-        setTokens(null);
+      // Verify with backend - add timeout (skip if endpoint doesn't exist)
+      try {
+        const response = await axios.get(`${API_URL}/auth/user`, {
+          timeout: 3000
+        });
+        
+        if (response.data.authenticated) {
+          setUser(response.data.user);
+        } else if (storedUser) {
+          // Clear local storage if backend says not authenticated
+          localStorage.removeItem('savr_tokens');
+          localStorage.removeItem('savr_user');
+          setUser(null);
+          setTokens(null);
+        }
+      } catch (authErr) {
+        // Auth endpoint might not exist yet - that's okay
+        console.log('Auth verification skipped (endpoint unavailable)');
+        // Keep stored user if available
       }
     } catch (err) {
       console.error('Auth check failed (non-critical):', err.message);
       // Don't block the app if backend is unreachable
-      // Just clear local storage on error
-      localStorage.removeItem('savr_tokens');
-      localStorage.removeItem('savr_user');
-      setUser(null);
-      setTokens(null);
     } finally {
       console.log('Auth check complete, setting loading to false');
       setLoading(false);
@@ -219,43 +221,8 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Axios interceptor to add auth token to requests
-  useEffect(() => {
-    const requestInterceptor = axios.interceptors.request.use(
-      (config) => {
-        if (tokens?.access_token) {
-          config.headers.Authorization = `Bearer ${tokens.access_token}`;
-        }
-        return config;
-      },
-      (error) => Promise.reject(error)
-    );
-
-    const responseInterceptor = axios.interceptors.response.use(
-      (response) => response,
-      async (error) => {
-        const originalRequest = error.config;
-
-        // If 401 and we haven't retried yet, try refreshing token
-        if (error.response?.status === 401 && !originalRequest._retry) {
-          originalRequest._retry = true;
-
-          const refreshed = await refreshToken();
-          if (refreshed) {
-            // Retry original request with new token
-            return axios(originalRequest);
-          }
-        }
-
-        return Promise.reject(error);
-      }
-    );
-
-    return () => {
-      axios.interceptors.request.eject(requestInterceptor);
-      axios.interceptors.response.eject(responseInterceptor);
-    };
-  }, [tokens]);
+  // Note: Interceptors are handled in api.js to avoid conflicts
+  // This auth context provides user state only
 
   const value = {
     user,

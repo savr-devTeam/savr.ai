@@ -35,11 +35,11 @@ const MealPlan = ({ sessionId, onNavigate }) => {
     try {
       const mealPlan = await generateMealPlan(userPreferences, sessionId)
       setGeneratedPlan(mealPlan)
-      console.log('✅ Meal plan generated:', mealPlan)
+      console.log('Meal plan generated:', mealPlan)
     } catch (err) {
       const errorMsg = err.message || 'Failed to generate meal plan. Please try again.'
       setError(errorMsg)
-      console.error('❌ Error generating meal plan:', err)
+      console.error('Error generating meal plan:', err)
     } finally {
       setIsLoading(false)
     }
@@ -75,7 +75,7 @@ const MealPlan = ({ sessionId, onNavigate }) => {
           {/* Error Alert */}
           {error && (
             <div className="error-alert">
-              <span className="error-icon">⚠️</span>
+              <span className="error-icon">!</span>
               <div>
                 <strong>Error:</strong> {error}
               </div>
@@ -107,16 +107,11 @@ const MealPlan = ({ sessionId, onNavigate }) => {
         {/* Generated Meal Plan Display */}
         {generatedPlan && (
           <section className="meal-plan-results">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3>✅ Your Generated Meal Plan</h3>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <button onClick={() => setGeneratedPlan(null)} className="secondary-button">
-                  ← New Plan
-                </button>
-                <button onClick={handleBackToDashboard} className="submit-button">
-                  Back to Dashboard
-                </button>
-              </div>
+            <h3>Your Generated Meal Plan</h3>
+            <div className="meal-plan-content">
+              <pre className="code-block">
+                {JSON.stringify(generatedPlan, null, 2)}
+              </pre>
             </div>
             
             <div className="meal-plan-content">

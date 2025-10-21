@@ -33,6 +33,21 @@ def lambda_handler(event, context):
         # Get receipt data from S3 key
         receipt_data = get_receipt_data_from_s3(s3_key)
         
+        # Check if AI insights already exist (return cached results)
+        if 'ai_insights' in receipt_data and receipt_data['ai_insights']:
+            print(f"Returning cached AI insights for receipt {receipt_id}")
+            return {
+                'statusCode': 200,
+                'headers': cors_headers(),
+                'body': json.dumps({
+                    'success': True,
+                    'receiptId': receipt_id,
+                    'insights': receipt_data['ai_insights'],
+                    'message': 'Receipt analysis retrieved from cache',
+                    'cached': True
+                }, cls=DecimalEncoder)
+            }
+        
         # Get user preferences for context
         user_preferences = get_user_preferences(user_id)
         
@@ -45,8 +60,10 @@ def lambda_handler(event, context):
         # Store insights in DynamoDB
         store_analysis_results(user_id, s3_key, ai_insights)
         
-        # Update user's budget tracker
-        update_budget_tracking(user_id, ai_insights.get('totalSpent', 0))
+        # Update user's budget tracker with total spent
+        total_spent = ai_insights.get('budgetAnalysis', {}).get('totalSpent', 0)
+        if total_spent > 0:
+            update_budget_tracking(user_id, total_spent)
         
         return {
             'statusCode': 200,
@@ -321,11 +338,36 @@ def update_receipt_with_insights(user_id, receipt_id, insights):
 def update_budget_tracking(user_id, amount_spent):
     """
     Update user's budget tracking with new purchase
+    Subtracts from weekly budget in UserPreferences table
     """
     try:
-        # This would update a budget tracking table
-        # For now, just log it
-        print(f"User {user_id} spent ${amount_spent}")
+        print(f"Updating budget: User {user_id} spent ${amount_spent}")
+        
+        # Get current budget data
+        response = user_preferences_table.get_item(Key={'user_id': user_id})
+        preferences = response.get('Item', {})
+        
+        # Get current budget and spent amount
+        weekly_budget = float(preferences.get('weekly_budget', 100))  # Default $100
+        total_spent = float(preferences.get('total_spent', 0))
+        
+        # Add new expense
+        new_total_spent = total_spent + float(amount_spent)
+        remaining_budget = weekly_budget - new_total_spent
+        
+        # Update in DynamoDB
+        user_preferences_table.update_item(
+            Key={'user_id': user_id},
+            UpdateExpression='SET total_spent = :spent, remaining_budget = :remaining, last_purchase = :timestamp',
+            ExpressionAttributeValues={
+                ':spent': Decimal(str(new_total_spent)),
+                ':remaining': Decimal(str(remaining_budget)),
+                ':timestamp': datetime.now().isoformat()
+            }
+        )
+        
+        print(f"Budget updated: ${new_total_spent} spent of ${weekly_budget}, ${remaining_budget} remaining")
+        
     except Exception as e:
         print(f"Error updating budget: {str(e)}")
 
