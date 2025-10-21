@@ -5,7 +5,7 @@ import laptopImage2 from "/laptop2.png";
 
 const LandingPage = ({onNavigate}) => {
   const handleGetStarted = () => {
-    onNavigate("meals");
+    onNavigate("Meal-Plan");
   };
 
   return (
@@ -13,9 +13,10 @@ const LandingPage = ({onNavigate}) => {
       <section className="section light-bg">
         <div className="content">
         <div className="landing-header">
-          <h1 className="pacifico-regular savr-header">Savr</h1>
+          <h1 className="pacifico-regular savr-header"
+              style= {{ fontSize: "4rem" }}
+          >Savr</h1>
         </div>
-
 
           <div className="anybody">
             <h2
@@ -70,7 +71,9 @@ const LandingPage = ({onNavigate}) => {
       <section className="section-two-wrapper">
         {/* LEFT SIDE — TEXT */}
         <div className="text-side">
-          <h1 className="pacifico-regular savr-header">Savr</h1>
+          <h1 className="pacifico-regular savr-header"
+              style= {{ fontSize: "4rem" }}
+          >Savr</h1>
           <div className="logo-title">
             <img src="/savricon.png" alt="Savr Logo" className="savr-logo" />
             <h2>
