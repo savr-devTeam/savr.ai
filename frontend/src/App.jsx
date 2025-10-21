@@ -68,8 +68,7 @@ function App() {
       case "receipts":
       case "receipt-scan":
         return <ReceiptScan onNavigate={navigate} sessionId={sessionId} />;
-      case "meals":
-      case "MealPlan":
+      case "Meal-Plan":
         return <MealPlan onNavigate={navigate} sessionId={sessionId} />;
       case "about":
         return <AboutUs onNavigate={navigate} />;
@@ -88,5 +87,3 @@ function App() {
 }
 
 export default App;
-
-

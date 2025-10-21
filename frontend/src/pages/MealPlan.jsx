@@ -135,12 +135,6 @@ export default function MealPlan() {
                 <span>Weekly Plan</span>
               </button>
               <div className="mp-toolbar-spacer" />
-              <button className="mp-icon-btn" title="Sort"><SortIcon/></button>
-              <button className="mp-icon-btn" title="Quick add"><LightningIcon/></button>
-              <button className="mp-icon-btn" title="Scale"><ScaleIcon/></button>
-              <button className="mp-icon-btn" title="Filters"><FilterIcon/></button>
-              <button className="mp-btn primary">New</button>
-              <button className="mp-icon-btn" title="More"><DotMenuIcon/></button>
             </div>
           </header>
 

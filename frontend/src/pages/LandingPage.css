@@ -45,14 +45,6 @@
   margin-bottom: 20px;
 }
 
-
-
-
-/* fix Savr header getting cut off */
-.savr-header {
-  margin-top: -150px;
-}
-
 .laptop-box {
   position: absolute;
   top: 120px;
@@ -140,13 +132,15 @@
   width: 80px;
   height: auto;
 }
+/* HERO heading: big, responsive */
 .savr-header {
-  margin-bottom: 2.5rem;
-  margin-top: 5px;
-  padding-top: 2.5rem;
-  font-size: 4rem;
-  
+  font-size: clamp(2.25rem, 4.5vw, 4rem);
+  line-height: 1.05;
+  margin-top: 0;
+  margin-bottom: 3.5rem;
+  padding-top: 1rem;
 }
+
 .text-side h2 {
   font-size: 2.5rem;
   font-weight: 700;
@@ -463,6 +457,3 @@
     font-size: 0.85rem;
   }
 }
-
-
-

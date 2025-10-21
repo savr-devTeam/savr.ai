@@ -1,308 +1,313 @@
+/* ===============================
+   BASE TOKENS
+=============================== */
+:root{
+  --bg:#f3f4f6;          /* page background */
+  --panel:#ffffff;        /* cards + panels */
+  --ink:#111827;          /* primary text */
+  --muted:#6b7280;        /* secondary text */
+  --line:#e5e7eb;         /* borders */
+  --radius:14px;
+  --shadow:0 8px 24px rgba(0,0,0,.08);
+
+  /* compact tuning */
+  --week-pad: 12px;
+  --col-gap: 16px;        /* between day columns */
+  --day-gap: 10px;        /* between cards in a day */
+  --card-pad: 12px;
+  --img-h: 100px;
+  --img-w: 10px;         /* image height band in cards */
+  --fs-title: 15px;       /* card title */
+  --fs-macro: 12px;
+  --fs-pill: 14px;
+
+  /* width cap for the horizontal week box */
+  --weekbox-w: 1180px;
+}
+
+/* Optional landing font helper (safe default size) */
 .pacifico-regular {
   font-family: "Pacifico", cursive;
   font-weight: 400;
   font-size: 2rem;
   font-style: normal;
 }
-:root{
-  --bg:#f3f4f6;          /* page background */
-  --panel:#ffffff;        /* cards + panels */
-  --ink:#111827;          /* primary text */
-  --muted:#6b7280;        /* secondary text */
-  --line:#e5e7eb;         /* borders */
-  --radius:14px;
-  --shadow:0 8px 24px rgba(0,0,0,.08);
+.mp-topbar{
+  position: sticky;
+  top: 0;
+  height: var(--topbar-h);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--panel);
+  background-color: #f3f4f6;
+  border-bottom: 1px solid var(--line);
+  padding: 16px 24px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.02);
 }
 
-/* Layout */
+.mp-brand-logo{
+  height: 32px;
+  width: auto;
+}
+
+.mp-brand-name{
+  font-family: "Pacifico", cursive;
+  font-weight: 400;
+  /* responsive brand size */
+  font-size: clamp(18px, 2.2vw, 28px);
+  color: var(--ink);
+  line-height: 1;
+}
+
+/* ===============================
+   APP LAYOUT
+=============================== */
 .mp-root{
-  /* make room for fixed sidebar */
-  display:block;
-  padding:24px;
-  padding-left:320px; /* sidebar (280) + gutter */
-  min-height:100vh;
-  background:var(--bg);
-  color:var(--ink);
-  box-sizing:border-box;
+  /* room for fixed sidebar (280 + gutter) */
+  display: block;
+  padding: 24px;
+  padding-left: 320px;
+  padding-top: calc(var(--topbar-h) + 16px);
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  box-sizing: border-box;
 }
 
-/* Fixed sidebar that stays on screen even with horizontal scroll */
+/* Fixed sidebar (stays visible while you scroll horizontally) */
 .mp-sidebar{
-  position:fixed; top:16px; left:24px; width:280px; z-index:20;
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  padding:16px;
-}
+  position: fixed;
+  margin-top: 10px;
+  top: calc(var(--topbar-h) + 16px);
+  left: 24px;
+  width: 280px;
+  z-index: 20;
 
-.mp-sidebar-section + .mp-sidebar-section{ margin-top:20px; }
-.mp-sidebar-title{ font-size:14px; color:var(--muted); margin:0 0 8px; font-weight:600; }
-.mp-link{ background:transparent; border:0; color:#111; text-align:left; padding:8px 10px; border-radius:10px; cursor:pointer; }
-.mp-link:hover{ background:#f3f4f6; }
-
-.mp-main{ display:flex; flex-direction:column; gap:18px; }
-.mp-header{ display:flex; align-items:center; justify-content:space-between; }
-.mp-title{ font-size:22px; margin:0; }
-
-.mp-toolbar{ display:flex; align-items:center; gap:8px; }
-.mp-toolbar-spacer{ width:8px; }
-
-/* Buttons */
-.mp-btn{ border:1px solid var(--line); background:var(--panel); padding:8px 12px; border-radius:10px; cursor:pointer; }
-.mp-btn.primary{ background:#0f62fe; color:#fff; border-color:#0f62fe; }
-.mp-btn.ghost{ background:transparent; }
-.mp-btn:hover{ filter:brightness(.98); }
-
-.mp-icon-btn{ width:34px; height:34px; display:grid; place-items:center; border:1px solid var(--line); border-radius:10px; background:var(--panel); cursor:pointer; }
-.mp-icon-btn:hover{ background:#f9fafb; }
-
-.mp-chip{ display:flex; align-items:center; gap:8px; border:1px solid var(--line); background:var(--panel); padding:8px 12px; border-radius:999px; }
-.mp-chip svg{ color:#111; }
-
-/* === Week box: horizontal scroll, auto height (grows to tallest day) === */
-.mp-scroller{
-  /* visual box */
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 12px;
+  padding: 16px;
+}
 
-  /* layout */
+.mp-sidebar-section + .mp-sidebar-section{ margin-top: 20px; }
+.mp-sidebar-title{
+  font-size: 14px; color: var(--muted);
+  margin: 0 0 8px; font-weight: 600;
+}
+.mp-link{
+  background: transparent; border: 0; color: #111;
+  text-align: left; padding: 8px 10px; border-radius: 10px;
+  cursor: pointer;
+}
+.mp-link:hover{ background:#f3f4f6; }
+
+/* Main column */
+.mp-main{ display: flex; flex-direction: column; gap: 24px; }
+
+/* Header row (title + toolbar) */
+.mp-header{ display: flex; align-items: center; justify-content: space-between;margin-top: 20px; }
+
+/* Big, responsive "Meal Plan" title */
+.mp-title{
+  font-size: clamp(28px, 2.2vw, 44px);
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.mp-toolbar{ display: flex; align-items: center; gap: 8px; }
+.mp-toolbar-spacer{ width: 8px; }
+
+/* Buttons */
+.mp-btn{
+  border:1px solid var(--line); background:var(--panel);
+  padding:8px 12px; border-radius:10px; cursor:pointer;
+}
+.mp-btn.primary{ background:#0f62fe; color:#fff; border-color:#0f62fe; }
+.mp-btn.ghost{ background:transparent; }
+.mp-btn:hover{ filter:brightness(.98); }
+
+.mp-icon-btn{
+  width:34px; height:34px; display:grid; place-items:center;
+  border:1px solid var(--line); border-radius:10px; background:var(--panel);
+  cursor:pointer;
+}
+.mp-icon-btn:hover{ background:#f9fafb; }
+
+.mp-chip{
+  display:flex; align-items:center; gap:8px;
+  border:1px solid var(--line); background:var(--panel);
+  padding:8px 12px; border-radius:999px;
+}
+.mp-chip svg{ color:#111; }
+
+/* ===============================
+   WEEK BOX (horizontal scroller)
+=============================== */
+.mp-scroller{
+  width: 100%;
+  max-width: var(--weekbox-w);
+  margin: 0 auto;
+
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--week-pad);
+
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: minmax(280px, 360px);
-  gap: 16px;
+  gap: var(--col-gap);
 
-  /* behavior: only horizontal scroll, height grows with content */
+  /* Only horizontal scroll; height grows with tallest day */
   overflow-x: auto;
   overflow-y: visible;
   height: auto;
 }
+
 .mp-scroller::-webkit-scrollbar{ height:10px; }
 .mp-scroller::-webkit-scrollbar-thumb{ background:#d1d5db; border-radius:6px; }
 
-/* Day column */
+/* ===============================
+   DAY COLUMN
+=============================== */
 .mp-day{
   background:var(--panel);
   border:1px solid var(--line);
   border-radius:var(--radius);
   box-shadow:var(--shadow);
+
   display:flex;
   flex-direction:column;
-  overflow:visible;      /* do not clip cards */
-  height:auto;           /* grow to content */
+  overflow:visible;        /* never clip cards */
+  height:auto;             /* grow to content (Breakfast/Lunch/Dinner fully visible) */
 }
-.mp-day-head{ display:flex; align-items:center; gap:8px; padding:12px 14px; border-bottom:1px solid var(--line); background:#fff; position:sticky; top:0; z-index:1; }
+
+.mp-day-head{
+  display:flex; align-items:center; gap:8px;
+  padding:10px 12px;
+  border-bottom:1px solid var(--line);
+  background:#fff;
+  position:sticky; top:0; z-index:1;
+}
 .mp-day-name{ font-weight:700; }
-.mp-day-count{ margin-left:auto; background:#f3f4f6; border:1px solid var(--line); padding:2px 8px; border-radius:999px; font-size:12px; color:var(--muted); }
-
-.mp-day-list{ display:flex; flex-direction:column; gap:12px; padding:12px; overflow:visible; }
-
-/* Card */
-.mp-card{ display:flex; flex-direction:column; border:1px solid var(--line); border-radius:14px; background:#fff; overflow:visible; }
-.mp-card-img{ height:160px; overflow:hidden; background:#f3f4f6; }
-.mp-card-img img{ width:100%; height:100%; object-fit:cover; display:block; }
-.mp-card-body{ padding:12px; }
-.mp-card-title{ font-size:16px; line-height:1.25; margin:0 0 8px; font-weight:700; }
-
-.mp-pill{ display:inline-block; font-size:12px; color:#111; background:#f3f4f6; border:1px solid var(--line); padding:4px 8px; border-radius:999px; }
-
-.mp-macros{ margin-top:10px; color:var(--muted); font-size:13px; }
-
-/* Responsive */
-@media (max-width: 960px){
-  .mp-sidebar{ position:static; width:auto; }
-  .mp-root{ padding-left:24px; }
-  .mp-scroller{ grid-auto-columns:minmax(240px, 1fr); }
+.mp-day-count{
+  margin-left:auto; background:#f3f4f6; border:1px solid var(--line);
+  padding:2px 8px; border-radius:999px; font-size:12px; color:var(--muted);
 }
 
-:root{
-  --bg:#f3f4f6;          /* page background */
-  --panel:#ffffff;        /* cards + panels */
-  --ink:#111827;          /* primary text */
-  --muted:#6b7280;        /* secondary text */
-  --line:#e5e7eb;         /* borders */
-  --radius:14px;
-  --shadow:0 8px 24px rgba(0,0,0,.08);
+.mp-day-list{
+  display:flex; flex-direction:column;
+  gap: var(--day-gap);
+  padding: 10px;
+  overflow: visible;       /* do not make inner columns scroll vertically */
 }
 
-/* Layout */
-.mp-root{
-  display:grid;
-  grid-template-columns:280px 1fr;
-  gap:24px;
-  min-height:100vh;
-  background:var(--bg);
-  color:var(--ink);
-  padding:24px;
-  box-sizing:border-box;
-}
-
-.mp-sidebar{
-  background:var(--panel);
+/* ===============================
+   MEAL CARD
+=============================== */
+.mp-card{
+  display:flex; flex-direction:column;
   border:1px solid var(--line);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  padding:16px;
-  position:sticky; top:16px; height:fit-content;
+  border-radius:14px;
+  background:#fff;
+  overflow: visible;       /* don't clip text */
 }
 
-.mp-sidebar-section + .mp-sidebar-section{ margin-top:20px; }
-.mp-sidebar-title{ font-size:14px; color:var(--muted); margin:0 0 8px; font-weight:600; }
-.mp-link{ background:transparent; border:0; color:#111; text-align:left; padding:8px 10px; border-radius:10px; cursor:pointer; }
-.mp-link:hover{ background:#f3f4f6; }
-
-.mp-main{ display:flex; flex-direction:column; gap:18px; }
-.mp-header{ display:flex; align-items:center; justify-content:space-between; }
-.mp-title{ font-size:22px; margin:0; }
-
-.mp-toolbar{ display:flex; align-items:center; gap:8px; }
-.mp-toolbar-spacer{ width:8px; }
-
-/* Buttons */
-.mp-btn{ border:1px solid var(--line); background:var(--panel); padding:8px 12px; border-radius:10px; cursor:pointer; }
-.mp-btn.primary{ background:#0f62fe; color:#fff; border-color:#0f62fe; }
-.mp-btn.ghost{ background:transparent; }
-.mp-btn:hover{ filter:brightness(.98); }
-
-.mp-icon-btn{ width:34px; height:34px; display:grid; place-items:center; border:1px solid var(--line); border-radius:10px; background:var(--panel); cursor:pointer; }
-.mp-icon-btn:hover{ background:#f9fafb; }
-
-.mp-chip{ display:flex; align-items:center; gap:8px; border:1px solid var(--line); background:var(--panel); padding:8px 12px; border-radius:999px; }
-.mp-chip svg{ color:#111; }
-
-/* Days scroller */
-.mp-scroller{
-  display:grid;
-  grid-auto-flow:column;
-  grid-auto-columns: minmax(280px, 360px);
-  gap:16px;
-  overflow-x:auto;
-  padding-bottom:8px;
+.mp-card-img{
+  height: var(--img-h);
+  overflow:hidden; background:#f3f4f6;
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
 }
-.mp-scroller::-webkit-scrollbar{ height:10px; }
-.mp-scroller::-webkit-scrollbar-thumb{ background:#d1d5db; border-radius:6px; }
-
-/* Day column */
-.mp-day{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
-.mp-day-head{ display:flex; align-items:center; gap:8px; padding:12px 14px; border-bottom:1px solid var(--line); background:#fff; position:sticky; top:0; z-index:1; }
-.mp-day-name{ font-weight:700; }
-.mp-day-count{ margin-left:auto; background:#f3f4f6; border:1px solid var(--line); padding:2px 8px; border-radius:999px; font-size:12px; color:var(--muted); }
-
-.mp-day-list{ display:flex; flex-direction:column; gap:12px; padding:12px; }
-
-/* Card */
-.mp-card{ border:1px solid var(--line); border-radius:14px; overflow:hidden; background:#fff; }
-.mp-card-img{ height:160px; overflow:hidden; background:#f3f4f6; }
-.mp-card-img img{ width:100%; height:100%; object-fit:cover; display:block; }
-.mp-card-body{ padding:12px; }
-.mp-card-title{ font-size:16px; line-height:1.25; margin:0 0 8px; font-weight:700; }
-
-.mp-pill{ display:inline-block; font-size:12px; color:#111; background:#f3f4f6; border:1px solid var(--line); padding:4px 8px; border-radius:999px; }
-
-.mp-macros{ margin-top:10px; color:var(--muted); font-size:13px; }
-
-/* Responsive */
-@media (max-width: 960px){
-  .mp-root{ grid-template-columns:1fr; }
-  .mp-sidebar{ position:static; order:2; }
-}
-/* ===== Compact mode: shrink spacing so page doesn't need vertical scroll ===== */
-:root{
-  --week-pad: 10px;
-  --col-gap: 14px;        /* between day columns */
-  --day-gap: 8px;         /* between cards in a day */
-  --card-pad: 10px;
-  --img-h: 140px;         /* was 160px */
-  --fs-title: 15px;       /* card title */
-  --fs-macro: 12px;
-  --fs-pill: 11px;
+.mp-card-img img{
+  width:100%; height:100%; object-fit:cover; display:block;
 }
 
-/* Box + columns get a touch tighter */
-.mp-scroller{
-  padding: var(--week-pad);
-  gap: var(--col-gap);
-}
-.mp-day-head{ padding: 10px 12px; }
-.mp-day-list{ gap: var(--day-gap); padding: 10px; }
-
-/* Cards */
 .mp-card-body{ padding: var(--card-pad); }
-.mp-card-img{ height: var(--img-h); }
-.mp-card-title{ font-size: var(--fs-title); margin-bottom: 6px; }
-
-/* Chips + macros a bit smaller */
-.mp-pill{ font-size: var(--fs-pill); padding: 3px 7px; }
-.mp-macros{ font-size: var(--fs-macro); margin-top: 8px; }
-
-/* Toolbar/title slightly tighter */
-.mp-title{ font-size: 20px; }
-.mp-chip{ padding: 7px 10px; }
-
-/* Optional: a slightly denser grid on very small laptops */
-@media (max-height: 820px){
-  :root{ --img-h: 130px; }
-}
-/* === Week box width cap (no more endless stretching) === */
-:root{
-  --weekbox-w: 1180px;          /* tweak this to your taste */
+.mp-card-title{
+  font-size: var(--fs-title);
+  line-height: 1.25;
+  margin: 0 0 6px;
+  font-weight: 700;
 }
 
-.mp-scroller{
-  width: 100%;
-  max-width: var(--weekbox-w);  /* limit the horizontal viewport */
-  margin: 0 auto;               /* center the box */
-  /* keep your existing box styling + horizontal scroll behavior */
-  overflow-x: auto;
-  overflow-y: visible;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(280px, 360px);
-  gap: 16px;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 12px;
+.mp-pill{
+  display:inline-block;
+  font-size: var(--fs-pill);
+  color:#111;
+  background:#f3f4f6;
+  border:1px solid var(--line);
+  padding:3px 7px;
+  border-radius:999px;
 }
 
-/* Optional: a little breathing room below the box */
-.mp-main { gap: 24px; }
+.mp-macros{ margin-top:8px; color:var(--muted); font-size: var(--fs-macro); }
 
-/* Mobile: let it use full width again */
+/* ===============================
+   RESPONSIVE
+=============================== */
 @media (max-width: 960px){
+  /* Sidebar becomes normal flow on small screens */
+  .mp-sidebar{
+    position: static;
+    width: auto;
+    margin-bottom: 16px;
+  }
+  .mp-root{
+    padding-left: 24px;
+  }
   .mp-scroller{
     max-width: none;
     grid-auto-columns: minmax(240px, 1fr);
   }
 }
-/* Top brand bar */
 
-.mp-topbar{
-   /* stays at top on vertical scroll */
-  top: 0;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+/* Slightly denser on short viewports */
+@media (max-height: 820px){
+  :root{ --img-h: 140px; }
+}
+/* ===== Mobile / narrow screens: fixed left sidebar + stacked days ===== */
+@media (max-width: 900px) {
+  /* Sidebar stays pinned on the left */
+  :root { --sb-w: 220px; }                /* sidebar width on small screens */
+  .mp-sidebar{
+    position: fixed;
+    top: var(--topbar-h, 0px) + 12px; /* if you don’t have a topbar, remove the calc() */
+    left: 12px;
+    width: var(--sb-w);
+    z-index: 40;
+  }
 
-  background: var(--panel);
-  border-bottom: 1px solid var(--line);
-  padding: 20px 24px;
-  box-shadow: 0 1px 0 rgba(0,0,0,0.02);
+  /* Make room for the fixed sidebar */
+  .mp-root{
+    padding-left: calc(var(--sb-w) + 24px);
+  }
+
+  /* Days become a vertical list (no horizontal scroll) */
+  .mp-scroller{
+    display: flex;
+    flex-direction: column;  /* stack days */
+    gap: 14px;
+    max-width: 760px;        /* optional: keep content readable */
+    overflow-x: hidden;      /* kill the horizontal scroll on small screens */
+    overflow-y: visible;
+  }
+
+  /* Day columns take full width */
+  .mp-day{
+    width: 100%;
+  }
+
+  /* Slightly tighter cards on small screens */
+  .mp-card-img{ height: 140px; }
+  .mp-card-title{ font-size: 15px; }
+  .mp-pill{ font-size: 11px; }
+  .mp-macros{ font-size: 12px; }
 }
 
-.mp-brand-logo{
-  height: 28px;         /* adjust to your logo */
-  width: auto;
-}
-
-.mp-brand-name{
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--ink);
-}
-
+/* Ultra-small phones: make the sidebar even narrower if ne*
