@@ -1,3 +1,9 @@
+.pacifico-regular {
+  font-family: "Pacifico", cursive;
+  font-weight: 400;
+  font-size: 2rem;
+  font-style: normal;
+}
 :root{
   --bg:#f3f4f6;          /* page background */
   --panel:#ffffff;        /* cards + panels */
@@ -111,7 +117,7 @@
   .mp-root{ padding-left:24px; }
   .mp-scroller{ grid-auto-columns:minmax(240px, 1fr); }
 }
-```css
+
 :root{
   --bg:#f3f4f6;          /* page background */
   --panel:#ffffff;        /* cards + panels */
@@ -273,3 +279,30 @@
     grid-auto-columns: minmax(240px, 1fr);
   }
 }
+/* Top brand bar */
+
+.mp-topbar{
+   /* stays at top on vertical scroll */
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  padding: 20px 24px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.02);
+}
+
+.mp-brand-logo{
+  height: 28px;         /* adjust to your logo */
+  width: auto;
+}
+
+.mp-brand-name{
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
