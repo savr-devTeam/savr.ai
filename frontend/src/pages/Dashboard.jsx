@@ -91,13 +91,12 @@ const Dashboard = ({ onNavigate, sessionId }) => {
     localStorage.setItem(GROCERY_KEY, JSON.stringify(groceryList));
   }, [groceryList]);
 
-  // Load prefs from backend (fallback to localStorage) + load meal plan if present
+  // Load prefs (backend first, then local) + load meal plan cache
   useEffect(() => {
     const load = async () => {
       try {
         setLoadingPrefs(true);
         setError("");
-        // load backend prefs
         if (sessionId) {
           const res = await getUserPreferences(sessionId);
           const prefs = res?.preferences || {};
@@ -108,22 +107,16 @@ const Dashboard = ({ onNavigate, sessionId }) => {
           if (prefs.budget != null) setBudget(Number(prefs.budget));
           if (prefs.spent != null) setSpent(Number(prefs.spent));
         } else {
-          // fallback to localStorage
           const savedBudget = localStorage.getItem("budget");
           const savedSpent = localStorage.getItem("spent");
           if (savedBudget) setBudget(Number(savedBudget));
           if (savedSpent) setSpent(Number(savedSpent));
         }
-        // meal plan from localStorage
         const savedPlan = localStorage.getItem(MEALPLAN_KEY);
         if (savedPlan) {
-          try {
-            setMealPlan(JSON.parse(savedPlan));
-          } catch {
-            setMealPlan(null);
-          }
+          try { setMealPlan(JSON.parse(savedPlan)); } catch { setMealPlan(null); }
         }
-      } catch (e) {
+      } catch {
         setError("Could not load preferences. Using defaults.");
       } finally {
         setLoadingPrefs(false);
@@ -152,12 +145,8 @@ const Dashboard = ({ onNavigate, sessionId }) => {
   }, []);
 
   // Persist budget & spent
-  useEffect(() => {
-    localStorage.setItem("budget", String(budget));
-  }, [budget]);
-  useEffect(() => {
-    localStorage.setItem("spent", String(spent));
-  }, [spent]);
+  useEffect(() => { localStorage.setItem("budget", String(budget)); }, [budget]);
+  useEffect(() => { localStorage.setItem("spent", String(spent)); }, [spent]);
 
   // Auto-sync groceries when meal plan changes (dedupe)
   useEffect(() => {
@@ -245,7 +234,7 @@ const Dashboard = ({ onNavigate, sessionId }) => {
   }
   function clearAllItems() {
     setGroceryList([]);
-    localStorage.removeItem("mealPlan.ingredients.sig");
+    localStorage.removeItem("mealPlan.ingredients.sig"); // allow re-population on next plan
   }
   function addItemsFromPlan(plan) {
     if (!plan?.days?.length) return;
@@ -267,12 +256,14 @@ const Dashboard = ({ onNavigate, sessionId }) => {
     if (incoming.length) setGroceryList((prev) => [...incoming, ...prev]);
   }
 
-  // Generate plan via backend
+  // Generate plan via backend (Claude through API Gateway → Lambda)
   const handleMealPlanning = async () => {
     setMealPlanLoading(true);
     setMealPlanError("");
     try {
       const payload = {
+        startDate: isoDate(),
+        days: 7,
         allergies: selectedAllergies,
         budget: budget || undefined,
         customPreferences: askAnything || undefined,
@@ -281,10 +272,8 @@ const Dashboard = ({ onNavigate, sessionId }) => {
       setMealPlan(plan);
       localStorage.setItem(MEALPLAN_KEY, JSON.stringify(plan));
       setAskAnything("");
-      // navigate if you want
-      // onNavigate("meals");
     } catch (e) {
-      setMealPlanError(e.message || "Failed to generate meal plan. Please try again.");
+      setMealPlanError(e?.message || "Failed to generate meal plan. Please try again.");
     } finally {
       setMealPlanLoading(false);
     }
@@ -312,18 +301,6 @@ const Dashboard = ({ onNavigate, sessionId }) => {
           <div className="help-section">
             <img src="/savricon.png" alt="Savr Icon" className="help-icon" />
             <h3>How can I help you?</h3>
-
-            <button
-              className="action-btn"
-              onClick={handleMealPlanning}
-              disabled={mealPlanLoading}
-            >
-              {mealPlanLoading ? "⏳ Generating…" : "Start meal planning for next week"}
-            </button>
-
-            <button className="action-btn" onClick={() => onNavigate("receipts")}>
-              Upload receipt
-            </button>
           </div>
 
           <div className="ask-section">
@@ -719,3 +696,4 @@ const Dashboard = ({ onNavigate, sessionId }) => {
 };
 
 export default Dashboard;
+
