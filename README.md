@@ -73,11 +73,3 @@ Base URL: set `VITE_API_URL` in `frontend/.env` or rely on the fallback configur
 - GET `/meal-plan` — Fetch stored meal plan by `userId`
 
 If you hit a 404 for `/upload` or other endpoints, confirm `VITE_API_URL` points to the correct API Gateway stage URL.
-
----
-
----
-
-## License
-
-This project is provided for hackathon/demo use. Add a license if you plan to open source it.
