@@ -77,20 +77,6 @@ class ApiGatewayStack(Stack):
             )
             analyze_receipt_resource.add_method("POST", analyze_receipt_integration)
 
-            # /preferences resource with /save and /get endpoints
-            preferences_resource = self.api.root.add_resource("preferences")
-            preferences_integration = apigateway.LambdaIntegration(
-                lambda_functions.get("preferences")
-            )
-            
-            # POST /preferences/save
-            save_resource = preferences_resource.add_resource("save")
-            save_resource.add_method("POST", preferences_integration)
-            
-            # GET /preferences/get
-            get_resource = preferences_resource.add_resource("get")
-            get_resource.add_method("GET", preferences_integration)
-
             # /preferences endpoint for user preferences and budget tracking
             preferences_resource = self.api.root.add_resource("preferences")
             preferences_integration = apigateway.LambdaIntegration(
