@@ -62,21 +62,6 @@ Diagram (suggested for slides):
 
 ---
 
-## Quickstart — Run locally (Frontend)
-
-1. Install dependencies and run frontend locally
-
-```powershell
-cd frontend
-npm install
-npm run dev
-# opens on http://localhost:5173 by default (Vite)
-```
-
-2. For quick development without deploying backend, the frontend has safe fallbacks and mocked flows. To run end-to-end, you’ll need access to the deployed API Gateway and S3/DynamoDB resources (or run CDK locally and deploy).
-
----
-
 ## API (important endpoints)
 
 Base URL: set `VITE_API_URL` in `frontend/.env` or rely on the fallback configured in `frontend/src/services/api.js`.
@@ -90,14 +75,6 @@ Base URL: set `VITE_API_URL` in `frontend/.env` or rely on the fallback configur
 If you hit a 404 for `/upload` or other endpoints, confirm `VITE_API_URL` points to the correct API Gateway stage URL.
 
 ---
-
-## Contributing
-
-1. Fork the repo
-2. Create a feature branch
-3. Open a PR and reference the hackathon issue
-
-We follow conventional commits and small PRs for faster reviews during the event.
 
 ---
 
