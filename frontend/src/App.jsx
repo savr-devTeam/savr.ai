@@ -5,7 +5,7 @@ import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 import Allergies from "./pages/Allergies";
 import LandingPage from "./pages/LandingPage";
-import Dashboard from "./pages/Dashboard";
+import MealPlan from "./pages/MealPlan";
 import "./App.css";
 
 // Initialize session ID on first load
