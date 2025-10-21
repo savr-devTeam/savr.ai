@@ -122,21 +122,45 @@
 .mp-toolbar-spacer{ width: 8px; }
 
 /* Buttons */
-.mp-btn{
-  border:1px solid var(--line); background:var(--panel);
-  padding:8px 12px; border-radius:10px; cursor:pointer;
+/* 1) Stack buttons vertically */
+.mp-sidebar .mp-quick-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;   /* buttons keep their own natural width */
 }
-.mp-btn.primary{ background:#0f62fe; color:#fff; border-color:#0f62fe; }
-.mp-btn.ghost{ background:transparent; }
-.mp-btn:hover{ filter:brightness(.98); }
 
-.mp-icon-btn{
-  width:34px; height:34px; display:grid; place-items:center;
-  border:1px solid var(--line); border-radius:10px; background:var(--panel);
-  cursor:pointer;
+/* 2) Buttons size to content, but never overflow the sidebar */
+.mp-sidebar .mp-btn {
+  display: inline-flex;      /* content-based width */
+  align-items: center;
+  gap: 8px;
+  width: auto;               /* <- key: auto width */
+  max-width: 100%;           /* don't spill out of the panel */
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 10px;
+  cursor: pointer;
 }
-.mp-icon-btn:hover{ background:#f9fafb; }
 
+.mp-sidebar .mp-btn {
+  white-space: nowrap;      
+  overflow: visible;        
+  text-overflow: unset;
+}
+
+.mp-sidebar .mp-btn.ghost {
+  background: transparent;
+}
+.mp-sidebar .mp-btn.ghost:hover {
+  border-color: blue;
+}
+
+.mp-savr-icon{
+  height:18px;
+  width:18px;
+}
 .mp-chip{
   display:flex; align-items:center; gap:8px;
   border:1px solid var(--line); background:var(--panel);

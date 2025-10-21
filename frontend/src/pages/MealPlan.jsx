@@ -116,14 +116,21 @@ export default function MealPlan() {
         <aside className="mp-sidebar">
           <div className="mp-sidebar-section">
             <h4 className="mp-sidebar-title">Quick Buttons</h4>
-            <button className="mp-btn ghost">Clear Week</button>
-            <button className="mp-btn ghost">Add New R...</button>
+            <div className="mp-quick-buttons">
+              <button className="mp-btn ghost"> 
+                <img src="/savricon.png" className= "mp-savr-icon"/>
+                        Generate Meal Plan </button>
+              <button className="mp-btn ghost">Clear Week</button>
+              <button className="mp-btn ghost"> + Add Receipt</button>
+            </div>
           </div>
+
           <div className="mp-sidebar-section">
             <h4 className="mp-sidebar-title">Pages</h4>
             <button className="mp-link">🍌 Groceries</button>
           </div>
         </aside>
+
 
         {/* Main */}
         <main className="mp-main">
@@ -134,6 +141,9 @@ export default function MealPlan() {
                 <CalendarIcon />
                 <span>Weekly Plan</span>
               </button>
+              <button className="mp-chip"> 
+                <img src="/savricon.png" className= "mp-savr-icon"/>
+                Generate Meal Plan </button>
               <div className="mp-toolbar-spacer" />
             </div>
           </header>
