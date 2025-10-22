@@ -94,13 +94,13 @@ class LambdaStack(Stack):
         meal_plans_table.grant_read_write_data(self.generate_plan_function)
         user_preferences_table.grant_read_data(self.generate_plan_function)
         receipts_table.grant_read_data(self.generate_plan_function)
-        # Bedrock invoke permissions (Claude 4.5 Sonnet)
+        # Bedrock invoke permissions (Claude 3.5 Sonnet via inference profile)
         self.generate_plan_function.add_to_role_policy(
             iam.PolicyStatement(
                 actions=["bedrock:InvokeModel", "bedrock:InvokeAgent"],
                 resources=[
-                    "arn:aws:bedrock:*::foundation-model/us.anthropic.claude-sonnet-4-5*",
-                    "arn:aws:bedrock:*::foundation-model/anthropic.claude-*"
+                    "arn:aws:bedrock:*::foundation-model/anthropic.claude-*",
+                    "arn:aws:bedrock:*:*:inference-profile/*"
                 ],
             )
         )
