@@ -146,8 +146,6 @@ vercel --prod
 
 ## API Endpoints
 
-Base URL: `VITE_API_URL` (set in `frontend/.env`)
-
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/upload` | POST | Request presigned S3 URL for receipt upload |
@@ -155,28 +153,6 @@ Base URL: `VITE_API_URL` (set in `frontend/.env`)
 | `/analyze-receipt` | POST | AI-powered analysis with Bedrock |
 | `/generate-plan` | POST | Generate meal plan from preferences |
 | `/meal-plan` | GET | Fetch stored meal plan by userId |
-
----
-
-## Testing
-
-```bash
-# Frontend linting and build
-cd frontend
-npm run lint
-npm run build
-
-# Backend Lambda tests
-cd backend
-pytest tests/ -v
-
-# Infrastructure tests
-cd infra
-pytest tests/ -v
-
-# Test backend endpoints
-python test_backend.py
-```
 
 ---
 

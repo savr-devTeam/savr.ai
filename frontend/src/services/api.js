@@ -101,16 +101,18 @@ api.interceptors.response.use(
 )
 
 /**
- * Generate a meal plan based on user preferences
+ * Generate a meal plan based on pantry items and user preferences
+ * @param {Array<string>} pantryItems - Array of pantry item names
  * @param {Object} preferences - User meal preferences (budget, dietaryRestrictions, nutritionGoal, etc.)
- * @param {string} userId - AWS Cognito user ID
- * @returns {Promise<Object>} Generated meal plan with meals and nutrition info
+ * @param {string} userId - User session ID
+ * @returns {Promise<Object>} Generated meal plan with meals array
  * @throws {Object} Error object with status and message
  */
-export const generateMealPlan = async (preferences, userId) => {
+export const generateMealPlan = async (pantryItems, preferences, userId) => {
     try {
         const response = await api.post('/generate-plan', {
             userId,
+            pantryItems,
             preferences
         })
         return response.data
