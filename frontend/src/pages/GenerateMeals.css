@@ -1,0 +1,342 @@
+/* ---------- SPLIT LAYOUT (40% / 60%) ---------- */
+.gm-split{
+  display: grid;
+  grid-template-columns: 40% 60%;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.gm-pane{
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;              /* clip inner scrollbars nicely */
+  display: flex;
+  flex-direction: column;
+}
+
+.gm-left{  overflow: auto; }
+.gm-right{ overflow: auto; }
+
+/* Pane header (optional) */
+.gm-pane-head{
+  padding: 12px 14px 0;
+}
+.gm-suggest-title{
+  margin: 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+.gm-hint{ color: var(--muted); margin: 8px 14px; }
+
+/* ---------- LEFT PANE: CATEGORIZED, HORIZONTAL STRIPS ---------- */
+.gm-cat{
+  padding: 10px 10px 4px;
+}
+.gm-cat + .gm-cat{
+  border-top: 1px solid var(--line);
+  margin-top: 6px;
+}
+.gm-cat-head{
+  display: flex; align-items: center; justify-content: space-between;
+  margin: 0 4px 6px;
+}
+.gm-cat-title{
+  font-weight: 700; font-size: 15px; margin: 0;
+}
+
+/* Horizontal strip of smaller cards */
+.gm-strip{
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 240px;     /* small card width */
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 8px 12px;
+  scroll-snap-type: x mandatory;
+}
+.gm-strip::-webkit-scrollbar{ height: 8px; }
+.gm-strip::-webkit-scrollbar-thumb{ background:#d1d5db; border-radius:6px; }
+
+/* Mini card sizing */
+.gm-mini{ scroll-snap-align: start; cursor: grab; }
+.gm-mini:active{ cursor: grabbing; }
+.gm-mini .mp-card{ max-width: 240px; }
+.gm-mini .mp-card-img{ height: 140px; }
+.gm-mini .mp-card-title{ font-size: 14px; }
+.gm-mini .mp-macros{ font-size: 12px; }
+.gm-subhint{ margin: 4px 12px 10px; color: var(--muted); font-size: 13px; }
+
+/* ---------- RIGHT PANE: WEEK BOARD, BOXED + HORIZONTAL SCROLL ---------- */
+.gm-weekbox{
+  margin: 10px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--week-pad);
+
+  display: grid;
+  grid-auto-flow: column;               /* horizontal columns like your Meal Plan */
+  grid-auto-columns: minmax(300px, 380px);
+  gap: var(--col-gap);
+
+  overflow-x: auto;
+  overflow-y: visible;
+}
+.gm-weekbox::-webkit-scrollbar{ height: 10px; }
+.gm-weekbox::-webkit-scrollbar-thumb{ background:#d1d5db; border-radius:6px; }
+
+/* ---------- DROP ZONES (same visual as before) ---------- */
+.gm-drop.empty, .gm-drop.has{ position: relative; }
+
+.gm-empty-card{
+  border: 2px dashed var(--line);
+  border-radius: var(--radius);
+  background: #fafafa;
+  padding: 16px;
+  text-align: center;
+  min-height: 120px;
+
+  display: grid;
+  grid-template-rows: auto auto;
+  place-items: center;
+  gap: 6px;
+}
+.gm-slot{ font-weight: 700; color: var(--muted); }
+.gm-drop-hint{ font-size: 13px; color: var(--muted); }
+
+.gm-drop.empty:hover .gm-empty-card{ background:#f7fbff; }
+.gm-drop.empty:focus-within .gm-empty-card{ outline: 2px solid #0f62fe22; }
+
+.gm-filled{ position: relative; }
+.gm-clear{
+  position: absolute;
+  top: 8px; right: 8px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  width: 28px; height: 28px;
+  display: grid; place-items: center;
+  cursor: pointer;
+}
+.gm-clear:hover{ color:#dc2626; }
+
+/* ---------- RESPONSIVE TWEAKS ---------- */
+@media (max-width: 1100px){
+  .gm-split{ grid-template-columns: 1fr; } /* stack panes on small screens */
+  .gm-weekbox{ grid-auto-columns: minmax(280px, 1fr); }
+}
+/* ----- PAGE WRAPPER: fill the viewport under the topbar ----- */
+.gm-page.mp-root{
+  padding: 24px;                 /* keep your page padding */
+  padding-left: 24px;            /* no sidebar gutter */
+  min-height: calc(100vh - var(--topbar-h)); /* fill screen height */
+  box-sizing: border-box;
+}
+
+/* ----- 40/60 SPLIT that fills the height ----- */
+.gm-split{
+  display: grid;
+  grid-template-columns: 40% 60%;
+  gap: 16px;
+  height: calc(100vh - var(--topbar-h) - 48px); /* fill remaining space */
+}
+
+/* Each pane is a flex column and clips its own overflow */
+.gm-pane{
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;   /* CRITICAL: let child scrollers size correctly */
+  overflow: hidden;
+}
+
+/* Small header area; body scrolls */
+.gm-pane-head{
+  padding: 12px 14px 6px;
+  border-bottom: 1px solid var(--line);
+  flex: 0 0 auto;
+}
+.gm-pane-body{
+  flex: 1 1 auto;   /* take all remaining height */
+  min-height: 0;    /* enable inner scroll */
+  overflow: auto;   /* vertical scroll INSIDE the box */
+  padding: 8px 8px 12px;
+}
+
+/* LEFT PANE: categorized horizontal strips (scroll INSIDE pane) */
+.gm-cat + .gm-cat{ border-top: 1px solid var(--line); margin-top: 10px; padding-top: 10px; }
+.gm-cat-title{ margin: 0 4px 6px; font-weight: 700; font-size: 15px; color: var(--ink); }
+
+/* horizontal “carousel” that never overflows the pane */
+.gm-strip{
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 220px;  /* compact card */
+  gap: 12px;
+  overflow-x: auto;   /* scrolls sideways, inside the pane */
+  overflow-y: hidden;
+  padding: 4px 4px 10px;
+  scroll-snap-type: x mandatory;
+}
+.gm-strip::-webkit-scrollbar{ height: 8px; }
+.gm-strip::-webkit-scrollbar-thumb{ background:#d1d5db; border-radius: 6px; }
+
+/* mini-card sizing */
+.gm-mini{ scroll-snap-align: start; cursor: grab; }
+.gm-mini:active{ cursor: grabbing; }
+.gm-mini .mp-card{ max-width: 220px; }
+.gm-mini .mp-card-img{ height: 120px; }
+.gm-mini .mp-card-title{ font-size: 14px; }
+.gm-mini .mp-macros{ font-size: 12px; }
+
+/* RIGHT PANE: week board boxed and scrolling horizontally INSIDE pane */
+.gm-weekbox{
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: auto;      /* internal horizontal scroll */
+  overflow-y: visible;
+  padding: var(--week-pad);
+
+  background: var(--panel);
+  border-top: none;
+  /* keep the same box look as your other page */
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(300px, 380px);
+  gap: var(--col-gap);
+}
+.gm-weekbox::-webkit-scrollbar{ height: 10px; }
+.gm-weekbox::-webkit-scrollbar-thumb{ background:#d1d5db; border-radius: 6px; }
+
+/* Dropzones (unchanged look) */
+.gm-drop.empty, .gm-drop.has{ position: relative; }
+.gm-empty-card{
+  border: 2px dashed var(--line);
+  border-radius: var(--radius);
+  background: #fafafa;
+  padding: 16px;
+  text-align: center;
+  min-height: 120px;
+  display: grid; place-items: center; gap: 6px;
+}
+.gm-slot{ font-weight: 700; color: var(--muted); }
+.gm-drop-hint{ font-size: 13px; color: var(--muted); }
+.gm-filled{ position: relative; }
+.gm-clear{
+  position: absolute; top: 8px; right: 8px;
+  background: #fff; border: 1px solid var(--line);
+  border-radius: 10px; width: 28px; height: 28px;
+  display: grid; place-items: center; cursor: pointer;
+}
+.gm-clear:hover{ color:#dc2626; }
+
+/* Responsive: stack panes on smaller screens */
+@media (max-width: 1100px){
+  .gm-split{ grid-template-columns: 1fr; height: auto; }
+  .gm-pane{ max-height: none; }
+}
+/* --- Top bar sizing --- */
+:root { --topbar-h: 72px; }       /* tweak to your logo height */
+
+/* Keep the bar above content */
+.mp-topbar{
+  position: sticky;               /* or `fixed` if you prefer */
+  top: 0;
+  z-index: 1000;
+  height: var(--topbar-h);
+  display: flex;
+  align-items: center;
+  gap: 12x;
+  background: var(--page, #f6f8fb);   /* same as page bg */
+  border-bottom: 1px solid var(--line);
+  padding: 0 16px;
+}
+
+/* Push content below the bar */
+.mp-root,
+.gm-page .mp-main{
+  padding-top: -5px;   /* 12px extra breathing room */
+}
+
+/* (Optional) make the brand block only take what it needs */
+.mp-brand-logo{ width: 44px; height: 44px; object-fit: contain; }
+.mp-brand-name{ line-height: 1; }
+/* --- AI button --- */
+.ai-btn {
+  --ai-bg: transparent;
+  --ai-shadow: 0 6px 14px rgba(33, 35, 36, 0.122), 0 2px 6px rgba(0, 0, 0, 0.06);
+
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 22px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  color: #000000;
+  background: var(--ai-bg);
+  box-shadow: var(--ai-shadow);
+  transition: transform .15s ease, box-shadow .2s ease, filter .2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* inner glow ring */
+.ai-btn::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 999px;
+  background: #dc262640;
+  z-index: -1;
+}
+
+/* hover/active/focus */
+.ai-btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+.ai-btn:active { transform: translateY(0); filter: brightness(.98); }
+.ai-btn:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 3px #cffafe, 0 0 0 6px rgba(14,165,233,.45), var(--ai-shadow);
+}
+/* Suggestions box header becomes a flex row */
+.gm-pane-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between; /* pushes button to the right */
+  gap:12px;
+  padding:0 var(--week-pad) 6px;
+}
+
+/* re-use your AI button styles; small variant for the panel */
+.ai-btn{ position:relative; }
+.ai-btn-sm{ padding:2px 2px; font-size:12px; border-radius:999px; }
+
+/* keep button on one line and from wrapping under the title */
+.gm-pane-head .ai-btn{ white-space:nowrap; }
+/* Header stays a row for title + button */
+.gm-pane-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 10px var(--week-pad) 6px;
+}
+
+/* New subhead sits below header and spans the panel width */
+.gm-pane-subhead{
+  padding: 0 var(--week-pad) 10px;
+}
+
+.gm-hint{
+  margin-top: 20px;
+  color: var(--muted);
+  font-size: 20px;
+}
+
+
