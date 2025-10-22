@@ -88,19 +88,20 @@ class LambdaStack(Stack):
                 "MEAL_PLANS_TABLE": meal_plans_table.table_name,
                 "USER_PREFERENCES_TABLE": user_preferences_table.table_name,
                 "RECEIPTS_TABLE": receipts_table.table_name,
+                "PEXELS_API_KEY": os.environ.get("PEXELS_API_KEY", ""),
             },
         )
         # DDB access
         meal_plans_table.grant_read_write_data(self.generate_plan_function)
         user_preferences_table.grant_read_data(self.generate_plan_function)
         receipts_table.grant_read_data(self.generate_plan_function)
-        # Bedrock invoke permissions (Claude 4.5 Sonnet)
+        # Bedrock invoke permissions (Claude 3.5 Sonnet only - no Titan needed)
         self.generate_plan_function.add_to_role_policy(
             iam.PolicyStatement(
-                actions=["bedrock:InvokeModel", "bedrock:InvokeAgent"],
+                actions=["bedrock:InvokeModel"],
                 resources=[
-                    "arn:aws:bedrock:*::foundation-model/us.anthropic.claude-sonnet-4-5*",
-                    "arn:aws:bedrock:*::foundation-model/anthropic.claude-*"
+                    "arn:aws:bedrock:*::foundation-model/anthropic.claude-*",
+                    "arn:aws:bedrock:*:*:inference-profile/*"
                 ],
             )
         )

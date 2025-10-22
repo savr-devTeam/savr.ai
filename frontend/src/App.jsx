@@ -4,6 +4,7 @@ import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
+import GenerateMeals from "./pages/GenerateMeals";
 import "./App.css";
 
 // Initialize session ID on first load
@@ -60,21 +61,17 @@ function App() {
   const renderPage = () => {
     switch (currentPage) {
       case "LandingPage":
-      case "home":
         return <LandingPage onNavigate={navigate} />;
       case "Dashboard":
         return <Dashboard onNavigate={navigate} sessionId={sessionId} />;
-      case "receipts":
-      case "receipt-scan":
-        return <ReceiptScan onNavigate={navigate} sessionId={sessionId} />;
+      case "GenerateMeals":
+        return <GenerateMeals onNavigate={navigate} sessionId={sessionId} />;
       case "Meal-Plan":
         return <MealPlan onNavigate={navigate} sessionId={sessionId} />;
       case "about":
         return <AboutUs onNavigate={navigate} />;
       case "contact":
         return <ContactUs onNavigate={navigate} />;
-      case "allergies":
-        return <Allergies onNavigate={navigate} />;
       default:
         return <LandingPage onNavigate={navigate} />;
     }

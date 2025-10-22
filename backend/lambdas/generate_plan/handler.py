@@ -28,14 +28,27 @@ def lambda_handler(event, context):
         body = json.loads(event.get('body', '{}'))
         user_id = body.get('userId') or 'anonymous'
         
+        # Get pantry items from request (NEW: direct pantry items)
+        pantry_items = body.get('pantryItems', [])
+        
+        print(f"Received request - userId: {user_id}, pantryItems: {pantry_items}")
+        
         # Get user preferences from request or database
         preferences = get_user_preferences(user_id, body.get('preferences', {}))
         
-        # Get recent grocery purchases
-        grocery_items = get_recent_grocery_items(user_id)
+        # Get recent grocery purchases (fallback if no pantry items provided)
+        if not pantry_items:
+            grocery_items = get_recent_grocery_items(user_id)
+        else:
+            # Convert pantry item strings to dict format
+            grocery_items = [{'name': item} for item in pantry_items]
+        
+        print(f"Grocery items for meal generation: {grocery_items}")
         
         # Generate meal plan using Bedrock Claude
         meal_plan = generate_meal_plan_with_ai(preferences, grocery_items)
+        
+        print(f"Generated meal plan with {len(meal_plan.get('meals', []))} meals")
         
         # Save meal plan to DynamoDB
         plan_id = save_meal_plan(user_id, meal_plan, preferences)
@@ -51,6 +64,7 @@ def lambda_handler(event, context):
             'body': json.dumps({
                 'success': True,
                 'planId': plan_id,
+                'meals': meal_plan.get('meals', []),  # NEW: return meals array for frontend
                 'mealPlan': meal_plan,
                 'message': 'Meal plan generated successfully'
             })
@@ -161,9 +175,9 @@ def generate_meal_plan_with_ai(preferences, grocery_items):
         # Create the prompt for Claude
         prompt = create_meal_plan_prompt(preferences, grocery_items)
         
-        # Call Bedrock Claude 4.5 Sonnet (most intelligent model)
+        # Call Bedrock Claude 3.5 Sonnet via inference profile
         response = bedrock_runtime.invoke_model(
-            modelId='us.anthropic.claude-sonnet-4-5-20250514-v1:0',
+            modelId='us.anthropic.claude-3-5-sonnet-20241022-v2:0',
             body=json.dumps({
                 'anthropic_version': 'bedrock-2023-05-31',
                 'max_tokens': 4000,
@@ -180,6 +194,9 @@ def generate_meal_plan_with_ai(preferences, grocery_items):
         # Parse response
         response_body = json.loads(response['body'].read())
         meal_plan_text = response_body['content'][0]['text']
+        
+        print(f"DEBUG: Claude response length: {len(meal_plan_text)}")
+        print(f"DEBUG: Claude response preview: {meal_plan_text[:500]}...")
         
         # Parse the structured meal plan from Claude's response
         meal_plan = parse_meal_plan_response(meal_plan_text)
@@ -256,7 +273,7 @@ Generate a practical, healthy, and budget-friendly meal plan that helps achieve 
 
 def parse_meal_plan_response(response_text):
     """
-    Parse Claude's response into structured meal plan data
+    Parse Claude's response into structured meal plan data and format for frontend
     """
     try:
         # Try to extract JSON from the response
@@ -265,8 +282,16 @@ def parse_meal_plan_response(response_text):
         
         if start_idx != -1 and end_idx != -1:
             json_str = response_text[start_idx:end_idx]
-            meal_plan = json.loads(json_str)
-            return meal_plan
+            meal_plan_data = json.loads(json_str)
+            
+            # Convert to frontend format with Pexels images
+            weekly_plan = meal_plan_data.get('weeklyPlan', {})
+            print(f"DEBUG: weeklyPlan keys: {list(weekly_plan.keys())}")
+            
+            meal_plan_data['meals'] = format_meals_for_frontend(weekly_plan)
+            print(f"DEBUG: Generated {len(meal_plan_data['meals'])} meals")
+            
+            return meal_plan_data
         else:
             raise ValueError("No JSON found in response")
             
@@ -275,6 +300,7 @@ def parse_meal_plan_response(response_text):
         # Return a simple fallback structure
         return {
             "weeklyPlan": {},
+            "meals": [],
             "weeklyTotals": {
                 "totalCalories": 14000,
                 "avgDailyCalories": 2000,
@@ -283,6 +309,103 @@ def parse_meal_plan_response(response_text):
             "shoppingList": [],
             "tips": ["Meal plan generated with limited data"]
         }
+
+
+def get_meal_image(meal_name, meal_type):
+    """
+    Get meal image from Pexels API
+    """
+    return get_pexels_image(meal_name, meal_type)
+
+
+def get_pexels_image(meal_name, meal_type):
+    """
+    Get meal image from Pexels API based on meal name
+    """
+    import urllib.request
+    import urllib.parse
+    
+    try:
+        # Pexels API key from environment
+        pexels_api_key = os.environ.get('PEXELS_API_KEY', '')
+        
+        if not pexels_api_key:
+            print("Warning: PEXELS_API_KEY not set, using default images")
+            return get_default_image(meal_type)
+        
+        # Create search query from meal name (e.g., "Grilled Chicken Salad" -> "grilled chicken salad food")
+        query = f"{meal_name} food"
+        encoded_query = urllib.parse.quote(query)
+        
+        # Call Pexels API
+        url = f"https://api.pexels.com/v1/search?query={encoded_query}&per_page=1"
+        req = urllib.request.Request(url)
+        req.add_header('Authorization', pexels_api_key)
+        
+        with urllib.request.urlopen(req, timeout=5) as response:
+            data = json.loads(response.read())
+            if data.get('photos') and len(data['photos']) > 0:
+                return data['photos'][0]['src']['large']
+        
+        # If no results for specific meal, try generic meal type
+        return get_default_image(meal_type)
+        
+    except Exception as e:
+        print(f"Error fetching from Pexels for {meal_name}: {str(e)}")
+        return get_default_image(meal_type)
+
+
+def get_default_image(meal_type):
+    """
+    Default fallback images (no API needed) - high quality Pexels images
+    """
+    fallbacks = {
+        'breakfast': 'https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'lunch': 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'dinner': 'https://images.pexels.com/photos/262959/pexels-photo-262959.jpeg?auto=compress&cs=tinysrgb&w=800'
+    }
+    return fallbacks.get(meal_type.lower(), fallbacks['lunch'])
+
+
+def format_meals_for_frontend(weekly_plan):
+    """
+    Convert weekly plan to flat array of meals with AI-generated images
+    Format expected by GenerateMeals.jsx
+    """
+    meals = []
+    
+    print(f"DEBUG: Formatting meals from weekly_plan with keys: {list(weekly_plan.keys())}")
+    
+    for day_name, day_meals in weekly_plan.items():
+        print(f"DEBUG: Processing day {day_name} with meal types: {list(day_meals.keys()) if isinstance(day_meals, dict) else 'not a dict'}")
+        
+        if not isinstance(day_meals, dict):
+            continue
+            
+        for meal_type in ['breakfast', 'lunch', 'dinner']:
+            meal_data = day_meals.get(meal_type)
+            if meal_data:
+                meal_name = meal_data.get('name', 'Untitled Meal')
+                print(f"DEBUG: Getting Pexels image for {meal_type}: {meal_name}")
+                
+                # Get image from Pexels
+                img_url = get_meal_image(meal_name, meal_type)
+                
+                # Format for frontend
+                meals.append({
+                    'title': meal_name,
+                    'meal': meal_type.capitalize(),
+                    'cals': meal_data.get('calories', 0),
+                    'p': meal_data.get('protein', 0),
+                    'c': meal_data.get('carbs', 0),
+                    'f': meal_data.get('fat', 0),
+                    'img': img_url,
+                    'ingredients': meal_data.get('ingredients', []),
+                    'prepTime': meal_data.get('prepTime', 'N/A')
+                })
+    
+    print(f"DEBUG: Formatted {len(meals)} total meals with Pexels images")
+    return meals
 
 
 def create_fallback_meal_plan(preferences):
