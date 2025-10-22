@@ -1,14 +1,9 @@
 import { useState } from 'react'
-import { useAuth } from '../context/AuthContext'
 import { uploadReceipt, parseReceipt, analyzeReceipt } from '../services/api'
 import './ReceiptScan.css'
 
-const ReceiptScan = ({ onNavigate }) => {
+const ReceiptScan = ({ onNavigate, sessionId }) => {
   console.log('ReceiptScan component mounted')
-  const navigate = onNavigate || ((page) => console.log('Navigate to:', page));
-  const auth = useAuth();
-  const user = auth?.user || null;
-  console.log('User:', user)
   const [receiptFile, setReceiptFile] = useState(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -20,7 +15,7 @@ const ReceiptScan = ({ onNavigate }) => {
 
   const fetchAiResults = async () => {
     if (!pendingReceiptId) return
-    
+
     try {
       setIsProcessing(true)
       setError('Fetching Claude 4.5 results...')
@@ -42,7 +37,7 @@ const ReceiptScan = ({ onNavigate }) => {
     const file = e.target.files[0]
     if (file) {
       console.log('File selected:', { name: file.name, type: file.type, size: file.size })
-      
+
       // Validate file type
       const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf']
       if (!allowedTypes.includes(file.type)) {
@@ -51,7 +46,7 @@ const ReceiptScan = ({ onNavigate }) => {
         setReceiptFile(null)
         return
       }
-      
+
       // Validate file size (max 10MB)
       if (file.size > 10 * 1024 * 1024) {
         console.error('File too large:', file.size)
@@ -59,7 +54,7 @@ const ReceiptScan = ({ onNavigate }) => {
         setReceiptFile(null)
         return
       }
-      
+
       console.log('File validated and set')
       setReceiptFile(file)
       setError(null)
@@ -85,19 +80,19 @@ const ReceiptScan = ({ onNavigate }) => {
     try {
       // Use logged in user ID or fallback to anonymous (matches backend)
       const userId = user?.userId || 'anonymous'
-      
+
       // Step 1: Upload file to S3
       console.log('Uploading receipt to S3...')
       setUploadProgress(25)
       const uploadResult = await uploadReceipt(receiptFile)
-      
+
       console.log('Upload successful:', uploadResult)
       setUploadProgress(50)
 
       // Step 2: Parse receipt with Textract
       console.log('Parsing receipt with Textract...')
       const parseResult = await parseReceipt(uploadResult.s3Key)
-      
+
       console.log('Parse successful:', parseResult)
       setParsedData(parseResult)
       setUploadProgress(75)
@@ -117,9 +112,9 @@ const ReceiptScan = ({ onNavigate }) => {
           setError('Claude 4.5 is analyzing your receipt (takes 30-60 seconds). Click "Fetch Results" in 30 seconds.')
         }
       }
-      
+
       setUploadProgress(100)
-      
+
       // Reset form
       setReceiptFile(null)
       document.getElementById('receipt-upload').value = ''
@@ -178,14 +173,14 @@ const ReceiptScan = ({ onNavigate }) => {
                 disabled={isProcessing}
                 className="file-input"
               />
-              
+
               {receiptFile ? (
                 <div className="file-selected">
                   <div className="file-icon">📄</div>
                   <p className="file-name">{receiptFile.name}</p>
                   <p className="file-size">{(receiptFile.size / 1024 / 1024).toFixed(2)} MB</p>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="change-file-btn"
                     onClick={(e) => {
                       e.stopPropagation()
@@ -218,8 +213,8 @@ const ReceiptScan = ({ onNavigate }) => {
             {isProcessing && uploadProgress > 0 && (
               <div className="progress-container">
                 <div className="progress-bar">
-                  <div 
-                    className="progress-fill" 
+                  <div
+                    className="progress-fill"
                     style={{ width: `${uploadProgress}%` }}
                   />
                 </div>
@@ -258,11 +253,11 @@ const ReceiptScan = ({ onNavigate }) => {
                 {JSON.stringify(parsedData, null, 2)}
               </pre>
             </div>
-            
+
             {/* Fetch AI Results Button */}
             {pendingReceiptId && !aiInsights && (
-              <button 
-                onClick={fetchAiResults} 
+              <button
+                onClick={fetchAiResults}
                 className="fetch-results-btn"
                 disabled={isProcessing}
               >
@@ -276,7 +271,7 @@ const ReceiptScan = ({ onNavigate }) => {
         {aiInsights && (
           <section className="ai-insights">
             <h3>Claude 4.5 AI Analysis</h3>
-            
+
             {/* Health Score */}
             <div className="insight-card health-score">
               <h4>Health Score</h4>
