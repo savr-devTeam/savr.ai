@@ -338,5 +338,78 @@
   color: var(--muted);
   font-size: 20px;
 }
+/* --- Save button (drop-in replacement) --- */
+.save-btn{
+  --bg: linear-gradient(135deg,#111827 0%,#1f2937 55%,#111827 100%);
+  --text: #fff;
+  --ring: 0 0 0 3px #1118271a, 0 0 0 6px #60a5fa33;
 
+  margin-top: 1rem;
+  padding: 0.75rem 1.15rem;        /* a bit taller/wider */
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: .2px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  color: var(--text);
+  background: var(--bg);
+  border: none;
+  border-radius: 999px;            /* pill */
+  cursor: pointer;
+  user-select: none;
+
+  box-shadow: 0 6px 18px rgba(17,24,39,.22), inset 0 1px 0 rgba(255,255,255,.06);
+  transition: transform .12s ease, box-shadow .12s ease, opacity .2s ease, background .2s;
+}
+
+.save-btn:hover { 
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(17,24,39,.30), inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+.save-btn:active { 
+  transform: translateY(0);
+  box-shadow: 0 6px 18px rgba(17,24,39,.22);
+}
+
+.save-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
+
+/* Disabled / saving visual */
+.save-btn.is-saving,
+.save-btn:disabled { 
+  opacity: .85; 
+  cursor: wait; 
+}
+
+/* Optional spinner element inside the button */
+.save-btn .spinner{
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Optional “Saved!” success flash */
+.save-btn.saved{
+  background: linear-gradient(135deg,#059669 0%,#10b981 100%);
+  box-shadow: 0 8px 22px rgba(5,150,105,.28);
+}
+
+/* (Optional) ghost variant if you ever need it */
+.save-btn--ghost{
+  --text:#111827;
+  background: #fff;
+  color: var(--text);
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 14px rgba(17,24,39,.08);
+}
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./Dashboard.css";
 import "./GenerateMeals.css";
 
@@ -35,12 +35,42 @@ const emptyWeek = () =>
 /* Replace with your real endpoint later */
 const GENERATE_ENDPOINT = "https://<api-id>.execute-api.<region>.amazonaws.com/generate-meals";
 
+/* Storage + channel keys */
+const STORAGE_KEY = "savr.week.v1";
+const CHANNEL_NAME = "savr";
+
 /* --- Page --- */
 export default function GenerateMeals() {
   const [week, setWeek] = useState(emptyWeek());
   const [suggestions, setSuggestions] = useState([]); // array of meal objects
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
+
+  /* ---------- Load saved plan on mount ---------- */
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw);
+      if (Array.isArray(saved) && saved.length === 7) {
+        setWeek(saved);
+      }
+    } catch {}
+  }, []);
+
+  /* ---------- Persist & broadcast on change ---------- */
+  const bcRef = useRef(null);
+  useEffect(() => {
+    if ("BroadcastChannel" in window) {
+      bcRef.current = new BroadcastChannel(CHANNEL_NAME);
+    }
+    return () => bcRef.current?.close();
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(week));
+    bcRef.current?.postMessage({ type: "week:update", week });
+  }, [week]);
 
   /* ---------- Drag helpers ---------- */
 
@@ -134,6 +164,12 @@ export default function GenerateMeals() {
     }
   };
 
+  // Simple way to go back to dashboard/main after finishing
+  const useThisPlan = () => {
+    localStorage.setItem("savr.week.publishedAt", String(Date.now()));
+    window.location.href = "/"; // change if your main page path differs
+  };
+
   return (
     <>
       {/* Top bar */}
@@ -149,7 +185,14 @@ export default function GenerateMeals() {
         <main className="mp-main">
           {/* Title */}
           <header className="mp-header">
-            <h1 className="mp-title">🍽️ Plan once. Eat better all week </h1>
+            <h1 className="mp-title">🍽️ Plan once. Eat better all week</h1>
+            <button
+            className="save-btn"
+            onClick={() => window.location.assign("/#Dashboard")}
+            title="Save and return to Dashboard"
+            >
+            Save & View on Dashboard
+            </button>
           </header>
 
           {/* ------- SPLIT PANES: 40% suggestions | 60% week board ------- */}
@@ -216,7 +259,7 @@ export default function GenerateMeals() {
               </div>
             </section>
 
-            {/* RIGHT: Week board (MOVED INSIDE .gm-split) */}
+            {/* RIGHT: Week board */}
             <section className="gm-pane gm-right" onDragOver={onDragOver}>
               <div className="gm-weekbox">
                 {week.map((day, dayIdx) => (
