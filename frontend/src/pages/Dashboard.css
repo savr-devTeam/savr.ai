@@ -2,30 +2,40 @@
    BASE TOKENS
 =============================== */
 
-:root{
-  --bg:#f3f4f6;          /* page background */
-  --panel:#ffffff;        /* cards + panels */
-  --ink:#111827;          /* primary text */
-  --muted:#6b7280;        /* secondary text */
-  --line:#e5e7eb;         /* borders */
-  --radius:14px;
-  --shadow:0 8px 24px rgba(0,0,0,.08);
+:root {
+  --bg: #f3f4f6;
+  /* page background */
+  --panel: #ffffff;
+  /* cards + panels */
+  --ink: #111827;
+  /* primary text */
+  --muted: #6b7280;
+  /* secondary text */
+  --line: #e5e7eb;
+  /* borders */
+  --radius: 14px;
+  --shadow: 0 8px 24px rgba(0, 0, 0, .08);
 
   /* compact tuning */
   --week-pad: 12px;
-  --col-gap: 16px;        /* between day columns */
-  --day-gap: 10px;        /* between cards in a day */
+  --col-gap: 16px;
+  /* between day columns */
+  --day-gap: 10px;
+  /* between cards in a day */
   --card-pad: 12px;
   --img-h: 100px;
-  --img-w: 10px;         /* image height band in cards */
-  --fs-title: 15px;       /* card title */
+  --img-w: 10px;
+  /* image height band in cards */
+  --fs-title: 15px;
+  /* card title */
   --fs-macro: 12px;
   --fs-pill: 14px;
 
   /* width cap for the horizontal week box */
   --weekbox-w: 1180px;
 
-  --topbar-h: 64px;       /* height of the top navigation bar */
+  --topbar-h: 64px;
+  /* height of the top navigation bar */
 }
 
 /* Optional landing font helper (safe default size) */
@@ -35,7 +45,8 @@
   font-size: 2rem;
   font-style: normal;
 }
-.mp-topbar{
+
+.mp-topbar {
   position: fixed;
   top: 0;
   height: var(--topbar-h);
@@ -47,15 +58,15 @@
   background-color: #f3f4f6;
   border-bottom: 1px solid var(--line);
   padding: 8px 24px;
-  box-shadow: 0 1px 0 rgba(0,0,0,0.02);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
 }
 
-.mp-brand-logo{
+.mp-brand-logo {
   height: 32px;
   width: auto;
 }
 
-.mp-brand-name{
+.mp-brand-name {
   font-family: "Pacifico", cursive;
   font-weight: 400;
   /* responsive brand size */
@@ -67,7 +78,7 @@
 /* ===============================
    APP LAYOUT
 =============================== */
-.mp-root{
+.mp-root {
   /* room for fixed sidebar (280 + gutter) */
   display: block;
   padding: 24px;
@@ -81,7 +92,7 @@
 
 /* ===== SIDEBAR (updated) ===== */
 /* Sidebar is now a container; each inner card uses .mp-sidecard */
-.mp-sidebar{
+.mp-sidebar {
   position: fixed;
   top: calc(var(--topbar-h) + 16px);
   left: 24px;
@@ -97,10 +108,12 @@
 
   display: flex;
   flex-direction: column;
-  gap: 16px; /* space between boxes */
+  gap: 16px;
+  /* space between boxes */
 }
+
 /* ===== SIDEBAR (container) ===== */
-.mp-sidebar{
+.mp-sidebar {
   position: fixed;
   top: calc(var(--topbar-h) + 16px);
   left: 24px;
@@ -127,14 +140,17 @@
 }
 
 /* optional: thinner sidebar scrollbar */
-.mp-sidebar::-webkit-scrollbar { width: 10px; }
+.mp-sidebar::-webkit-scrollbar {
+  width: 10px;
+}
+
 .mp-sidebar::-webkit-scrollbar-thumb {
   background: #d1d5db;
   border-radius: 6px;
 }
 
 /* Boxed panels inside the sidebar */
-.mp-sidecard{
+.mp-sidecard {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -142,7 +158,7 @@
   padding: 16px;
 }
 
-.mp-sidecard-title{
+.mp-sidecard-title {
   font-size: 14px;
   font-weight: 600;
   color: var(--muted);
@@ -150,34 +166,63 @@
 }
 
 /* (Retain older helper if still used somewhere) */
-.mp-sidebar-section + .mp-sidebar-section{ margin-top: 20px; }
-.mp-sidebar-title{
-  font-size: 14px; color: var(--muted);
-  margin: 0 0 8px; font-weight: 600;
+.mp-sidebar-section+.mp-sidebar-section {
+  margin-top: 20px;
 }
-.mp-link{
-  background: transparent; border: 0; color: #111;
-  text-align: left; padding: 8px 10px; border-radius: 10px;
+
+.mp-sidebar-title {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.mp-link {
+  background: transparent;
+  border: 0;
+  color: #111;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 10px;
   cursor: pointer;
 }
-.mp-link:hover{ background:#f3f4f6; }
+
+.mp-link:hover {
+  background: #f3f4f6;
+}
 
 /* Main column */
-.mp-main{ display: flex; flex-direction: column; gap: 24px; }
+.mp-main {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
 
 /* Header row (title + toolbar) */
-.mp-header{ display: flex; align-items: center; justify-content: space-between;margin-top: 20px; }
+.mp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+}
 
 /* Big, responsive "Meal Plan" title */
-.mp-title{
+.mp-title {
   font-size: clamp(28px, 2.2vw, 44px);
   font-weight: 800;
   line-height: 1.1;
   margin: 0;
 }
 
-.mp-toolbar{ display: flex; align-items: center; gap: 8px; }
-.mp-toolbar-spacer{ width: 8px; }
+.mp-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mp-toolbar-spacer {
+  width: 8px;
+}
 
 /* ===== Sidebar buttons & layouts ===== */
 /* 1) Stack buttons vertically */
@@ -185,16 +230,20 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  align-items: flex-start;   /* buttons keep their own natural width */
+  align-items: flex-start;
+  /* buttons keep their own natural width */
 }
 
 /* 2) Buttons size to content, but never overflow the sidebar */
 .mp-sidebar .mp-btn {
-  display: inline-flex;      /* content-based width */
+  display: inline-flex;
+  /* content-based width */
   align-items: center;
   gap: 8px;
-  width: auto;               /* <- key: auto width */
-  max-width: 100%;           /* don't spill out of the panel */
+  width: auto;
+  /* <- key: auto width */
+  max-width: 100%;
+  /* don't spill out of the panel */
   padding: 10px 14px;
   border: 1px solid var(--line);
   background: var(--panel);
@@ -206,19 +255,22 @@
   text-overflow: unset;
 }
 
-.mp-sidebar .mp-btn.ghost { background: transparent; }
-.mp-sidebar .mp-btn.ghost:hover{
-  border-color:#0f62fe;
-  background:#f7faff;
+.mp-sidebar .mp-btn.ghost {
+  background: transparent;
 }
 
-.mp-savr-icon{
-  height:18px;
-  width:18px;
+.mp-sidebar .mp-btn.ghost:hover {
+  border-color: #0f62fe;
+  background: #f7faff;
+}
+
+.mp-savr-icon {
+  height: 18px;
+  width: 18px;
 }
 
 /* Inputs & lists for Virtual Pantry box */
-.mp-input{
+.mp-input {
   width: 100%;
   box-sizing: border-box;
   padding: 10px 12px;
@@ -227,7 +279,7 @@
   margin-bottom: 10px;
 }
 
-.mp-pantry-list{
+.mp-pantry-list {
   list-style: none;
   padding: 0;
   margin: 0 0 10px;
@@ -235,17 +287,24 @@
   gap: 6px;
 }
 
-.mp-chip{
-  display:flex; align-items:center; gap:8px;
-  border:1px solid var(--line); background:var(--panel);
-  padding:8px 12px; border-radius:999px;
+.mp-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  padding: 8px 12px;
+  border-radius: 999px;
 }
-.mp-chip svg{ color:#111; }
+
+.mp-chip svg {
+  color: #111;
+}
 
 /* ===============================
    WEEK BOX (horizontal scroller)
 =============================== */
-.mp-scroller{
+.mp-scroller {
   width: 100%;
   max-width: var(--weekbox-w);
   margin: 0 auto;
@@ -267,116 +326,163 @@
   height: auto;
 }
 
-.mp-scroller::-webkit-scrollbar{ height:10px; }
-.mp-scroller::-webkit-scrollbar-thumb{ background:#d1d5db; border-radius:6px; }
+.mp-scroller::-webkit-scrollbar {
+  height: 10px;
+}
+
+.mp-scroller::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 6px;
+}
 
 /* ===============================
    DAY COLUMN
 =============================== */
-.mp-day{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
+.mp-day {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 
-  display:flex;
-  flex-direction:column;
-  overflow:visible;        /* never clip cards */
-  height:auto;             /* grow to content (Breakfast/Lunch/Dinner fully visible) */
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  /* never clip cards */
+  height: auto;
+  /* grow to content (Breakfast/Lunch/Dinner fully visible) */
 }
 
-.mp-day-head{
-  display:flex; align-items:center; gap:8px;
-  padding:10px 12px;
-  border-bottom:1px solid var(--line);
-  background:#fff;
-  position:sticky; top:0; z-index:1;
-}
-.mp-day-name{ font-weight:700; }
-.mp-day-count{
-  margin-left:auto; background:#f3f4f6; border:1px solid var(--line);
-  padding:2px 8px; border-radius:999px; font-size:12px; color:var(--muted);
+.mp-day-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
-.mp-day-list{
-  display:flex; flex-direction:column;
+.mp-day-name {
+  font-weight: 700;
+}
+
+.mp-day-count {
+  margin-left: auto;
+  background: #f3f4f6;
+  border: 1px solid var(--line);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.mp-day-list {
+  display: flex;
+  flex-direction: column;
   gap: var(--day-gap);
   padding: 10px;
-  overflow: visible;       /* do not make inner columns scroll vertically */
+  overflow: visible;
+  /* do not make inner columns scroll vertically */
 }
 
 /* ===============================
    MEAL CARD
 =============================== */
-.mp-card{
-  display:flex; flex-direction:column;
-  border:1px solid var(--line);
-  border-radius:14px;
-  background:#fff;
-  overflow: visible;       /* don't clip text */
+.mp-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  overflow: visible;
+  /* don't clip text */
 }
 
-.mp-card-img{
+.mp-card-img {
   height: var(--img-h);
-  overflow:hidden; background:#f3f4f6;
+  overflow: hidden;
+  background: #f3f4f6;
   border-top-left-radius: 14px;
   border-top-right-radius: 14px;
 }
-.mp-card-img img{
-  width:100%; height:100%; object-fit:cover; display:block;
+
+.mp-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
-.mp-card-body{ padding: var(--card-pad); }
-.mp-card-title{
+.mp-card-body {
+  padding: var(--card-pad);
+}
+
+.mp-card-title {
   font-size: var(--fs-title);
   line-height: 1.25;
   margin: 0 0 6px;
   font-weight: 700;
 }
 
-.mp-pill{
-  display:inline-block;
+.mp-pill {
+  display: inline-block;
   font-size: var(--fs-pill);
-  color:#111;
-  background:#f3f4f6;
-  border:1px solid var(--line);
-  padding:3px 7px;
-  border-radius:999px;
+  color: #111;
+  background: #f3f4f6;
+  border: 1px solid var(--line);
+  padding: 3px 7px;
+  border-radius: 999px;
 }
 
-.mp-macros{ margin-top:8px; color:var(--muted); font-size: var(--fs-macro); }
+.mp-macros {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: var(--fs-macro);
+}
 
 /* ===============================
    RESPONSIVE
 =============================== */
-@media (max-width: 960px){
+@media (max-width: 960px) {
+
   /* Sidebar becomes normal flow on small screens */
-  .mp-sidebar{
+  .mp-sidebar {
     position: static;
     width: auto;
     padding: 0;
     gap: 16px;
     margin-bottom: 16px;
   }
-  .mp-root{
+
+  .mp-root {
     padding-left: 24px;
   }
-  .mp-scroller{
+
+  .mp-scroller {
     max-width: none;
     grid-auto-columns: minmax(240px, 1fr);
   }
 }
 
 /* Slightly denser on short viewports */
-@media (max-height: 820px){
-  :root{ --img-h: 140px; }
+@media (max-height: 820px) {
+  :root {
+    --img-h: 140px;
+  }
 }
 
 /* ===== Mobile / narrow screens: fixed left sidebar + stacked days ===== */
 @media (max-width: 900px) {
+
   /* Sidebar stays pinned on the left */
-  :root { --sb-w: 220px; }                /* sidebar width on small screens */
-  .mp-sidebar{
+  :root {
+    --sb-w: 220px;
+  }
+
+  /* sidebar width on small screens */
+  .mp-sidebar {
     position: fixed;
     top: calc(var(--topbar-h, 0px) + 12px);
     left: 12px;
@@ -385,33 +491,48 @@
   }
 
   /* Make room for the fixed sidebar */
-  .mp-root{
+  .mp-root {
     padding-left: calc(var(--sb-w) + 24px);
   }
 
   /* Days become a vertical list (no horizontal scroll) */
-  .mp-scroller{
+  .mp-scroller {
     display: flex;
-    flex-direction: column;  /* stack days */
+    flex-direction: column;
+    /* stack days */
     gap: 14px;
-    max-width: 760px;        /* optional: keep content readable */
-    overflow-x: hidden;      /* kill the horizontal scroll on small screens */
+    max-width: 760px;
+    /* optional: keep content readable */
+    overflow-x: hidden;
+    /* kill the horizontal scroll on small screens */
     overflow-y: visible;
   }
 
   /* Day columns take full width */
-  .mp-day{
+  .mp-day {
     width: 100%;
   }
 
   /* Slightly tighter cards on small screens */
-  .mp-card-img{ height: 140px; }
-  .mp-card-title{ font-size: 15px; }
-  .mp-pill{ font-size: 11px; }
-  .mp-macros{ font-size: 12px; }
+  .mp-card-img {
+    height: 140px;
+  }
+
+  .mp-card-title {
+    font-size: 15px;
+  }
+
+  .mp-pill {
+    font-size: 11px;
+  }
+
+  .mp-macros {
+    font-size: 12px;
+  }
 }
+
 /* Pantry list items: label + delete button inline */
-.mp-pantry-item{
+.mp-pantry-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -423,7 +544,7 @@
 }
 
 /* Ensure long item names wrap nicely */
-.mp-pantry-text{
+.mp-pantry-text {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -431,41 +552,50 @@
 
 /* Small icon button for delete */
 /* Pantry list row (keeps the X perfectly centered vertically) */
-.mp-pantry-item{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
+.mp-pantry-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 /* Delete button: no border/box, centered icon */
-.mp-icon-del{
-  all: unset;                 /* clear UA + inherited btn styles */
+.mp-icon-del {
+  all: unset;
+  /* clear UA + inherited btn styles */
   display: grid;
-  place-items: center;        /* centers the X */
+  place-items: center;
+  /* centers the X */
   width: 28px;
   height: 28px;
   cursor: pointer;
   border: none;
   outline: none;
-  background: transparent;    /* no background box */
+  background: transparent;
+  /* no background box */
 }
 
 /* Size the X icon */
-.mp-icon-del svg{
+.mp-icon-del svg {
   width: 16px;
   height: 16px;
 }
 
 /* Hover/active states (just tint the X) */
-.mp-icon-del:hover svg{ color:#dc2626; }
-.mp-icon-del:active svg{ transform: scale(0.95); }
+.mp-icon-del:hover svg {
+  color: #dc2626;
+}
+
+.mp-icon-del:active svg {
+  transform: scale(0.95);
+}
 
 /* Optional: a subtle keyboard focus without a box */
-.mp-icon-del:focus-visible svg{
-  color:#dc2626;
+.mp-icon-del:focus-visible svg {
+  color: #dc2626;
 }
-.mp-empty{
+
+.mp-empty {
   color: var(--muted);
   font-size: 14px;
   padding: 12px;
@@ -473,8 +603,9 @@
   border-radius: 10px;
   background: #fafafa;
 }
+
 /* Quick-add row */
-.mp-quickadd{
+.mp-quickadd {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -482,13 +613,14 @@
 }
 
 /* Input should fill the row */
-.mp-quickadd .mp-input{
+.mp-quickadd .mp-input {
   flex: 1;
-  margin: 0;          /* in case your input has default margins */
+  margin: 0;
+  /* in case your input has default margins */
 }
 
 /* Square + button */
-.mp-add-btn{
+.mp-add-btn {
   display: grid;
   place-items: center;
   width: 44px;
@@ -502,126 +634,207 @@
   cursor: pointer;
 }
 
-.mp-add-btn:hover{ background:#f9fafb; }
-.mp-add-btn:disabled{ opacity:.5; cursor:not-allowed; }
+.mp-add-btn:hover {
+  background: #f9fafb;
+}
+
+.mp-add-btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
 /* Limit the whole sidebar height to the viewport (below the topbar) */
 
 
 /* The pantry card should fill the leftover space inside the sidebar */
-.mp-sidecard.vp{
-  flex: 1 1 auto;                 /* grow to take remaining height */
+.mp-sidecard.vp {
+  flex: 1 1 auto;
+  /* grow to take remaining height */
   display: flex;
   flex-direction: column;
-  min-height: 0;                  /* <-- critical so the list can scroll */
+  min-height: 0;
+  /* <-- critical so the list can scroll */
 }
 
 /* Make the list area scroll within the pantry card */
-.mp-pantry-list{
-  flex: 1 1 auto;                 /* consume vertical space inside card */
-  overflow-y: auto;               /* internal scroll */
+.mp-pantry-list {
+  flex: 1 1 auto;
+  /* consume vertical space inside card */
+  overflow-y: auto;
+  /* internal scroll */
   margin: 10px 0;
   padding: 0;
 }
 
 /* (Nice but optional) keep the empty-state box from getting huge */
-.mp-pantry-empty{
+.mp-pantry-empty {
   flex: 0 0 auto;
 }
 
 /* Keep the add-item input/row from stretching */
-.mp-quickadd, .mp-input, .mp-btn.ghost{
+.mp-quickadd,
+.mp-input,
+.mp-btn.ghost {
   flex: 0 0 auto;
 }
+
 /* Modal shell */
-.mp-modal{
-  position: fixed; inset: 0; z-index: 1000;
-  background: rgba(17,24,39,.45);
-  display: grid; place-items: center;
+.mp-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(17, 24, 39, .45);
+  display: grid;
+  place-items: center;
   padding: 24px;
 }
-.mp-modal-card{
+
+.mp-modal-card {
   width: min(720px, 96vw);
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  display: flex; flex-direction: column;
+  display: flex;
+  flex-direction: column;
   max-height: 85vh;
 }
-.mp-modal-head, .mp-modal-foot{
-  padding: 14px 16px; border-bottom: 1px solid var(--line);
-  display: flex; align-items: center; justify-content: space-between;
+
+.mp-modal-head,
+.mp-modal-foot {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-.mp-modal-foot{ border-top: 1px solid var(--line); border-bottom: 0; }
-.mp-modal-body{
-  padding: 16px; overflow: auto;
+
+.mp-modal-foot {
+  border-top: 1px solid var(--line);
+  border-bottom: 0;
+}
+
+.mp-modal-body {
+  padding: 16px;
+  overflow: auto;
 }
 
 /* Upload row */
-.mp-upload-row{
+.mp-upload-row {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  gap: 10px; align-items: center;
+  gap: 10px;
+  align-items: center;
   margin-bottom: 12px;
 }
-.mp-upload-name{ color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.mp-upload-name {
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 /* Review list */
-.mp-review-title{ margin: 12px 0 6px; font-size: 14px; color: var(--muted); }
-.mp-review-list{ list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-.mp-review-item{
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 12px; border: 1px solid var(--line);
-  border-radius: 10px; background: #fff;
+.mp-review-title {
+  margin: 12px 0 6px;
+  font-size: 14px;
+  color: var(--muted);
 }
-.mp-review-text{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.mp-review-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.mp-review-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.mp-review-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 /* Reuse your icon delete style; ensure no border box */
-.mp-icon-btn{ border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 6px 8px; cursor: pointer; }
-.mp-icon-btn:hover{ background: #f9fafb; }
-.mp-icon-del{ all: unset; display: grid; place-items:center; cursor: pointer; padding: 4px; }
-.mp-icon-del:hover{ color: #dc2626; }
+.mp-icon-btn {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+.mp-icon-btn:hover {
+  background: #f9fafb;
+}
+
+.mp-icon-del {
+  all: unset;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.mp-icon-del:hover {
+  color: #dc2626;
+}
 
 /* === Modal button visibility upgrades === */
 
 /* Bigger, higher-contrast buttons in the modal */
-.mp-modal .mp-btn{
+.mp-modal .mp-btn {
   height: 44px;
   padding: 0 16px;
   border-radius: 12px;
   font-weight: 700;
   letter-spacing: .2px;
-  border: 2px solid #111;         /* crisp outline */
-  background: #ffffff;            /* light surface */
+  border: 2px solid #111;
+  /* crisp outline */
+  background: #ffffff;
+  /* light surface */
   color: #111;
-  box-shadow: 0 1px 0 rgba(0,0,0,.05);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .05);
 }
 
-.mp-modal .mp-btn:hover{
+.mp-modal .mp-btn:hover {
   background: #f3f4f6;
 }
 
-.mp-modal .mp-btn.primary{
-  background: #0f62fe;            /* IBM blue */
+.mp-modal .mp-btn.primary {
+  background: #0f62fe;
+  /* IBM blue */
   border-color: #0f62fe;
   color: #fff;
 }
 
-.mp-modal .mp-btn.primary:hover{
+.mp-modal .mp-btn.primary:hover {
   filter: brightness(1.05);
 }
 
 /* Disabled still readable (not nearly black-on-black) */
-.mp-modal .mp-btn:disabled{
+.mp-modal .mp-btn:disabled {
   background: #e5e7eb;
   border-color: #d1d5db;
   color: #6b7280;
-  opacity: 1;                     /* keep text legible */
+  opacity: 1;
+  /* keep text legible */
   cursor: not-allowed;
 }
 
 /* Make the small “X” close button clearer and tappable */
-.mp-modal .mp-icon-btn{
+.mp-modal .mp-icon-btn {
   border: 2px solid #111;
   background: #fff;
   color: #111;
@@ -632,16 +845,17 @@
   place-items: center;
 }
 
-.mp-modal .mp-icon-btn:hover{
+.mp-modal .mp-icon-btn:hover {
   background: #f3f4f6;
 }
 
 /* Strong, accessible focus ring for keyboard users */
 .mp-modal .mp-btn:focus-visible,
-.mp-modal .mp-icon-btn:focus-visible{
+.mp-modal .mp-icon-btn:focus-visible {
   outline: 3px solid #0f62fe66;
   outline-offset: 2px;
 }
+
 .dashboard-header {
   position: fixed;
   top: 0;
@@ -725,7 +939,53 @@
 
 /* Push layout below header */
 .mp-root {
-  padding-top: 72px; /* only for spacing under the header */
+  padding-top: 72px;
+  /* only for spacing under the header */
   margin: 0;
 }
 
+/* Receipt Upload Styles */
+.scan-upload-area {
+  margin: 20px 0;
+}
+
+.upload-label {
+  display: block;
+  cursor: pointer;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.upload-label:hover {
+  border-color: #0f62fe;
+  background-color: #f8faff;
+}
+
+.upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.upload-icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.upload-hint {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.scan-status {
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: 6px;
+  background-color: #f3f4f6;
+  text-align: center;
+}
