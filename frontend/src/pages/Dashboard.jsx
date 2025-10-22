@@ -1,11 +1,12 @@
 import React, { useRef, useState, useEffect } from "react";
 import "./Dashboard.css";
 import "./GenerateMeals.css";
+import { uploadReceipt, parseReceipt, analyzeReceiptAI } from '../services/api';
 
 /* --- tiny bits --- */
 const CalendarIcon = () => (
   <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-    <path fill="currentColor" d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h1V3a1 1 0 0 1 1-1Zm12 8H5v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9Zm-2-5H7v1a1 1 0 1 1-2 0V5H5a1 1 0 0 0-1 1v2h16V6a1 1 0 0 0-1-1h-1V5a1 1 0 1 1-2 0V5Z"/>
+    <path fill="currentColor" d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h1V3a1 1 0 0 1 1-1Zm12 8H5v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9Zm-2-5H7v1a1 1 0 1 1-2 0V5H5a1 1 0 0 0-1 1v2h16V6a1 1 0 0 0-1-1h-1V5a1 1 0 1 1-2 0V5Z" />
   </svg>
 );
 
@@ -84,6 +85,39 @@ async function scanWithTextractApiGateway(file) {
 /* --- main --- */
 export default function MealPlan() {
   /* Pantry */
+/* ---------- Scan receipt using real API ---------- */
+async function scanWithTextractApiGateway(file, sessionId) {
+  try {
+    // Step 1: Upload to S3 (gets presigned URL and uploads)
+    console.log('📤 Uploading receipt to S3...');
+    const uploadResult = await uploadReceipt(file, sessionId);
+    console.log('✅ Upload successful:', uploadResult);
+
+    // Step 2: Parse receipt with Textract (calls Lambda directly)
+    console.log('🔍 Parsing receipt with Textract...');
+    const parseResult = await parseReceipt(uploadResult.s3Key, sessionId);
+    console.log('✅ Parse successful:', parseResult);
+
+    // Step 3: Format items for display
+    const items = parseResult.result?.items || [];
+
+    // Transform items to match expected format: [{name, qty?, unit?}]
+    const formattedItems = items.map(item => ({
+      name: item.name,
+      qty: item.quantity || null,
+      unit: null  // Textract doesn't extract units by default
+    }));
+
+    return { items: formattedItems };
+
+  } catch (error) {
+    console.error('❌ Receipt scan error:', error);
+    throw error;
+  }
+}
+/* ---------- Main component ---------- */
+export default function Dashboard({ sessionId }) { // Add sessionId prop
+  /* Virtual Pantry */
   const [pantryItems, setPantryItems] = useState([]);
   const [newItem, setNewItem] = useState("");
 
@@ -150,10 +184,20 @@ export default function MealPlan() {
     try {
       setIsParsing(true);
       setScanError("");
-      const { items } = await scanWithTextractApiGateway(selectedFile);
+
+      // Use sessionId from props, or generate one if not provided
+      const userSessionId = sessionId || 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+
+      const { items } = await scanWithTextractApiGateway(selectedFile, userSessionId);
       setParsed(Array.isArray(items) ? items : []);
     } catch { setScanError("We couldn't read that receipt. Try another image/PDF."); }
     finally { setIsParsing(false); }
+    } catch (err) {
+      console.error('Scan error:', err);
+      setScanError("We couldn't read that receipt. Try another image/PDF.");
+    } finally {
+      setIsParsing(false);
+    }
   };
   const removeParsedItem = (idx) => setParsed((p) => p.filter((_, i) => i !== idx));
   const addParsedToPantry = () => {
@@ -234,6 +278,8 @@ export default function MealPlan() {
         <div className="mp-modal" role="dialog" aria-modal="true" aria-labelledby="scan-title"
              onClick={(e)=>{ if(e.target.classList.contains('mp-modal')) closeScan(); }}>
           <div className="mp-modal-card" onClick={(e)=>e.stopPropagation()}>
+        <div className="mp-modal" role="dialog" aria-modal="true" aria-labelledby="scan-title" onClick={(e) => { if (e.target.classList.contains('mp-modal')) closeScan(); }}>
+          <div className="mp-modal-card" onClick={(e) => e.stopPropagation()}>
             <header className="mp-modal-head">
               <h3 id="scan-title">Scan Receipt</h3>
               <button className="mp-icon-btn" onClick={closeScan} aria-label="Close">✕</button>

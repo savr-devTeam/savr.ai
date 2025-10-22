@@ -1,75 +1,181 @@
-# Savr.ai — Autonomous Meal Planning
+<div align="center">
+  <img src="frontend/public/savricon.png" alt="savr.ai" width="120"/>
+  <h1>savr.ai — Autonomous Meal Planning Agent</h1>
+  <p>Scan grocery receipts. Get personalized meal plans. Powered by AWS & AI.</p>
+  
+  **[Live Demo](https://savr-ai-one.vercel.app)** | **[Documentation](./DEPLOYMENT_GUIDE.md)**
+</div>
 
-Savr.ai scans grocery receipts and turns purchases into personalized, actionable meal plans. Designed for a fast hackathon demo, this repo contains a responsive React frontend, serverless AWS backend (Lambda + API Gateway), receipt OCR (Textract), and AI reasoning (Amazon Bedrock / Claude).
+---
 
-Live demo: https://savr-ai-one.vercel.app
+## Project Overview
 
-Quick highlights
+**savr.ai** scans grocery receipts and turns purchases into personalized, actionable meal plans. Designed for fast deployment, this project combines receipt OCR (Amazon Textract), AI reasoning (Amazon Bedrock/Claude), and a serverless AWS backend to deliver intelligent meal recommendations based on dietary restrictions, allergies, and budget constraints.
 
-- Upload a grocery receipt (image / PDF)
-- Parse items & prices with Textract
-- Enrich and reason about groceries with Bedrock (Claude)
-- Generate weekly meal plans tailored to diet, allergies, budget
-- Session-based lightweight user persistence (no third-party auth required for demo)
+### Key Highlights
+
+- Upload grocery receipts (image/PDF)
+- Parse items & prices with Amazon Textract
+- Enrich and reason about groceries using Bedrock (Claude 3.5 Sonnet)
+- Generate weekly meal plans tailored to diet, allergies, and budget
+- Session-based user persistence with DynamoDB
 
 ---
 
 ## Features
 
-- **Receipt Scanning** - Extracts purchased items using **Amazon Textract**
-- **AI Reasoning Engine** - Generates meal plans via **Claude 4.5** on **Amazon Bedrock**
-- **Agent Orchestration** - Uses **Bedrock AgentCore** for reasoning and tool calling
-- **Data Management** - Stores user profiles, receipts, and meal plans in **DynamoDB**
-- **Serverless Backend** - Built with **AWS Lambda** and **API Gateway**
-- **Frontend Dashboard** - Responsive **React + Vite + Vercel** web app
-- **Monitoring & Analytics** - **CloudWatch** and **X-Ray** for logging
+- **Receipt Scanning** - Extracts purchased items using Amazon Textract OCR
+- **AI Reasoning Engine** - Generates meal plans via Claude 3.5 Sonnet on Amazon Bedrock
+- **Agent Orchestration** - Uses Bedrock AgentCore for reasoning and tool calling
+- **Data Management** - Stores user profiles, receipts, and meal plans in DynamoDB
+- **Serverless Backend** - Built with AWS Lambda and API Gateway
+- **Responsive Dashboard** - React + Vite + Vercel web app
+- **Monitoring & Analytics** - CloudWatch and X-Ray for logging
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-**Frontend:** React 18, Vite, Axios, Vercel  
-**Backend:** AWS Lambda (Python 3.9), API Gateway, Textract, Bedrock  
-**Database:** DynamoDB  
-**Storage:** S3
-
-## Screenshot / Demo
-
-Include screenshots or a short GIF here for the presentation. Example:
-
-![Demo placeholder](./frontend/public/demo-placeholder.png)
-
----
-
-## What’s in this repository
-
-- `frontend/` — React + Vite single-page app (Dashboard, MealPlan, ReceiptScan)
-- `backend/` — Lambda handlers (receipt parsing, upload, analyze, preferences)
-- `infra/` — AWS CDK stacks (S3, DynamoDB, Lambda, API Gateway, IAM)
+| Layer | Technologies |
+|-------|-------------|
+| **Frontend** | React 18, Vite, Axios, React Router |
+| **Backend** | AWS Lambda (Python 3.9), API Gateway |
+| **AI/ML** | Amazon Bedrock (Claude 3.5 Sonnet), Amazon Textract |
+| **Database** | DynamoDB |
+| **Storage** | S3 |
+| **Infrastructure** | AWS CDK, CloudFormation |
+| **Deployment** | Vercel (Frontend), AWS (Backend) |
 
 ---
 
-## Architecture (high level)
+## Repository Structure
+
+```
+savr.ai/
+├── frontend/              # React + Vite application
+│   ├── src/
+│   │   ├── pages/        # Dashboard, ReceiptScan, etc.
+│   │   ├── components/   # Reusable UI components
+│   │   ├── services/     # API integration
+│   │   └── context/      # State management
+│   └── public/           # Static assets
+│
+├── backend/
+│   └── lambdas/          # Python Lambda functions
+│       ├── analyze_receipt_ai/    # AI-powered analysis
+│       ├── parse_receipt/         # Textract OCR
+│       ├── generate_plan/         # Meal plan generation
+│       ├── get_meal_plan/         # Retrieve plans
+│       ├── preferences/           # User preferences
+│       └── api_upload/            # S3 presigned URLs
+│
+└── infra/                # AWS CDK infrastructure
+    └── stacks/           # Infrastructure definitions
+```
+
+---
+
+## Architecture
+
+**High-Level Flow:**
 
 1. Frontend uploads receipts via presigned S3 URLs (Lambda generates URL)
-2. Textract (via `parse_receipt` Lambda) extracts items/prices from the receipt
-3. AI analysis Lambda (`analyze_receipt_ai`) calls Amazon Bedrock (Claude) to produce categories, recipes, health & budget insights
+2. Textract (`parse_receipt` Lambda) extracts items/prices from receipt
+3. AI analysis Lambda (`analyze_receipt_ai`) calls Bedrock (Claude) for categories, recipes, health & budget insights
 4. Meal planning generation uses Bedrock and stores plans in DynamoDB
+5. Frontend retrieves and displays personalized meal plans
 
-Diagram (suggested for slides):
+**System Architecture Diagram:**
 
-- Browser → API Gateway → Lambda → S3 / DynamoDB / Bedrock
+![System Architecture](frontend/public/systemarchitectfinal.png)
 
 ---
 
-## API (important endpoints)
+## Getting Started
 
-Base URL: set `VITE_API_URL` in `frontend/.env` or rely on the fallback configured in `frontend/src/services/api.js`.
+### Prerequisites
 
-- POST `/upload` — Request a presigned S3 URL. Body: `{ fileName, contentType, userId }` → returns `{ uploadUrl, s3Key }`
-- POST `/parse-receipt` — Parse an uploaded receipt. Body: `{ s3Key, userId }` → returns parsed items
-- POST `/analyze-receipt` — Bedrock-powered AI analysis. Body: `{ s3Key, userId }` → returns insights, recipe suggestions, budget analysis
-- POST `/generate-plan` — Generate a meal plan from preferences. Body: `{ preferences, userId }`
-- GET `/meal-plan` — Fetch stored meal plan by `userId`
+- Node.js 18+ and npm
+- Python 3.9+
+- AWS Account with configured credentials (`aws configure`)
+- AWS Bedrock access (request Claude 3.5 Sonnet model access)
 
-If you hit a 404 for `/upload` or other endpoints, confirm `VITE_API_URL` points to the correct API Gateway stage URL.
+### 1. Frontend Setup
+
+```bash
+cd frontend
+npm install
+npm run dev          # Runs on http://localhost:5173
+```
+
+### 2. Deploy AWS Infrastructure
+
+```bash
+cd infra
+
+# Setup Python environment
+python -m venv .venv
+.venv\Scripts\activate    # Windows
+# source .venv/bin/activate  # Mac/Linux
+
+pip install -r requirements.txt
+
+# Bootstrap CDK (first time only)
+cdk bootstrap
+
+# Deploy all stacks
+cdk deploy --all
+```
+
+### 3. Configure Frontend
+
+After deploying, update `frontend/.env`:
+```env
+VITE_API_URL=https://your-api-gateway-url.execute-api.us-east-1.amazonaws.com/prod
+```
+
+### 4. Deploy Frontend
+
+```bash
+cd frontend
+npm run build
+vercel --prod
+```
+
+---
+
+## API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/upload` | POST | Request presigned S3 URL for receipt upload |
+| `/parse-receipt` | POST | Parse uploaded receipt with Textract |
+| `/analyze-receipt` | POST | AI-powered analysis with Bedrock |
+| `/generate-plan` | POST | Generate meal plan from preferences |
+| `/meal-plan` | GET | Fetch stored meal plan by userId |
+
+**Example Request:**
+```bash
+curl -X POST https://your-api-url/upload \
+  -H "Content-Type: application/json" \
+  -d '{"fileName": "receipt.jpg", "contentType": "image/jpeg", "userId": "user123"}'
+```
+
+---
+
+## AWS Cost Estimation
+
+Expected monthly costs (light usage):
+- Lambda: $0-5
+- DynamoDB: $0-2
+- S3: $0-1
+- API Gateway: $0-3
+- Bedrock AI: $5-20 (usage-based)
+- **Total: ~$10-30/month**
+
+---
+
+<div align="center">
+  <p><strong>Built with AWS, React, and AI</strong></p>
+  <p>© 2025 Savr.ai Dev Team</p>
+</div>

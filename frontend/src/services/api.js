@@ -1,7 +1,8 @@
 import axios from 'axios'
 
 // Use environment variable or fallback to Lambda API Gateway
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://2bficji0m1.execute-api.us-east-2.amazonaws.com/prod'
+const API_BASE_URL =
+    import.meta.env.VITE_API_URL || 'https://2bficji0m1.execute-api.us-east-2.amazonaws.com/prod'
 
 console.log('API Configuration:', {
     envVar: import.meta.env.VITE_API_URL,
@@ -34,26 +35,26 @@ const handleApiError = (error, context = '') => {
                 baseURL: error.config?.baseURL
             }
         })
-        
+
         throw {
             status: 0,
             message: `Network error: Unable to reach ${error.config?.baseURL}. Check API endpoint and CORS settings.`,
             originalError: error
         }
     }
-    
-    const errorMessage = error.response?.data?.message || 
-                        error.response?.data?.error || 
-                        error.message || 
-                        'Unknown error occurred'
-    
+
+    const errorMessage = error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        'Unknown error occurred'
+
     console.error(`API Error ${context}:`, {
         status: error.response?.status,
         message: errorMessage,
         data: error.response?.data,
         url: error.config?.url
     })
-    
+
     throw {
         status: error.response?.status,
         message: errorMessage,
@@ -69,19 +70,19 @@ api.interceptors.request.use((config) => {
     if (!config.baseURL) {
         config.baseURL = API_BASE_URL
     }
-    
+
     const token = localStorage.getItem('id_token')
     if (token) {
         config.headers.Authorization = `Bearer ${token}`
     }
-    
+
     console.log('Request config:', {
         method: config.method,
         url: config.url,
         baseURL: config.baseURL,
         fullURL: `${config.baseURL}${config.url}`
     })
-    
+
     return config
 }, (error) => {
     return Promise.reject(error)
@@ -174,7 +175,9 @@ export const uploadToS3 = async (uploadUrl, file) => {
                 'Content-Type': file.type
             }
         })
-        return { s3Key: uploadUrl.split('/').pop() }
+        return {
+            s3Key: uploadUrl.split('/').pop()
+        }
     } catch (error) {
         handleApiError(error, 'uploadToS3')
     }
@@ -188,14 +191,18 @@ export const uploadToS3 = async (uploadUrl, file) => {
  * @returns {Promise<Object>} Upload response with S3 key
  * @throws {Object} Error object with status and message
  */
-export const uploadReceipt = async (file, userId) => {
+export const uploadReceipt = async (file, userId = 'anonymous') => {
     try {
-        console.log('uploadReceipt called with:', { name: file.name, type: file.type, size: file.size })
-        
+        console.log('uploadReceipt called with:', {
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            userId
+        })
         // Step 1: Get presigned URL
         console.log('Calling getUploadUrl...')
-        const uploadData = await getUploadUrl(file.name, file.type)
-        console.log('Got upload URL:', uploadData)
+        const uploadData = await getUploadUrl(file.name, file.type, userId) // ✅ Pass userId
+
 
         // Step 2: Upload to S3
         console.log('Uploading to S3...')

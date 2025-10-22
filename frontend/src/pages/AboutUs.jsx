@@ -1,4 +1,3 @@
-import { useNavigation } from '../hooks/useNavigation'
 import './AboutUs.css'
 
 const AboutUs = () => {
