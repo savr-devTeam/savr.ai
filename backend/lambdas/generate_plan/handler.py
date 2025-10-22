@@ -180,7 +180,7 @@ def generate_meal_plan_with_ai(preferences, grocery_items):
             modelId='us.anthropic.claude-3-5-sonnet-20241022-v2:0',
             body=json.dumps({
                 'anthropic_version': 'bedrock-2023-05-31',
-                'max_tokens': 8000,
+                'max_tokens': 4000,
                 'messages': [
                     {
                         'role': 'user',
@@ -194,9 +194,6 @@ def generate_meal_plan_with_ai(preferences, grocery_items):
         # Parse response
         response_body = json.loads(response['body'].read())
         meal_plan_text = response_body['content'][0]['text']
-        
-        print(f"DEBUG: Claude response length: {len(meal_plan_text)}")
-        print(f"DEBUG: Claude response preview: {meal_plan_text[:500]}...")
         
         # Parse the structured meal plan from Claude's response
         meal_plan = parse_meal_plan_response(meal_plan_text)
@@ -233,28 +230,18 @@ RESPONSE FORMAT (JSON):
 {{
   "weeklyPlan": {{
     "monday": {{
-      "breakfast": {{"name": "Meal Name", "ingredients": ["ingredient1", "ingredient2"], "calories": 400, "protein": 20, "carbs": 45, "fat": 15, "prepTime": "10 mins"}},
-      "lunch": {{"name": "Meal Name", "ingredients": ["ingredient1", "ingredient2"], "calories": 500, "protein": 25, "carbs": 55, "fat": 18, "prepTime": "15 mins"}},
-      "dinner": {{"name": "Meal Name", "ingredients": ["ingredient1", "ingredient2"], "calories": 600, "protein": 35, "carbs": 60, "fat": 20, "prepTime": "25 mins"}},
-      "snacks": [{{"name": "Snack Name", "ingredients": ["ingredient1"], "calories": 150, "protein": 8, "carbs": 15, "fat": 6, "prepTime": "5 mins"}}]
+      "breakfast": {{"name": "Meal Name", "calories": 400, "protein": 20, "carbs": 45, "fat": 15}},
+      "lunch": {{"name": "Meal Name", "calories": 500, "protein": 25, "carbs": 55, "fat": 18}},
+      "dinner": {{"name": "Meal Name", "calories": 600, "protein": 35, "carbs": 60, "fat": 20}},
+      "snacks": [{{"name": "Snack Name", "calories": 150, "protein": 8, "carbs": 15, "fat": 6}}]
     }},
-    "tuesday": {{ ... }},
-    "wednesday": {{ ... }},
-    "thursday": {{ ... }},
-    "friday": {{ ... }},
-    "saturday": {{ ... }},
-    "sunday": {{ ... }}
-  }},
-  "weeklyTotals": {{
-    "totalCalories": 14000,
-    "avgDailyCalories": 2000,
-    "totalProtein": 1050,
-    "totalCarbs": 1400,
-    "totalFat": 455,
-    "estimatedCost": 85
-  }},
-  "shoppingList": ["item1", "item2", "item3"],
-  "tips": ["tip1", "tip2", "tip3"]
+    "tuesday": {{ "breakfast": {{"name": "...", "calories": 400, "protein": 20, "carbs": 45, "fat": 15}}, "lunch": {{"name": "...", "calories": 500, "protein": 25, "carbs": 55, "fat": 18}}, "dinner": {{"name": "...", "calories": 600, "protein": 35, "carbs": 60, "fat": 20}}, "snacks": [{{"name": "...", "calories": 150, "protein": 8, "carbs": 15, "fat": 6}}] }},
+    "wednesday": {{ "breakfast": {{"name": "...", "calories": 400, "protein": 20, "carbs": 45, "fat": 15}}, "lunch": {{"name": "...", "calories": 500, "protein": 25, "carbs": 55, "fat": 18}}, "dinner": {{"name": "...", "calories": 600, "protein": 35, "carbs": 60, "fat": 20}}, "snacks": [{{"name": "...", "calories": 150, "protein": 8, "carbs": 15, "fat": 6}}] }},
+    "thursday": {{ "breakfast": {{"name": "...", "calories": 400, "protein": 20, "carbs": 45, "fat": 15}}, "lunch": {{"name": "...", "calories": 500, "protein": 25, "carbs": 55, "fat": 18}}, "dinner": {{"name": "...", "calories": 600, "protein": 35, "carbs": 60, "fat": 20}}, "snacks": [{{"name": "...", "calories": 150, "protein": 8, "carbs": 15, "fat": 6}}] }},
+    "friday": {{ "breakfast": {{"name": "...", "calories": 400, "protein": 20, "carbs": 45, "fat": 15}}, "lunch": {{"name": "...", "calories": 500, "protein": 25, "carbs": 55, "fat": 18}}, "dinner": {{"name": "...", "calories": 600, "protein": 35, "carbs": 60, "fat": 20}}, "snacks": [{{"name": "...", "calories": 150, "protein": 8, "carbs": 15, "fat": 6}}] }},
+    "saturday": {{ "breakfast": {{"name": "...", "calories": 400, "protein": 20, "carbs": 45, "fat": 15}}, "lunch": {{"name": "...", "calories": 500, "protein": 25, "carbs": 55, "fat": 18}}, "dinner": {{"name": "...", "calories": 600, "protein": 35, "carbs": 60, "fat": 20}}, "snacks": [{{"name": "...", "calories": 150, "protein": 8, "carbs": 15, "fat": 6}}] }},
+    "sunday": {{ "breakfast": {{"name": "...", "calories": 400, "protein": 20, "carbs": 45, "fat": 15}}, "lunch": {{"name": "...", "calories": 500, "protein": 25, "carbs": 55, "fat": 18}}, "dinner": {{"name": "...", "calories": 600, "protein": 35, "carbs": 60, "fat": 20}}, "snacks": [{{"name": "...", "calories": 150, "protein": 8, "carbs": 15, "fat": 6}}] }}
+  }}
 }}
 
 Generate a practical, healthy, and budget-friendly meal plan that helps achieve the user's nutrition goals."""
@@ -277,10 +264,7 @@ def parse_meal_plan_response(response_text):
             
             # Convert to frontend format with Pexels images
             weekly_plan = meal_plan_data.get('weeklyPlan', {})
-            print(f"DEBUG: weeklyPlan keys: {list(weekly_plan.keys())}")
-            
             meal_plan_data['meals'] = format_meals_for_frontend(weekly_plan)
-            print(f"DEBUG: Generated {len(meal_plan_data['meals'])} meals")
             
             return meal_plan_data
         else:
@@ -366,11 +350,7 @@ def format_meals_for_frontend(weekly_plan):
     """
     meals = []
     
-    print(f"DEBUG: Formatting meals from weekly_plan with keys: {list(weekly_plan.keys())}")
-    
     for day_name, day_meals in weekly_plan.items():
-        print(f"DEBUG: Processing day {day_name} with meal types: {list(day_meals.keys()) if isinstance(day_meals, dict) else 'not a dict'}")
-        
         if not isinstance(day_meals, dict):
             continue
             
@@ -378,10 +358,9 @@ def format_meals_for_frontend(weekly_plan):
             meal_data = day_meals.get(meal_type)
             if meal_data:
                 meal_name = meal_data.get('name', 'Untitled Meal')
-                print(f"DEBUG: Getting Pexels image for {meal_type}: {meal_name}")
                 
-                # Get image from Pexels
-                img_url = get_meal_image(meal_name, meal_type)
+                # Get image from Pexels (use default for speed)
+                img_url = get_default_image(meal_type)
                 
                 # Format for frontend
                 meals.append({
@@ -401,10 +380,9 @@ def format_meals_for_frontend(weekly_plan):
         for snack_data in snacks:
             if snack_data:
                 snack_name = snack_data.get('name', 'Untitled Snack')
-                print(f"DEBUG: Getting Pexels image for snack: {snack_name}")
                 
-                # Get image from Pexels
-                img_url = get_meal_image(snack_name, 'snack')
+                # Get image from Pexels (use default for speed)
+                img_url = get_default_image('snack')
                 
                 # Format for frontend
                 meals.append({
@@ -419,7 +397,6 @@ def format_meals_for_frontend(weekly_plan):
                     'prepTime': snack_data.get('prepTime', 'N/A')
                 })
     
-    print(f"DEBUG: Formatted {len(meals)} total meals with Pexels images")
     return meals
 
 
