@@ -1,7 +1,7 @@
 import React from "react";
 import "./LandingPage.css";
-import laptopImage1 from "/laptop1.png";
-import laptopImage2 from "/laptop2.png";
+import laptopImage1 from "/Laptop0.png";
+import laptopImage2 from "/laptop2.gif";
 
 const LandingPage = ({onNavigate}) => {
   const handleGetStarted = () => {
