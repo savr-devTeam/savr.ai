@@ -81,9 +81,6 @@ const DayColumn = ({ label, items }) => (
   </section>
 );
 
-/* ---------- Import API functions ---------- */
-import { uploadReceipt, parseReceipt } from '../services/api';
-
 /* ---------- Scan receipt using real API ---------- */
 async function scanWithTextractApiGateway(file, sessionId) {
   try {
@@ -115,7 +112,7 @@ async function scanWithTextractApiGateway(file, sessionId) {
   }
 }
 /* ---------- Main component ---------- */
-export default function Dashboard({ sessionId }) {
+export default function Dashboard({ sessionId }) { // Add sessionId prop
   /* Virtual Pantry */
   const [pantryItems, setPantryItems] = useState([]);
   const [newItem, setNewItem] = useState("");
