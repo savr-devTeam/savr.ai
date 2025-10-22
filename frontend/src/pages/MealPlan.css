@@ -82,7 +82,6 @@
 /* Sidebar is now a container; each inner card uses .mp-sidecard */
 .mp-sidebar{
   position: fixed;
-  margin-top: 10px;
   top: calc(var(--topbar-h) + 16px);
   left: 24px;
   width: 280px;
