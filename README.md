@@ -16,7 +16,7 @@
 
 - Upload grocery receipts (image/PDF)
 - Parse items & prices with Amazon Textract
-- Enrich and reason about groceries using Bedrock (Claude 4.5 Sonnet)
+- Enrich and reason about groceries using Bedrock (Claude 3.5 Sonnet v2)
 - Generate weekly meal plans tailored to diet, allergies, and budget
 - Session-based user persistence with DynamoDB
 
@@ -25,7 +25,7 @@
 ## Features
 
 - **Receipt Scanning** - Extracts purchased items using Amazon Textract OCR
-- **AI Reasoning Engine** - Generates meal plans via Claude 4.5 Sonnet on Amazon Bedrock
+- **AI Reasoning Engine** - Generates meal plans via Claude 3.5 Sonnet v2 on Amazon Bedrock
 - **Agent Orchestration** - Uses Bedrock AgentCore for reasoning and tool calling
 - **Data Management** - Stores user profiles, receipts, and meal plans in DynamoDB
 - **Serverless Backend** - Built with AWS Lambda and API Gateway
@@ -40,7 +40,7 @@
 |-------|-------------|
 | **Frontend** | React 18, Vite, Axios, React Router |
 | **Backend** | AWS Lambda (Python 3.9), API Gateway |
-| **AI/ML** | Amazon Bedrock (Claude 4.5 Sonnet), Amazon Textract |
+| **AI/ML** | Amazon Bedrock (Claude 3.5 Sonnet v2), Amazon Textract |
 | **Database** | DynamoDB |
 | **Storage** | S3 |
 | **Infrastructure** | AWS CDK, CloudFormation |
