@@ -202,7 +202,6 @@ export default function MealPlan({ sessionId } = {}) {
                 <img src="/savricon.png" alt="" className="mp-savr-icon" />
                 Generate Meal Plan
               </button>
-              <button className="mp-btn ghost" onClick={clearWeek}>Clear Week</button>
               <button className="mp-btn ghost" onClick={openScan}>Scan Receipt</button>
             </div>
           </div>
@@ -233,7 +232,6 @@ export default function MealPlan({ sessionId } = {}) {
           <header className="mp-header">
             <h1 className="mp-title">This Weeks Meal Plan {hasCustomPlan ? "" : ""}</h1>
             <div className="mp-toolbar">
-              <button className="mp-chip"><CalendarIcon /><span>Weekly Plan</span></button>
               <button className="mp-chip" onClick={() => window.location.assign("/#GenerateMeals")}>
                 <img src="/savricon.png" alt="" className="mp-savr-icon" />
                 Generate Meal Plan

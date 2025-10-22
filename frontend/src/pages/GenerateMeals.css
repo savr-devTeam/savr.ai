@@ -412,4 +412,53 @@
   border: 1px solid #e5e7eb;
   box-shadow: 0 4px 14px rgba(17,24,39,.08);
 }
+/* Header layout */
+.mp-header{
+  display:flex;
+  align-items:center;           /* vertically center title + buttons */
+  justify-content:space-between;
+}
 
+/* Right side button bar */
+.mp-toolbar{
+  display:flex;
+  align-items:center;           /* align the two buttons perfectly */
+  gap:14px;                     /* space between them */
+}
+
+/* Button base (both buttons) */
+.ai-btn{
+  margin:0;                     /* kill any top offset */
+  padding:12px 22px;
+  border-radius:28px;
+  font-weight:700;
+  line-height:1;                /* same height for both */
+  display:inline-flex;
+  align-items:center;           /* vertically center text */
+  justify-content:center;
+  border:1px solid rgba(0,0,0,0.06);
+  background:#fff;
+  box-shadow:0 6px 22px rgba(16,24,40,.08);
+}
+
+/* Primary button */
+.ai-btn.primary,
+.save-btn{
+  background:#111827;           /* your dark brand color */
+  color:#fff;
+  border-color:transparent;
+}
+
+/* Optional: make both exactly same height */
+.ai-btn,
+.save-btn{
+  min-height:48px;
+}
+/* Weekday header: not sticky */
+.mp-day-head{
+  position: static;    /* or 'relative'—both will behave non-sticky */
+  top: auto;
+  z-index: auto;
+  box-shadow: none;    /* optional: remove any sticky shadow */
+  background: transparent; /* optional: if you had a sticky background */
+}
