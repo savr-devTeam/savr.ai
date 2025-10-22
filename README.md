@@ -85,10 +85,9 @@ savr.ai/
 4. Meal planning generation uses Bedrock and stores plans in DynamoDB
 5. Frontend retrieves and displays personalized meal plans
 
-**Diagram:**
-```
-Browser → API Gateway → Lambda Functions → S3 / DynamoDB / Bedrock
-```
+**System Architecture Diagram:**
+
+![System Architecture](frontend/public/systemarchitectfinal.png)
 
 ---
 
@@ -197,18 +196,6 @@ Expected monthly costs (light usage):
 - API Gateway: $0-3
 - Bedrock AI: $5-20 (usage-based)
 - **Total: ~$10-30/month**
-
----
-
-## Contributing
-
-We welcome contributions! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m "feat: add amazing feature"`
-4. Push to the branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
 
 ---
 
