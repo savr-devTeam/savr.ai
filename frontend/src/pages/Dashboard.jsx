@@ -89,6 +89,7 @@ export default function MealPlan({ sessionId } = {}) {
   const [newItem, setNewItem] = useState("");
   const [week, setWeek] = useState(emptyWeek());
   const [hasCustomPlan, setHasCustomPlan] = useState(false);
+  const [scanOpen, setScanOpen] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("savr_pantry_items", JSON.stringify(pantryItems));
@@ -103,7 +104,7 @@ export default function MealPlan({ sessionId } = {}) {
         setWeek(saved);
         setHasCustomPlan(true);
       }
-    } catch {}
+    } catch { }
   }, []);
 
   useEffect(() => {
@@ -148,7 +149,7 @@ export default function MealPlan({ sessionId } = {}) {
           <button
             className="mp-chip"
             onClick={() => window.location.assign("/#GenerateMeals")}>
-            <img src="/savricon.png" alt="" className="mp-savr-icon" />  
+            <img src="/savricon.png" alt="" className="mp-savr-icon" />
             Generate Meal Plan
           </button>
         </div>
@@ -228,6 +229,25 @@ export default function MealPlan({ sessionId } = {}) {
           </div>
         </main>
       </div>
+
+      {/* Scan Receipt Modal */}
+      {scanOpen && (
+        <div className="mp-modal" onClick={() => setScanOpen(false)}>
+          <div className="mp-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="mp-modal-head">
+              <h3>Scan Receipt</h3>
+              <button className="mp-icon-btn" onClick={() => setScanOpen(false)}>×</button>
+            </div>
+            <div className="mp-modal-body">
+              <p>Receipt scanning functionality will be available soon!</p>
+              <p>For now, you can manually add items to your Virtual Pantry.</p>
+            </div>
+            <div className="mp-modal-foot">
+              <button className="mp-btn" onClick={() => setScanOpen(false)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
