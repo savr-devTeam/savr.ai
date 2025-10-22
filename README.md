@@ -3,7 +3,7 @@
   <h1>savr.ai — Autonomous Meal Planning Agent</h1>
   <p>Scan grocery receipts. Get personalized meal plans. Powered by AWS & AI.</p>
   
-  **[Live Demo](https://savr-ai-one.vercel.app)** | **[Documentation](./DEPLOYMENT_GUIDE.md)**
+  **[Live Demo](https://savr-ai-one.vercel.app)** 
 </div>
 
 ---
@@ -16,7 +16,7 @@
 
 - Upload grocery receipts (image/PDF)
 - Parse items & prices with Amazon Textract
-- Enrich and reason about groceries using Bedrock (Claude 3.5 Sonnet)
+- Enrich and reason about groceries using Bedrock (Claude 4.5 Sonnet)
 - Generate weekly meal plans tailored to diet, allergies, and budget
 - Session-based user persistence with DynamoDB
 
@@ -25,7 +25,7 @@
 ## Features
 
 - **Receipt Scanning** - Extracts purchased items using Amazon Textract OCR
-- **AI Reasoning Engine** - Generates meal plans via Claude 3.5 Sonnet on Amazon Bedrock
+- **AI Reasoning Engine** - Generates meal plans via Claude 4.5 Sonnet on Amazon Bedrock
 - **Agent Orchestration** - Uses Bedrock AgentCore for reasoning and tool calling
 - **Data Management** - Stores user profiles, receipts, and meal plans in DynamoDB
 - **Serverless Backend** - Built with AWS Lambda and API Gateway
@@ -40,7 +40,7 @@
 |-------|-------------|
 | **Frontend** | React 18, Vite, Axios, React Router |
 | **Backend** | AWS Lambda (Python 3.9), API Gateway |
-| **AI/ML** | Amazon Bedrock (Claude 3.5 Sonnet), Amazon Textract |
+| **AI/ML** | Amazon Bedrock (Claude 4.5 Sonnet), Amazon Textract |
 | **Database** | DynamoDB |
 | **Storage** | S3 |
 | **Infrastructure** | AWS CDK, CloudFormation |
@@ -91,6 +91,59 @@ savr.ai/
 
 ---
 
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ and npm
+- Python 3.9+
+- AWS Account with configured credentials (`aws configure`)
+- AWS Bedrock access (request Claude 4.5 Sonnet model access)
+
+### 1. Frontend Setup
+
+```bash
+cd frontend
+npm install
+npm run dev          # Runs on http://localhost:5173
+```
+
+### 2. Deploy AWS Infrastructure
+
+```bash
+cd infra
+
+# Setup Python environment
+python -m venv .venv
+.venv\Scripts\activate    # Windows
+# source .venv/bin/activate  # Mac/Linux
+
+pip install -r requirements.txt
+
+# Bootstrap CDK (first time only)
+cdk bootstrap
+
+# Deploy all stacks
+cdk deploy --all
+```
+
+### 3. Configure Frontend
+
+After deploying, update `frontend/.env`:
+```env
+VITE_API_URL=https://your-api-gateway-url.execute-api.us-east-1.amazonaws.com/prod
+```
+
+### 4. Deploy Frontend
+
+```bash
+cd frontend
+npm run build
+vercel --prod
+```
+
+---
+
 ## API Endpoints
 
 | Endpoint | Method | Description |
@@ -100,13 +153,6 @@ savr.ai/
 | `/analyze-receipt` | POST | AI-powered analysis with Bedrock |
 | `/generate-plan` | POST | Generate meal plan from preferences |
 | `/meal-plan` | GET | Fetch stored meal plan by userId |
-
-**Example Request:**
-```bash
-curl -X POST https://your-api-url/upload \
-  -H "Content-Type: application/json" \
-  -d '{"fileName": "receipt.jpg", "contentType": "image/jpeg", "userId": "user123"}'
-```
 
 ---
 

@@ -25,8 +25,8 @@ const DAY_LABELS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday
 const SLOTS = ["Breakfast", "Lunch", "Dinner"];
 const emptyWeek = () => DAY_LABELS.map(() => ({ Breakfast:null, Lunch:null, Dinner:null }));
 
-/* Replace with your real endpoint later */
-const GENERATE_ENDPOINT = "https://<api-id>.execute-api.<region>.amazonaws.com/generate-meals";
+// Import API function
+import { generateMealPlan } from '../services/api';
 
 /* Storage + channel keys */
 const STORAGE_KEY = "savr.week.v1";
@@ -35,6 +35,18 @@ const CHANNEL_NAME = "savr";
 /* --- Page (DRAFT workflow) --- */
 export default function GenerateMeals() {
   // Draft you are editing here
+/* --- Page --- */
+export default function GenerateMeals({ sessionId }) {
+  /* Load pantry items from localStorage */
+  const [pantryItems] = useState(() => {
+    try {
+      const saved = localStorage.getItem('savr_pantry_items');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
   const [week, setWeek] = useState(emptyWeek());
   // Snapshot of what’s currently on the dashboard
   const [savedWeek, setSavedWeek] = useState(emptyWeek());
@@ -54,7 +66,7 @@ export default function GenerateMeals() {
           setSavedWeek(w);
         }
       }
-    } catch {}
+    } catch { }
   }, []);
 
   // 2) Setup broadcaster (don’t send until the user saves)
@@ -136,6 +148,7 @@ export default function GenerateMeals() {
   };
 
   // Suggestions (mock)
+  // Generate meals using Claude AI based on pantry items
   const generateWithAI = async () => {
     try {
       setIsGenerating(true);
@@ -145,6 +158,36 @@ export default function GenerateMeals() {
       const meals = MOCK_MEALS;
       setSuggestions(meals);
     } catch {
+
+      console.log('🤖 Generating meals with Claude AI...');
+      console.log('Pantry items:', pantryItems);
+
+      // Call the API with pantry items
+      const response = await generateMealPlan(
+        pantryItems,
+        {
+          budget: 100,
+          dietaryRestrictions: '',
+          nutritionGoal: 'maintenance',
+          caloricTarget: 2000,
+          proteinTarget: 150,
+          carbTarget: 200,
+          fatTarget: 65
+        },
+        sessionId || 'anonymous'
+      );
+
+      console.log('✅ Meals generated:', response);
+
+      // Extract meals array from response
+      const meals = response.meals || [];
+      setSuggestions(meals);
+
+      if (meals.length === 0) {
+        setError("No meals generated. Try adding more items to your pantry.");
+      }
+    } catch (err) {
+      console.error('❌ Error generating meals:', err);
       setError("Sorry—couldn't generate meals. Try again.");
     } finally {
       setIsGenerating(false);
@@ -175,6 +218,13 @@ export default function GenerateMeals() {
                 Save & View on Dashboard
               </button>
             </div>
+            <button
+              className="save-btn"
+              onClick={() => window.location.assign("/#Dashboard")}
+              title="Save and return to Dashboard"
+            >
+              Save & View on Dashboard
+            </button>
           </header>
 
           {/* ------- SPLIT PANES ------- */}
@@ -204,8 +254,8 @@ export default function GenerateMeals() {
                   const byType = (t) => suggestions.filter((m) => m.meal?.toLowerCase() === t);
                   const rows = [
                     { key: "breakfast", label: "Breakfast", data: byType("breakfast") },
-                    { key: "lunch",     label: "Lunch",     data: byType("lunch") },
-                    { key: "dinner",    label: "Dinner",    data: byType("dinner") },
+                    { key: "lunch", label: "Lunch", data: byType("lunch") },
+                    { key: "dinner", label: "Dinner", data: byType("dinner") },
                   ];
                   return rows.map(({ key, label, data }) =>
                     data.length ? (

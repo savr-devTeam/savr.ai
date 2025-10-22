@@ -29,9 +29,9 @@ const MealCard = ({ item }) => (
 /* --- shared scaffold --- */
 const STORAGE_KEY = "savr.week.v1";
 const CHANNEL_NAME = "savr";
-const DAY_LABELS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-const SLOTS = ["Breakfast","Lunch","Dinner"];
-const emptyWeek = () => DAY_LABELS.map(() => ({ Breakfast:null, Lunch:null, Dinner:null }));
+const DAY_LABELS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+const SLOTS = ["Breakfast", "Lunch", "Dinner"];
+const emptyWeek = () => DAY_LABELS.map(() => ({ Breakfast: null, Lunch: null, Dinner: null }));
 
 /* Day column that always shows all 3 slots */
 function DayColumn({ label, day }) {
@@ -96,9 +96,21 @@ async function scanWithTextractApiGateway(file, sessionId) {
 
 /* --- main component --- */
 export default function MealPlan({ sessionId } = {}) {
-  /* Pantry */
-  const [pantryItems, setPantryItems] = useState([]);
+  /* Pantry - load from localStorage */
+  const [pantryItems, setPantryItems] = useState(() => {
+    try {
+      const saved = localStorage.getItem('savr_pantry_items');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [newItem, setNewItem] = useState("");
+
+  /* Save pantry items to localStorage whenever they change */
+  useEffect(() => {
+    localStorage.setItem('savr_pantry_items', JSON.stringify(pantryItems));
+  }, [pantryItems]);
 
   /* Saved week (NO DEMO) */
   const [week, setWeek] = useState(emptyWeek());
@@ -114,7 +126,7 @@ export default function MealPlan({ sessionId } = {}) {
         setWeek(saved);
         setHasCustomPlan(true);
       }
-    } catch {}
+    } catch { }
   }, []);
 
   /* Live updates from GenerateMeals */
