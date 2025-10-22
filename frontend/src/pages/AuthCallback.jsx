@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigation } from '../hooks/useNavigation'
 import './AuthCallback.css';
 
 function AuthCallback() {

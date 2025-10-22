@@ -81,35 +81,38 @@ const DayColumn = ({ label, items }) => (
   </section>
 );
 
-/* ---------- CALL YOUR API GATEWAY (AnalyzeExpense) ---------- */
-/* Replace SCAN_ENDPOINT with your real endpoint. Return shape: { items: [{name, qty?, unit?}, ...] } */
-const SCAN_ENDPOINT = "https://<api-id>.execute-api.<region>.amazonaws.com/scan-receipt";
-
-async function scanWithTextractApiGateway(file) {
+/* ---------- Scan receipt using real API ---------- */
+async function scanWithTextractApiGateway(file, sessionId) {
   try {
     // Step 1: Upload to S3 (gets presigned URL and uploads)
-    console.log('Uploading receipt to S3...');
+    console.log('📤 Uploading receipt to S3...');
     const uploadResult = await uploadReceipt(file, sessionId);
+    console.log('✅ Upload successful:', uploadResult);
 
-    // Step 2: Wait for S3 trigger to invoke Textract (automatic)
-    // Give it 3-5 seconds to process
-    await new Promise(resolve => setTimeout(resolve, 5000));
-
-    // Step 3: Parse receipt (calls your Lambda)
-    console.log('Parsing receipt with Textract...');
+    // Step 2: Parse receipt with Textract (calls Lambda directly)
+    console.log('🔍 Parsing receipt with Textract...');
     const parseResult = await parseReceipt(uploadResult.s3Key, sessionId);
+    console.log('✅ Parse successful:', parseResult);
 
-    // Step 4: Format items for display
+    // Step 3: Format items for display
     const items = parseResult.result?.items || [];
-    return { items };
+
+    // Transform items to match expected format: [{name, qty?, unit?}]
+    const formattedItems = items.map(item => ({
+      name: item.name,
+      qty: item.quantity || null,
+      unit: null  // Textract doesn't extract units by default
+    }));
+
+    return { items: formattedItems };
 
   } catch (error) {
-    console.error('Receipt scan error:', error);
+    console.error('❌ Receipt scan error:', error);
     throw error;
   }
 }
 /* ---------- Main component ---------- */
-export default function Dashboard({ sessionId }) {
+export default function Dashboard({ sessionId }) { // Add sessionId prop
   /* Virtual Pantry */
   const [pantryItems, setPantryItems] = useState([]);
   const [newItem, setNewItem] = useState("");
@@ -155,10 +158,10 @@ export default function Dashboard({ sessionId }) {
       setIsParsing(true);
       setScanError("");
 
-      // Get sessionId from props
-      const sessionId = 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+      // Use sessionId from props, or generate one if not provided
+      const userSessionId = sessionId || 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
 
-      const { items } = await scanWithTextractApiGateway(selectedFile, sessionId);
+      const { items } = await scanWithTextractApiGateway(selectedFile, userSessionId);
       setParsed(Array.isArray(items) ? items : []);
     } catch (err) {
       console.error('Scan error:', err);
