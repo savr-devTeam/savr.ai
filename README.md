@@ -91,16 +91,6 @@ savr.ai/
 
 ---
 
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+ and npm
-- Python 3.9+
-- AWS Account with configured credentials (`aws configure`)
-- AWS Bedrock access (request Claude 3.5 Sonnet model access)
----
-
 ## API Endpoints
 
 | Endpoint | Method | Description |
