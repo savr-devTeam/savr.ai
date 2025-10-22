@@ -209,7 +209,10 @@ export default function Dashboard({ sessionId }) { // Add sessionId prop
           <div className="mp-sidecard">
             <h4 className="mp-sidebar-title">Quick Buttons</h4>
             <div className="mp-quick-buttons">
-              <button className="mp-btn ghost">
+              <button
+                className="mp-btn ghost"
+                onClick={() => window.location.assign("/#GenerateMeals")}
+              >
                 <img src="/savricon.png" alt="" className="mp-savr-icon" />
                 Generate Meal Plan
               </button>
@@ -286,8 +289,11 @@ export default function Dashboard({ sessionId }) { // Add sessionId prop
                 <CalendarIcon />
                 <span>Weekly Plan</span>
               </button>
-              <button className="mp-chip">
-                <img src="/savricon.png" className="mp-savr-icon" alt="" />
+              <button
+                className="mp-chip"
+                onClick={() => window.location.assign("/#GenerateMeals")}
+              >
+                <img src="/savricon.png" alt="" className="mp-savr-icon" />
                 Generate Meal Plan
               </button>
               <div className="mp-toolbar-spacer" />
