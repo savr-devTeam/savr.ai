@@ -31,6 +31,8 @@ def lambda_handler(event, context):
         # Get pantry items from request (NEW: direct pantry items)
         pantry_items = body.get('pantryItems', [])
         
+        print(f"Received request - userId: {user_id}, pantryItems: {pantry_items}")
+        
         # Get user preferences from request or database
         preferences = get_user_preferences(user_id, body.get('preferences', {}))
         
@@ -41,8 +43,12 @@ def lambda_handler(event, context):
             # Convert pantry item strings to dict format
             grocery_items = [{'name': item} for item in pantry_items]
         
+        print(f"Grocery items for meal generation: {grocery_items}")
+        
         # Generate meal plan using Bedrock Claude
         meal_plan = generate_meal_plan_with_ai(preferences, grocery_items)
+        
+        print(f"Generated meal plan with {len(meal_plan.get('meals', []))} meals")
         
         # Save meal plan to DynamoDB
         plan_id = save_meal_plan(user_id, meal_plan, preferences)
@@ -169,9 +175,9 @@ def generate_meal_plan_with_ai(preferences, grocery_items):
         # Create the prompt for Claude
         prompt = create_meal_plan_prompt(preferences, grocery_items)
         
-        # Call Bedrock Claude 4.5 Sonnet (most intelligent model)
+        # Call Bedrock Claude 3.5 Sonnet via cross-region inference profile
         response = bedrock_runtime.invoke_model(
-            modelId='us.anthropic.claude-sonnet-4-5-20250514-v1:0',
+            modelId='us.anthropic.claude-3-5-sonnet-20241022-v2:0',
             body=json.dumps({
                 'anthropic_version': 'bedrock-2023-05-31',
                 'max_tokens': 4000,
@@ -305,6 +311,8 @@ def format_meals_for_frontend(weekly_plan):
     """
     meals = []
     
+    print(f"DEBUG: Formatting meals from weekly_plan with keys: {list(weekly_plan.keys())}")
+    
     # Unsplash image URLs for different meal types (free, no API key needed)
     meal_images = {
         'breakfast': [
@@ -327,9 +335,16 @@ def format_meals_for_frontend(weekly_plan):
     meal_index = {'breakfast': 0, 'lunch': 0, 'dinner': 0}
     
     for day_name, day_meals in weekly_plan.items():
+        print(f"DEBUG: Processing day {day_name} with meal types: {list(day_meals.keys()) if isinstance(day_meals, dict) else 'not a dict'}")
+        
+        if not isinstance(day_meals, dict):
+            continue
+            
         for meal_type in ['breakfast', 'lunch', 'dinner']:
             meal_data = day_meals.get(meal_type)
             if meal_data:
+                print(f"DEBUG: Found {meal_type} for {day_name}: {meal_data.get('name', 'no name')}")
+                
                 # Get image URL (cycle through available images)
                 meal_type_lower = meal_type.lower()
                 images = meal_images.get(meal_type_lower, meal_images['lunch'])
@@ -349,6 +364,7 @@ def format_meals_for_frontend(weekly_plan):
                     'prepTime': meal_data.get('prepTime', 'N/A')
                 })
     
+    print(f"DEBUG: Formatted {len(meals)} total meals")
     return meals
 
 
