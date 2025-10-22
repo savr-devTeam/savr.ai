@@ -210,14 +210,6 @@ We welcome contributions! Please follow these steps:
 4. Push to the branch: `git push origin feature/amazing-feature`
 5. Open a Pull Request
 
-We follow [Conventional Commits](https://www.conventionalcommits.org/) specification.
-
----
-
-## License
-
-ISC License - See LICENSE file for details
-
 ---
 
 <div align="center">
