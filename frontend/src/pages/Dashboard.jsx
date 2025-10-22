@@ -135,55 +135,68 @@ export default function MealPlan({ sessionId } = {}) {
     setHasCustomPlan(false);
   };
 
-  const handleFileUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
+  /* Scan modal state */
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [parsed, setParsed] = useState([]);
+  const [isParsing, setIsParsing] = useState(false);
+  const [scanError, setScanError] = useState("");
+  const fileInputRef = useRef(null);
 
-    setScanStatus("🔄 Uploading and scanning receipt...");
+  const openScan = () => {
+    setScanOpen(true);
+    setSelectedFile(null);
+    setParsed([]);
+    setScanError("");
+  };
 
+  const closeScan = () => setScanOpen(false);
+
+  const onPickFile = () => fileInputRef.current?.click();
+
+  const onFileChange = (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setSelectedFile(f);
+    setParsed([]);
+    setScanError("");
+  };
+
+  useEffect(() => {
+    if (!scanOpen && fileInputRef.current) fileInputRef.current.value = "";
+  }, [scanOpen]);
+
+  const runScan = async () => {
+    if (!selectedFile) return;
     try {
-      const result = await scanWithTextractApiGateway(file, sessionId || 'anonymous');
+      setIsParsing(true);
+      setScanError("");
 
-      if (result.items && result.items.length > 0) {
-        // Add scanned items to pantry
-        const newItems = result.items.map(item => item.name).filter(name => name && name.trim());
-        setPantryItems(prev => {
-          const existing = new Set(prev.map(item => item.toLowerCase()));
-          const uniqueNew = newItems.filter(item => !existing.has(item.toLowerCase()));
-          return [...prev, ...uniqueNew];
-        });
-
-        setScanStatus(`✅ Added ${newItems.length} items to your pantry!`);
-        setTimeout(() => {
-          setScanStatus("");
-          setScanOpen(false);
-        }, 2000);
-      } else {
-        setScanStatus("❌ No items found in receipt. Try a clearer image.");
-      }
-    } catch (error) {
-      console.error("Scan error:", error);
-      setScanStatus("❌ Failed to scan receipt. Please try again.");
+      const userSessionId = sessionId || 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+      const { items } = await scanWithTextractApiGateway(selectedFile, userSessionId);
+      setParsed(Array.isArray(items) ? items : []);
+    } catch (err) {
+      console.error('Scan error:', err);
+      setScanError("We couldn't read that receipt. Try another image/PDF.");
+    } finally {
+      setIsParsing(false);
     }
+  };
+
+  const removeParsedItem = (idx) => setParsed((p) => p.filter((_, i) => i !== idx));
+
+  const addParsedToPantry = () => {
+    if (!parsed.length) return;
+    const labels = parsed.map((it) => `${it.name}${it.qty ? ` x${it.qty}` : ""}${it.unit ? ` ${it.unit}` : ""}`);
+    setPantryItems((p) => [...labels, ...p]);
+    closeScan();
   };
 
   return (
     <>
-      {/* HEADER BAR */}
-      <header className="dashboard-header">
-        <div className="header-left">
-          <img src="/savricon.png" alt="Savr logo" className="header-logo" />
-          <h1 className="header-title pacifico-regular">Savr</h1>
-        </div>
-
-        <div className="header-buttons">
-          <button
-            className="mp-chip"
-            onClick={() => window.location.assign("/#GenerateMeals")}>
-            <img src="/savricon.png" alt="" className="mp-savr-icon" />
-            Generate Meal Plan
-          </button>
-        </div>
+      {/* Brand header */}
+      <header className="mp-topbar">
+        <img src="/savricon.png" alt="Logo" className="mp-brand-logo" />
+        <div className="mp-brand-name"><span className="pacifico-regular">Savr</span></div>
       </header>
 
       {/* MAIN LAYOUT */}
@@ -192,16 +205,12 @@ export default function MealPlan({ sessionId } = {}) {
           <div className="mp-sidecard">
             <h4 className="mp-sidebar-title">Quick Buttons</h4>
             <div className="mp-quick-buttons">
-              <button
-                className="mp-btn ghost"
-                onClick={() => window.location.assign("/#GenerateMeals")}
-              >
+              <button className="mp-btn ghost" onClick={() => window.location.assign("/#GenerateMeals")}>
                 <img src="/savricon.png" alt="" className="mp-savr-icon" />
                 Generate Meal Plan
               </button>
-              <button className="mp-btn ghost" onClick={() => setScanOpen(true)}>
-                Scan Receipt
-              </button>
+              <button className="mp-btn ghost" onClick={clearWeek}>Clear Week</button>
+              <button className="mp-btn ghost" onClick={openScan}>Scan Receipt</button>
             </div>
           </div>
 
@@ -251,7 +260,15 @@ export default function MealPlan({ sessionId } = {}) {
 
         <main className="mp-main">
           <header className="mp-header">
-            <h1 className="mp-title">This Week’s Meal Plan</h1>
+            <h1 className="mp-title">This Weeks Meal Plan {hasCustomPlan ? "" : ""}</h1>
+            <div className="mp-toolbar">
+              <button className="mp-chip"><CalendarIcon /><span>Weekly Plan</span></button>
+              <button className="mp-chip" onClick={() => window.location.assign("/#GenerateMeals")}>
+                <img src="/savricon.png" alt="" className="mp-savr-icon" />
+                Generate Meal Plan
+              </button>
+              <div className="mp-toolbar-spacer" />
+            </div>
           </header>
           <div className="mp-scroller">
             {week.map((day, i) => (
@@ -261,40 +278,54 @@ export default function MealPlan({ sessionId } = {}) {
         </main>
       </div>
 
-      {/* Scan Receipt Modal */}
+      {/* Scan Modal */}
       {scanOpen && (
-        <div className="mp-modal" onClick={() => setScanOpen(false)}>
+        <div
+          className="mp-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="scan-title"
+          onClick={(e) => { if (e.target.classList.contains('mp-modal')) closeScan(); }}
+        >
           <div className="mp-modal-card" onClick={(e) => e.stopPropagation()}>
-            <div className="mp-modal-head">
-              <h3>Scan Receipt</h3>
-              <button className="mp-icon-btn" onClick={() => setScanOpen(false)}>×</button>
-            </div>
+            <header className="mp-modal-head">
+              <h3 id="scan-title">Scan Receipt</h3>
+              <button className="mp-icon-btn" onClick={closeScan} aria-label="Close">✕</button>
+            </header>
+
             <div className="mp-modal-body">
-              <div className="scan-upload-area">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  style={{ display: 'none' }}
-                  id="receipt-upload"
-                />
-                <label htmlFor="receipt-upload" className="upload-label">
-                  <div className="upload-content">
-                    <div className="upload-icon">📄</div>
-                    <p>Click to upload receipt image</p>
-                    <p className="upload-hint">Supports JPG, PNG, PDF</p>
-                  </div>
-                </label>
+              <div className="mp-upload-row">
+                <input ref={fileInputRef} type="file" accept="image/*,.pdf" onChange={onFileChange} hidden />
+                <button className="mp-btn" onClick={onPickFile}>{selectedFile ? "Change file" : "Choose file"}</button>
+                <span className="mp-upload-name">{selectedFile ? selectedFile.name : "No file chosen"}</span>
+                <button className="mp-btn primary" onClick={runScan} disabled={!selectedFile || isParsing}>
+                  {isParsing ? "Scanning…" : "Parse receipt"}
+                </button>
               </div>
-              {scanStatus && (
-                <div className="scan-status">
-                  <p>{scanStatus}</p>
-                </div>
+
+              {scanError && <div className="mp-alert error">{scanError}</div>}
+
+              {!!parsed.length && (
+                <>
+                  <h4 className="mp-review-title">Items found</h4>
+                  <ul className="mp-review-list">
+                    {parsed.map((it, idx) => (
+                      <li key={idx} className="mp-review-item">
+                        <span className="mp-review-text">
+                          {it.name}{it.qty ? ` x${it.qty}` : ""}{it.unit ? ` ${it.unit}` : ""}
+                        </span>
+                        <button className="mp-icon-btn mp-icon-del" aria-label={`Remove ${it.name}`} onClick={() => removeParsedItem(idx)}>✕</button>
+                      </li>
+                    ))}
+                  </ul>
+                </>
               )}
             </div>
-            <div className="mp-modal-foot">
-              <button className="mp-btn" onClick={() => setScanOpen(false)}>Close</button>
-            </div>
+
+            <footer className="mp-modal-foot">
+              <button className="mp-btn ghost" onClick={closeScan}>Cancel</button>
+              <button className="mp-btn primary" disabled={!parsed.length} onClick={addParsedToPantry}>Add to Pantry</button>
+            </footer>
           </div>
         </div>
       )}
