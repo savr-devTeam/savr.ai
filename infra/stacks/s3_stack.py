@@ -8,7 +8,7 @@ from constructs import Construct
 
 
 class S3Stack(Stack):
-    def __init__(self, scope: Construct, construct_id: str, *, parse_receipt_fn=None, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         # Create S3 bucket for storing receipts and other files
@@ -32,9 +32,13 @@ class S3Stack(Stack):
             ]
         )
 
-        # This runs ParseReceiptFunction automatically whenever a file is uploaded
-        if parse_receipt_fn is not None:
-            self.receipts_bucket.add_event_notification(
-                s3.EventType.OBJECT_CREATED,
-                s3n.LambdaDestination(parse_receipt_fn)
-            )
+    def add_parse_trigger(self, parse_receipt_fn):
+        """
+        Add S3 event notification to trigger parse_receipt Lambda on upload
+        This is called after the Lambda function is created
+        """
+        self.receipts_bucket.add_event_notification(
+            s3.EventType.OBJECT_CREATED,
+            s3n.LambdaDestination(parse_receipt_fn),
+            s3.NotificationKeyFilter(prefix="receipts/")  # Only trigger for receipts folder
+        )

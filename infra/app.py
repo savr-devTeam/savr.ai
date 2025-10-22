@@ -18,13 +18,11 @@ env = cdk.Environment(
 # Create stacks with proper dependencies
 iam_stack = IamRolesStack(app, "IamRolesStack", env=env)
 dynamodb_stack = DynamoDBStack(app, "DynamoDBStack", env=env)
-s3_stack = S3Stack(
-    app, 
-    "S3Stack", 
-    env=env,
-    parse_receipt_fn=lambda_stack.parse_receipt_function  # Add this!
-)
 
+# Create S3 bucket first (without trigger)
+s3_stack = S3Stack(app, "S3Stack", env=env)
+
+# Create Lambda functions (needs S3 bucket to exist)
 lambda_stack = LambdaStack(
     app, 
     "LambdaStack",
@@ -35,6 +33,9 @@ lambda_stack = LambdaStack(
     receipts_bucket=s3_stack.receipts_bucket,
     iam_role=iam_stack.lambda_execution_role
 )
+
+# Now add S3 trigger to invoke parse_receipt Lambda on upload
+s3_stack.add_parse_trigger(lambda_stack.parse_receipt_function)
 # Pass lambda functions to API Gateway
 lambda_functions = {
     "auth_login": lambda_stack.auth_login_function,
