@@ -175,7 +175,7 @@ def generate_meal_plan_with_ai(preferences, grocery_items):
         # Create the prompt for Claude
         prompt = create_meal_plan_prompt(preferences, grocery_items)
         
-        # Call Bedrock Claude 3.5 Sonnet via cross-region inference profile
+        # Call Bedrock Claude 3.5 Sonnet via inference profile
         response = bedrock_runtime.invoke_model(
             modelId='us.anthropic.claude-3-5-sonnet-20241022-v2:0',
             body=json.dumps({
@@ -194,6 +194,9 @@ def generate_meal_plan_with_ai(preferences, grocery_items):
         # Parse response
         response_body = json.loads(response['body'].read())
         meal_plan_text = response_body['content'][0]['text']
+        
+        print(f"DEBUG: Claude response length: {len(meal_plan_text)}")
+        print(f"DEBUG: Claude response preview: {meal_plan_text[:500]}...")
         
         # Parse the structured meal plan from Claude's response
         meal_plan = parse_meal_plan_response(meal_plan_text)
@@ -281,8 +284,12 @@ def parse_meal_plan_response(response_text):
             json_str = response_text[start_idx:end_idx]
             meal_plan_data = json.loads(json_str)
             
-            # Convert to frontend format with Unsplash images
-            meal_plan_data['meals'] = format_meals_for_frontend(meal_plan_data.get('weeklyPlan', {}))
+            # Convert to frontend format with Pexels images
+            weekly_plan = meal_plan_data.get('weeklyPlan', {})
+            print(f"DEBUG: weeklyPlan keys: {list(weekly_plan.keys())}")
+            
+            meal_plan_data['meals'] = format_meals_for_frontend(weekly_plan)
+            print(f"DEBUG: Generated {len(meal_plan_data['meals'])} meals")
             
             return meal_plan_data
         else:
