@@ -299,7 +299,7 @@ export default function MealPlan({ sessionId } = {}) {
                 <button className="mp-btn" onClick={onPickFile}>{selectedFile ? "Change file" : "Choose file"}</button>
                 <span className="mp-upload-name">{selectedFile ? selectedFile.name : "No file chosen"}</span>
                 <button className="mp-btn primary" onClick={runScan} disabled={!selectedFile || isParsing}>
-                  {isParsing ? "Scanning…" : "Scan with AI"}
+                  {isParsing ? "Scanning…" : "Parse receipt"}
                 </button>
               </div>
 
