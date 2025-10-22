@@ -93,8 +93,6 @@ Browser → API Gateway → Lambda Functions → S3 / DynamoDB / Bedrock
 
 ## API Endpoints
 
-Base URL: `VITE_API_URL` (set in `frontend/.env`)
-
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/upload` | POST | Request presigned S3 URL for receipt upload |
