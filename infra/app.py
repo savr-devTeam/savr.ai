@@ -18,7 +18,12 @@ env = cdk.Environment(
 # Create stacks with proper dependencies
 iam_stack = IamRolesStack(app, "IamRolesStack", env=env)
 dynamodb_stack = DynamoDBStack(app, "DynamoDBStack", env=env)
-s3_stack = S3Stack(app, "S3Stack", env=env)
+s3_stack = S3Stack(
+    app, 
+    "S3Stack", 
+    env=env,
+    parse_receipt_fn=lambda_stack.parse_receipt_function  # Add this!
+)
 
 lambda_stack = LambdaStack(
     app, 
