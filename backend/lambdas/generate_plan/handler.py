@@ -28,11 +28,18 @@ def lambda_handler(event, context):
         body = json.loads(event.get('body', '{}'))
         user_id = body.get('userId') or 'anonymous'
         
+        # Get pantry items from request (NEW: direct pantry items)
+        pantry_items = body.get('pantryItems', [])
+        
         # Get user preferences from request or database
         preferences = get_user_preferences(user_id, body.get('preferences', {}))
         
-        # Get recent grocery purchases
-        grocery_items = get_recent_grocery_items(user_id)
+        # Get recent grocery purchases (fallback if no pantry items provided)
+        if not pantry_items:
+            grocery_items = get_recent_grocery_items(user_id)
+        else:
+            # Convert pantry item strings to dict format
+            grocery_items = [{'name': item} for item in pantry_items]
         
         # Generate meal plan using Bedrock Claude
         meal_plan = generate_meal_plan_with_ai(preferences, grocery_items)
@@ -51,6 +58,7 @@ def lambda_handler(event, context):
             'body': json.dumps({
                 'success': True,
                 'planId': plan_id,
+                'meals': meal_plan.get('meals', []),  # NEW: return meals array for frontend
                 'mealPlan': meal_plan,
                 'message': 'Meal plan generated successfully'
             })
@@ -256,7 +264,7 @@ Generate a practical, healthy, and budget-friendly meal plan that helps achieve 
 
 def parse_meal_plan_response(response_text):
     """
-    Parse Claude's response into structured meal plan data
+    Parse Claude's response into structured meal plan data and format for frontend
     """
     try:
         # Try to extract JSON from the response
@@ -265,8 +273,12 @@ def parse_meal_plan_response(response_text):
         
         if start_idx != -1 and end_idx != -1:
             json_str = response_text[start_idx:end_idx]
-            meal_plan = json.loads(json_str)
-            return meal_plan
+            meal_plan_data = json.loads(json_str)
+            
+            # Convert to frontend format with Unsplash images
+            meal_plan_data['meals'] = format_meals_for_frontend(meal_plan_data.get('weeklyPlan', {}))
+            
+            return meal_plan_data
         else:
             raise ValueError("No JSON found in response")
             
@@ -275,6 +287,7 @@ def parse_meal_plan_response(response_text):
         # Return a simple fallback structure
         return {
             "weeklyPlan": {},
+            "meals": [],
             "weeklyTotals": {
                 "totalCalories": 14000,
                 "avgDailyCalories": 2000,
@@ -283,6 +296,60 @@ def parse_meal_plan_response(response_text):
             "shoppingList": [],
             "tips": ["Meal plan generated with limited data"]
         }
+
+
+def format_meals_for_frontend(weekly_plan):
+    """
+    Convert weekly plan to flat array of meals with Unsplash images
+    Format expected by GenerateMeals.jsx
+    """
+    meals = []
+    
+    # Unsplash image URLs for different meal types (free, no API key needed)
+    meal_images = {
+        'breakfast': [
+            'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=800&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800&auto=format&fit=crop',
+        ],
+        'lunch': [
+            'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1547592180-85f173990554?w=800&auto=format&fit=crop',
+        ],
+        'dinner': [
+            'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=800&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop',
+        ]
+    }
+    
+    meal_index = {'breakfast': 0, 'lunch': 0, 'dinner': 0}
+    
+    for day_name, day_meals in weekly_plan.items():
+        for meal_type in ['breakfast', 'lunch', 'dinner']:
+            meal_data = day_meals.get(meal_type)
+            if meal_data:
+                # Get image URL (cycle through available images)
+                meal_type_lower = meal_type.lower()
+                images = meal_images.get(meal_type_lower, meal_images['lunch'])
+                img_url = images[meal_index[meal_type_lower] % len(images)]
+                meal_index[meal_type_lower] += 1
+                
+                # Format for frontend
+                meals.append({
+                    'title': meal_data.get('name', 'Untitled Meal'),
+                    'meal': meal_type.capitalize(),
+                    'cals': meal_data.get('calories', 0),
+                    'p': meal_data.get('protein', 0),
+                    'c': meal_data.get('carbs', 0),
+                    'f': meal_data.get('fat', 0),
+                    'img': img_url,
+                    'ingredients': meal_data.get('ingredients', []),
+                    'prepTime': meal_data.get('prepTime', 'N/A')
+                })
+    
+    return meals
 
 
 def create_fallback_meal_plan(preferences):
