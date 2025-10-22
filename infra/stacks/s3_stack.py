@@ -1,7 +1,6 @@
 from aws_cdk import (
     Stack,
     aws_s3 as s3,
-    aws_s3_notifications as s3n,
     RemovalPolicy,
 )
 from constructs import Construct
@@ -31,14 +30,6 @@ class S3Stack(Stack):
                 )
             ]
         )
-
-    def add_parse_trigger(self, parse_receipt_fn):
-        """
-        Add S3 event notification to trigger parse_receipt Lambda on upload
-        This is called after the Lambda function is created
-        """
-        self.receipts_bucket.add_event_notification(
-            s3.EventType.OBJECT_CREATED,
-            s3n.LambdaDestination(parse_receipt_fn),
-            s3.NotificationKeyFilter(prefix="receipts/")  # Only trigger for receipts folder
-        )
+        
+        # Note: We don't use S3 triggers to avoid circular dependencies
+        # Instead, the frontend calls the parse-receipt API endpoint directly after upload
