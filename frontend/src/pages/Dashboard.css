@@ -1,1147 +1,643 @@
-/* General Layout */
+/* ===============================
+   BASE TOKENS
+=============================== */
+:root{
+  --bg:#f3f4f6;          /* page background */
+  --panel:#ffffff;        /* cards + panels */
+  --ink:#111827;          /* primary text */
+  --muted:#6b7280;        /* secondary text */
+  --line:#e5e7eb;         /* borders */
+  --radius:14px;
+  --shadow:0 8px 24px rgba(0,0,0,.08);
+
+  /* compact tuning */
+  --week-pad: 12px;
+  --col-gap: 16px;        /* between day columns */
+  --day-gap: 10px;        /* between cards in a day */
+  --card-pad: 12px;
+  --img-h: 100px;
+  --img-w: 10px;         /* image height band in cards */
+  --fs-title: 15px;       /* card title */
+  --fs-macro: 12px;
+  --fs-pill: 14px;
+
+  /* width cap for the horizontal week box */
+  --weekbox-w: 1180px;
+
+  --topbar-h: 64px;       /* height of the top navigation bar */
+}
+
+/* Optional landing font helper (safe default size) */
 .pacifico-regular {
   font-family: "Pacifico", cursive;
   font-weight: 400;
-  font-size: 3.5rem;
+  font-size: 2rem;
   font-style: normal;
 }
-
-.anybody {
-  font-family: "Anybody", sans-serif;
-  font-optical-sizing: auto;
-  font-style: normal;
-}
-
-.dashboard-container {
-  font-family: "Anybody";
-  background-color: #f3f2ef;
-  min-height: 100vh;
-  padding-bottom: 2rem;
-}
-
-.dashboard {
-  display: flex;
-  justify-content: space-between;
-  /* keeps both sides apart */
-  align-items: flex-start;
-  width: 100%;
-  padding: 2rem 5rem;
-  /* control how far from screen edges */
-  box-sizing: border-box;
-}
-
-/* LEFT SIDE */
-.left-panel {
-  flex: 1;
-  max-width: 40%;
-  /* takes up about 40% of page */
-}
-
-/* RIGHT SIDE */
-.right-panel {
-  flex: 1.2;
-  margin-left: 3rem;
-  margin-top: 4rem;
-  margin: 0 auto;
-}
-
-
-/* Header */
-.dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem 4%;
-  background-color: #f3f2ef;
-}
-
-.logo {
-  font-size: 3rem;
-  color: #1c1c1c;
-}
-
-.dashboard-icons i {
-  font-size: 1.3rem;
-  margin-left: 1.2rem;
-  cursor: pointer;
-}
-
-.divider {
-  border: 0.5px solid #cfcfcf;
-  margin-bottom: 1rem;
-}
-
-/* Main Content Layout */
-.dashboard-content {
-  display: flex;
-  justify-content: space-between;
-  gap: 2rem;
-  padding: 0 4%;
-}
-
-.help-section {
-  text-align: center;
-  margin-top: 2rem;
-}
-
-.help-section h3 {
-  font-size: 2rem;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 2rem;
-  margin-top: -1rem;
-}
-
-
-.help-icon {
-  width: 80px;
-  margin-bottom: 2rem;
-  margin-top: 14rem;
-}
-
-.action-btn {
-  display: block;
-  width: 325px;
-  margin: 10px auto;
-  padding: 0.5rem;
-  border: 1px solid #00000049;
-  border-radius: 20px;
-  background: rgb(255, 255, 255);
-  cursor: pointer;
-  font-weight: 450;
-  font-size: 1rem;
-  transition: 0.3s;
-}
-
-.action-btn:hover {
-  background-color: #f26d3da7;
-  color: rgb(251, 250, 250);
-  font-weight: 800;
-  border-color: #f26d3d;
-}
-
-/*message container*/
-.ask-box {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 18px;
-  width: 500px;
-  height: 100px;
-  padding: 0.8rem 1rem;
-  margin-top: 0;
-  margin: 1rem auto;
-}
-
-/* message chat bot button*/
-.ask-section {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1rem;
-  width: 100%;
-  height: 100px;
-  max-width: 40rem;
-  background: #fff;
-  border: 1px solid #0000004f;
-  border-radius: 25px;
-  /*rounded corners*/
-  padding: 1.2rem 6rem;
-  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
-  margin-bottom: 60px;
-  margin-top: 150px;
-  padding-left: 1.5rem;
-  margin: 180px auto 60px;
-}
-
-.attach-icon {
-  width: 20px;
-  height: 20px;
-  margin-right: 1px;
-  vertical-align: middle;
-}
-
-.ask-input {
-  width: 100%;
-  border: none;
-  outline: none;
-  font-size: 1.1rem;
-  color: #333;
-  background: transparent;
-  align-items: flex-start;
-  text-align: left;
-  width: 100%;
-}
-
-.attach-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  border: 1px solid #0000003a;
-  color: #100f0f;
-  background: transparent;
-  border-radius: 20px;
-  padding: .1rem .75rem;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-}
-
-.attach-btn:hover {
-  background: #d9d1ce5a;
-  border-color: #696564;
-}
-
-
-/* Cards */
-.card {
-  background-color: white;
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.21);
-}
-
-/* Today's Menu Title */
-.card h2 {
-  font-size: 1.7rem;
-}
-
-.meal-plan {
-  background: #fff;
-  border-radius: 20px;
-  padding: 1.5rem 2rem !important;
-  width: 100%;
-  max-width: 950px;
-  margin: 0 auto;
-  margin-top: 40px;
-}
-
-.card.meal-plan {
-  position: relative;
-  /* allows absolute positioning for children */
-  width: 100%;
-  max-width: 950px;
-  margin: 0 auto;
-  padding: 2rem;
-  box-sizing: border-box;
-}
-
-
-.view-meal-btn {
-  position: absolute;
-  top: 1rem;
-  /* adjust vertical spacing */
-  right: 1rem;
-  /* adjust horizontal spacing */
-  background-color: #f26d3d;
-  color: white;
-  padding: .5rem 1.5rem;
-  border-radius: 20px;
-  font-weight: 500;
-  cursor: pointer;
-  margin-top: 1rem;
-
-}
-
-.view-meal-btn:hover {
-  font-weight: 800;
-  border-color: #f26d3dc1;
-  padding: .6rem 1.8rem;
-}
-
-.card.meal-plan {
-  height: 420px;
-  /* fixed height */
-  overflow-y: auto;
-  /* scroll inside if content overflows */
-}
-
-.meal-plan img {
-  width: 60px;
-  height: 60px;
-  border-radius: 8px;
-  object-fit: cover;
-}
-.empty-plan {
-  padding: 12px 0 4px;
-}
-
-.primary-btn {
-  background: #e2724f; /* your peach tone */
-  color: #fff;
-  font-weight: 600;
-  border: 0;
-  border-radius: 999px;
-  padding: 10px 18px;
-  cursor: pointer;
-  transition: filter .15s;
-}
-.primary-btn:hover { filter: brightness(0.97); }
-
-/* food course breakfast, lunch, dinner */
-.meal-item {
-  font-size: 25px;
-  background-color: #fdfbfb00;
-  border-radius: 16px;
-  padding: 16px;
-  width: 100%;
-  text-align: left;
-  margin-bottom: 15px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-}
-
-.meal-item:hover {
-  border-radius: 1rem;
-  border-color: #0c0c0c2d;
-  transform: scale(1.02);
-  font-weight: 1000 !important;
-  background-color: #c2bfbd32;
-  color: rgb(0, 0, 0);
-  font-weight: 800;
-  border-color: #3939393f;
-}
-
-.meal-detail {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-}
-
-.meal-image-placeholder {
-  width: 60px;
-  height: 60px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  flex-shrink: 0;
-}
-
-.meal-name {
-  font-weight: 550;
-  font-size: 16px;
-}
-
-.ingredients {
-  font-size: 0.9rem;
-  color: #666;
-}
-
-.date {
-  color: #555555d4;
-  margin-bottom: 1rem;
-  margin-top: -1px;
-  font-size: 15px;
-
-}
-
-.view-menu {
-  text-align: right;
-  font-size: 0.9rem;
-  color: #666;
-  cursor: pointer;
-
-}
-
-/* BOTTOM ROW */
-.bottom-row {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  /* Left column smaller, right column larger */
-  grid-template-rows: auto auto;
-  grid-column-gap: 1.5rem;
-  grid-row-gap: 1.5rem;
-  align-items: start;
-  justify-content: center;
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  margin-top: 2rem;
-}
-
-.dashboard-content,
-.right-panel,
-.left-panel {
-  width: 100%;
-  max-width: 100%;
-}
-
-/* Shared Card Style */
-.card {
-  background-color: #ffffff;
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease-in-out;
-  width: 100%;
-}
-
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.08);
-}
-
-/* Card Header (title + icon) */
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 18px;
-}
-
-.card-header h3 {
-  font-size: 25px;
-  font-weight: 700;
-  margin: 0;
-}
-
-.card-header i {
-  font-size: 1.1rem;
-  color: #333;
-  cursor: pointer;
-}
-
-/* Allergies Card */
-.allergies {
-  grid-column: 1;
-  grid-row: 1;
-  position: relative;
-}
-
-.edit-allergy-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  cursor: pointer;
-  width: 40px;
-  height: 40px;
-  vertical-align: middle;
-}
-
-.allergies .tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.allergies .tags span {
-  background-color: #ffffff;
-  border: 1px solid #000;
-  padding: 0.4rem 1rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.allergies .tags span:hover {
-  background-color: #f3f3f3;
-}
-
-/* Allergy tags display inside dashboard */
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.tags span {
-  background-color: #f3f3f3;
-  padding: 0.4rem 0.8rem;
-  border-radius: 18px;
-  font-size: 0.9rem;
-  border: 1px solid #ddd;
-}
-
-.placeholder-text {
-  font-size: 0.9rem;
-  color: #777;
-  margin-top: 0.5rem;
-}
-
-/* Weekly Budget */
-.spend-section {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  /* spacing between input and button */
-  margin-top: 1rem;
-}
-
-.spend-section input {
-  flex: 1;
-  padding: 0.6rem 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-}
-
-.spend-section .save-btn {
-  background-color: #f26d3d;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 0.6rem 1.5rem;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background-color 0.3s ease;
-}
-
-.spend-section .save-btn:hover {
-  background-color: #e05f32;
-}
-
-.budget {
-  grid-column: 1;
-  grid-row: 2;
-  position: relative;
-}
-
-.reset-info {
-  font-size: 0.85rem;
-  color: #777;
-  margin-top: 0.5rem;
-}
-
-.edit-budget-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  cursor: pointer;
-  width: 40px;
-  height: 40px;
-  vertical-align: middle;
-}
-
-.budget h2 {
-  margin-top: 0.5rem;
-  font-size: 1.8rem;
-  font-weight: 700;
-}
-
-.progress-bar {
-  width: 100%;
-  height: 8px;
-  background-color: #eee;
-  border-radius: 5px;
-  overflow: hidden;
-  margin-top: 0.5rem;
-}
-
-.progress {
-  height: 100%;
-  background-color: #345c3e;
-  /* green progress */
-  width: 60%;
-  /* adjust dynamically as needed */
-  border-radius: 5px;
-  transition: width 0.3s ease;
-}
-
-.remaining {
-  color: #555;
-  font-size: 0.9rem;
-  margin-top: 0.3rem;
-}
-/* Modal input */
-.budget-input {
-  width: 100%;
-  padding: 12px 14px;
-  font-size: 16px;
-  line-height: 1.2;
-  border: 2px solid #e5e7eb;          /* neutral border */
-  border-radius: 10px;
-  background: #fff;
-  outline: none;
-  transition: border-color .15s, box-shadow .15s, background .15s;
-}
-
-/* Placeholder */
-.budget-input::placeholder {
-  color: #9ca3af;                      /* softer gray */
-}
-
-/* Focus ring */
-.budget-input:focus {
-  border-color: #111827;               /* dark slate */
-  box-shadow: 0 0 0 4px rgba(17,24,39,.08);
-}
-
-/* Error / valid states you can toggle with a class */
-.budget-input.error {
-  border-color: #ef4444;
-  background: #fef2f2;
-}
-.budget-input.valid {
-  border-color: #10b981;
-  background: #f0fdf4;
-}
-
-/* Remove number spinners */
-.budget-input[type="number"]::-webkit-outer-spin-button,
-.budget-input[type="number"]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-.budget-input[type="number"] {
-  -moz-appearance: textfield;          /* Firefox */
-}
-
-.save-btn {
-  padding: 10px 18px;
-  border-radius: 12px;
-  border: 0;
-  background: #f4b7a2;
-  font-weight: 600;
-  transition: filter .15s, transform .02s;
-}
-.save-btn:hover:not(:disabled) { filter: brightness(0.97); }
-.save-btn:active:not(:disabled) { transform: translateY(1px); }
-.save-btn:disabled {
-  opacity: .5;
-  cursor: not-allowed;
-}
-
-
-/* Grocery List */
-.grocery-list {
-  grid-column: 2;
-  /* right side */
-  grid-row: 1 / span 2;
-  /* spans both rows vertically */
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  position: relative;
-  overflow-y: auto;
-  flex: 1;
-  min-width: 250px;
-  max-width: 100%;
-  max-height: 100%;
-  overflow: hidden;
-  position: relative;
-}
-
-.grocery-list ul {
-  flex: 1;
-  /* takes all available space above the button */
-  overflow-y: auto;
-  padding-right: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.grocery-list ul::after {
-  content: "";
-  position: sticky;
-  bottom: 0;
-  height: 2rem;
-  background: linear-gradient(to bottom, transparent, white);
-  pointer-events: none;
-}
-
-.card.grocery-list {
-  overflow-y: auto;
-  /* scroll inside if content overflows */
-}
-
-.view-more-btn {
-  position: absolute;
-  bottom: 1rem;
-  /* adjust vertical spacing */
-  right: 1rem;
-  /* adjust horizontal spacing */
-  background-color: #f26d3d;
-  color: white;
-  padding: .5rem 1.5rem;
-  border-radius: 20px;
-  font-weight: 500;
-  cursor: pointer;
-
-}
-
-.view-more-btn:hover {
-  font-weight: 800;
-  border-color: #e8d5cec1;
-  padding: .6rem 1.8rem;
-}
-
-.grocery-list h3 {
-  font-size: 25px;
-  font-weight: 700;
-  margin-bottom: 0.8rem;
-}
-
-.grocery-list ul {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
-}
-
-.grocery-list li {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin: 0.4rem 0;
-  font-size: 0.95rem;
-}
-
-.grocery-list input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  accent-color: black;
-}
-
-.view-more {
-  text-align: right;
-  font-size: 0.9rem;
-  color: #444;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-/* Responsive Layout */
-@media (max-width: 1024px) {
-  .bottom-row {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .grocery-list {
-    grid-row: auto;
-    grid-column: auto;
-    height: auto;
-  }
-}
-
-/* ---------- Two-column default layout ---------- */
-.dashboard-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  /* left half chatbot | right half cards */
-  gap: 2rem;
-  align-items: flex-start;
-  width: 100%;
-}
-
-
-/* ---------- Bottom cards grid ---------- */
-.bottom-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  /* left = allergy/budget | right = grocery */
-  grid-template-rows: auto auto;
-  gap: 1.5rem;
-}
-
-/* ---------- Responsive behavior ---------- */
-@media (max-width: 1024px) {
-  .dashboard-content {
-    grid-template-columns: 1fr;
-    /* stack vertically */
-    justify-items: center;
-  }
-
-  .left-panel,
-  .right-panel {
-    width: 100%;
-    max-width: 700px;
-  }
-
-  .bottom-row {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
-    align-items: center;
-  }
-}
-
-/* Popup overlay */
-.popup-overlay {
+.mp-topbar{
   position: fixed;
   top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
+  height: var(--topbar-h);
+  z-index: 50;
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1000;
+  gap: 10px;
+  background: var(--panel);
+  background-color: #f3f4f6;
+  border-bottom: 1px solid var(--line);
+  padding: 8px 24px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.02);
 }
 
-/* Popup box */
-.popup-box {
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  width: 400px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  animation: fadeIn 0.3s ease;
-  position: relative;
+.mp-brand-logo{
+  height: 32px;
+  width: auto;
 }
 
-/* Animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/*ALLERGY POPUP WINDOW*/
-.allergy-section h2 {
-  font-size: 1.8rem;
-  color: #333;
-  margin-bottom: 0.5rem;
-}
-
-.allergy-section h3 {
-  font-size: 1rem;
+.mp-brand-name{
+  font-family: "Pacifico", cursive;
   font-weight: 400;
-  color: #555;
-  margin-bottom: 1.5rem;
-  line-height: 1.4;
-  max-width: 100%;
+  /* responsive brand size */
+  font-size: clamp(18px, 2.2vw, 28px);
+  color: var(--ink);
+  line-height: 1;
 }
 
-
-.allergy-section {
-  text-align: center;
-  margin-bottom: 2rem;
+/* ===============================
+   APP LAYOUT
+=============================== */
+.mp-root{
+  /* room for fixed sidebar (280 + gutter) */
+  display: block;
+  padding: 24px;
+  padding-left: 320px;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  box-sizing: border-box;
+  padding-top: calc(var(--topbar-h) -0px);
 }
 
-.allergy-options {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
-  margin-top: 1rem;
-}
+/* ===== SIDEBAR (updated) ===== */
+/* Sidebar is now a container; each inner card uses .mp-sidecard */
+.mp-sidebar{
+  position: fixed;
+  top: calc(var(--topbar-h) + 16px);
+  left: 24px;
+  width: 280px;
+  z-index: 20;
 
-.allergy-option {
-  border: 1px solid #ccc;
-  border-radius: 18px;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  background-color: #fff;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.allergy-option.selected {
-  background-color: #f26d3d;
-  color: white;
-  border-color: #f26d3d;
-}
-
-.popup-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-
-.popup-buttons button {
-  border: none;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.popup-buttons .save-btn {
-  background-color: #f26d3d;
-  color: white;
-}
-
-.popup-buttons .save-btn:hover {
-  opacity: 0.85;
-  font-weight: 600;
-  padding: .5rem 2rem;
-}
-
-.cancel-btn {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: none;
-  border: none;
-  color: #333;
-  font-size: 1.5rem;
-  cursor: pointer;
-  transition: 0.2s ease;
+  /* container-only */
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
   padding: 0;
-  /* remove extra spacing */
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* space between boxes */
+}
+/* ===== SIDEBAR (container) ===== */
+.mp-sidebar{
+  position: fixed;
+  top: calc(var(--topbar-h) + 16px);
+  left: 24px;
+  width: 280px;
+  z-index: 20;
+
+  /* stack inner cards */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  /* cap height to viewport below the topbar */
+  max-height: calc(100vh - (var(--topbar-h) + 32px));
+
+  /* allow the sidebar itself to scroll if needed */
+  overflow: auto;
+
+  /* container visuals off (each card is boxed) */
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
 }
 
-.cancel-btn:hover {
-  color: #f26d3d;
-  /* subtle hover color to match your theme */
+/* optional: thinner sidebar scrollbar */
+.mp-sidebar::-webkit-scrollbar { width: 10px; }
+.mp-sidebar::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 6px;
 }
 
-/* Remove number input arrows */
+/* Boxed panels inside the sidebar */
+.mp-sidecard{
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
 
-/* Chrome, Safari, Edge, Opera */
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
+.mp-sidecard-title{
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+
+/* (Retain older helper if still used somewhere) */
+.mp-sidebar-section + .mp-sidebar-section{ margin-top: 20px; }
+.mp-sidebar-title{
+  font-size: 14px; color: var(--muted);
+  margin: 0 0 8px; font-weight: 600;
+}
+.mp-link{
+  background: transparent; border: 0; color: #111;
+  text-align: left; padding: 8px 10px; border-radius: 10px;
+  cursor: pointer;
+}
+.mp-link:hover{ background:#f3f4f6; }
+
+/* Main column */
+.mp-main{ display: flex; flex-direction: column; gap: 24px; }
+
+/* Header row (title + toolbar) */
+.mp-header{ display: flex; align-items: center; justify-content: space-between;margin-top: 20px; }
+
+/* Big, responsive "Meal Plan" title */
+.mp-title{
+  font-size: clamp(28px, 2.2vw, 44px);
+  font-weight: 800;
+  line-height: 1.1;
   margin: 0;
 }
 
-/* Firefox */
-input[type=number] {
-  -moz-appearance: textfield;
-}
+.mp-toolbar{ display: flex; align-items: center; gap: 8px; }
+.mp-toolbar-spacer{ width: 8px; }
 
-/* Authentication-related styles */
-.dashboard-user-section {
+/* ===== Sidebar buttons & layouts ===== */
+/* 1) Stack buttons vertically */
+.mp-sidebar .mp-quick-buttons {
   display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-
-
-.dashboard-icons {
-  display: flex;
+  flex-direction: column;
   gap: 12px;
+  align-items: flex-start;   /* buttons keep their own natural width */
+}
+
+/* 2) Buttons size to content, but never overflow the sidebar */
+.mp-sidebar .mp-btn {
+  display: inline-flex;      /* content-based width */
   align-items: center;
-}
-
-.dashboard-icons i:hover {
-  color: #667eea;
-  transform: scale(1.1);
-  transition: all 0.2s ease;
-}
-
-/* Loading screen */
-.loading-screen {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  gap: 20px;
-}
-
-.loading-screen .spinner {
-  width: 60px;
-  height: 60px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #667eea;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.loading-screen p {
-  font-size: 1.2rem;
-  color: #666;
-  font-weight: 500;
-}
-
-/* Loading states for backend integration */ .action-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.loading-spinner {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid #f3f3f3;
-  border-top: 2px solid #ff6b6b;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-right: 8px;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* Enhanced meal items for dynamic content */
-.meal-name {
-  font-weight: 600;
-  color: #333;
-}
-
-.ingredients {
-  color: #666;
-  font-size: 0.9rem;
-  line-height: 1.3;
-}
-
-/* Grocery list enhancements */
-.grocery-list ul li {
-  transition: background-color 0.2s ease;
-}
-
-.grocery-list ul li:hover {
-  background-color: rgba(255, 107, 107, 0.1);
-  border-radius: 4px;
-}
-
-/* Enhanced ask section for interactive chat */
-.ask-section form {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.ask-input:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.attach-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.attach-btn {
-  transition: all 0.2s ease;
-}
-
-
-/* Enhanced meal plan interactions */
-.view-meal-btn {
-  transition: all 0.1s ease;
-}
-
-.view-meal-btn:hover {
-  transform: translateY(-1px);
-}
-
-/* Enhanced grocery list */
-.view-more-btn {
-  transition: all 0.1s ease;
-}
-
-.view-more-btn:hover {
-  color: white;
-  transform: translateY(-1px);
-}
-
-/* Loading states */
-.action-btn.loading {
-  position: relative;
-}
-
-.action-btn.loading::after {
-  content: '';
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
-  border: 2px solid #ffffff;
-  border-top: 2px solid transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-.grocery-ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
-.grocery-li { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.grocery-row { display: flex; align-items: center; gap: 10px; }
-.grocery-li.checked .grocery-text { text-decoration: line-through; opacity: .6; }
-
-.icon-btn { border: 0; background: transparent; font-size: 16px; cursor: pointer; opacity: .6; }
-.icon-btn:hover { opacity: 1; }
-
-.chip { font-size: 11px; padding: 2px 6px; border-radius: 999px; background: #f1f5f9; color: #475569; margin-left: 6px; }
-
-.mini-btn { border: 0; border-radius: 999px; padding: 6px 10px; font-weight: 600; background: #e9ecef; cursor: pointer; }
-.mini-btn:hover { filter: brightness(.97); }
-
-.empty-plan { padding: 12px 0 4px; }
-.primary-btn { background: #e2724f; color: #fff; font-weight: 600; border: 0; border-radius: 999px; padding: 10px 18px; cursor: pointer; transition: filter .15s; }
-.primary-btn:hover { filter: brightness(0.97); }
-
-/* Keep the card layout tidy */
-.card.grocery-list { display: flex; flex-direction: column; }
-
-/* Only the list scrolls */
-.grocery-scroll {
-  /* responsive height cap: min 160px, up to 30vh, but never more than 280px */
-  max-height: clamp(160px, 30vh, 280px);
-  overflow-y: auto;
-  margin-top: 4px;
-
-  /* prevent horizontal jiggle when scrollbar shows */
-  padding-right: 6px;
-  margin-right: -6px;
-}
-
-/* optional scrollbar styling */
-.grocery-scroll::-webkit-scrollbar { width: 8px; }
-.grocery-scroll::-webkit-scrollbar-thumb { border-radius: 8px; background: #e5e7eb; }
-.grocery-scroll::-webkit-scrollbar-track { background: transparent; }
-
-/* list styles from before (kept here for clarity) */
-.grocery-ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
-.grocery-li { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.grocery-row { display: flex; align-items: center; gap: 10px; }
-.grocery-li.checked .grocery-text { text-decoration: line-through; opacity: .6; }
-/* Bottom row layout: 2 cols, grocery spans both rows */
-.bottom-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;   /* left column, right column */
-  grid-auto-rows: 1fr;              /* equal row heights */
-  gap: 24px;
-  align-items: stretch;
-}
-
-/* Place left cards explicitly (optional but clear) */
-.card.allergies { grid-column: 1; grid-row: 1; }
-.card.budget    { grid-column: 1; grid-row: 2; }
-
-/* Grocery card spans the height of the two left cards */
-.card.grocery-list {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  display: flex;          /* so inner scroll area can grow */
-  flex-direction: column;
-  min-height: 0;          /* allow child to shrink/scroll */
-}
-
-/* Header + input keep natural size; only the list scrolls */
-.grocery-scroll {
-  flex: 1;                /* take remaining height */
-  min-height: 0;          /* critical for proper scrolling in flex */
-  overflow-y: auto;
-  margin-top: 4px;
-  padding-right: 6px;     /* avoid layout shift when scrollbar appears */
-  margin-right: -6px;
-}
-
-/* keep footer buttons at the bottom of the card */
-.grocery-footer {
-  margin-top: 12px;
-  display: flex;
   gap: 8px;
+  width: auto;               /* <- key: auto width */
+  max-width: 100%;           /* don't spill out of the panel */
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 10px;
+  cursor: pointer;
+
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: unset;
+}
+
+.mp-sidebar .mp-btn.ghost { background: transparent; }
+.mp-sidebar .mp-btn.ghost:hover{
+  border-color:#0f62fe;
+  background:#f7faff;
+}
+
+.mp-savr-icon{
+  height:18px;
+  width:18px;
+}
+
+/* Inputs & lists for Virtual Pantry box */
+.mp-input{
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.mp-pantry-list{
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px;
+  display: grid;
+  gap: 6px;
+}
+
+.mp-chip{
+  display:flex; align-items:center; gap:8px;
+  border:1px solid var(--line); background:var(--panel);
+  padding:8px 12px; border-radius:999px;
+}
+.mp-chip svg{ color:#111; }
+
+/* ===============================
+   WEEK BOX (horizontal scroller)
+=============================== */
+.mp-scroller{
+  width: 100%;
+  max-width: var(--weekbox-w);
+  margin: 0 auto;
+
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--week-pad);
+
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(280px, 360px);
+  gap: var(--col-gap);
+
+  /* Only horizontal scroll; height grows with tallest day */
+  overflow-x: auto;
+  overflow-y: visible;
+  height: auto;
+}
+
+.mp-scroller::-webkit-scrollbar{ height:10px; }
+.mp-scroller::-webkit-scrollbar-thumb{ background:#d1d5db; border-radius:6px; }
+
+/* ===============================
+   DAY COLUMN
+=============================== */
+.mp-day{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+
+  display:flex;
+  flex-direction:column;
+  overflow:visible;        /* never clip cards */
+  height:auto;             /* grow to content (Breakfast/Lunch/Dinner fully visible) */
+}
+
+.mp-day-head{
+  display:flex; align-items:center; gap:8px;
+  padding:10px 12px;
+  border-bottom:1px solid var(--line);
+  background:#fff;
+  position:sticky; top:0; z-index:1;
+}
+.mp-day-name{ font-weight:700; }
+.mp-day-count{
+  margin-left:auto; background:#f3f4f6; border:1px solid var(--line);
+  padding:2px 8px; border-radius:999px; font-size:12px; color:var(--muted);
+}
+
+.mp-day-list{
+  display:flex; flex-direction:column;
+  gap: var(--day-gap);
+  padding: 10px;
+  overflow: visible;       /* do not make inner columns scroll vertically */
+}
+
+/* ===============================
+   MEAL CARD
+=============================== */
+.mp-card{
+  display:flex; flex-direction:column;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#fff;
+  overflow: visible;       /* don't clip text */
+}
+
+.mp-card-img{
+  height: var(--img-h);
+  overflow:hidden; background:#f3f4f6;
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+}
+.mp-card-img img{
+  width:100%; height:100%; object-fit:cover; display:block;
+}
+
+.mp-card-body{ padding: var(--card-pad); }
+.mp-card-title{
+  font-size: var(--fs-title);
+  line-height: 1.25;
+  margin: 0 0 6px;
+  font-weight: 700;
+}
+
+.mp-pill{
+  display:inline-block;
+  font-size: var(--fs-pill);
+  color:#111;
+  background:#f3f4f6;
+  border:1px solid var(--line);
+  padding:3px 7px;
+  border-radius:999px;
+}
+
+.mp-macros{ margin-top:8px; color:var(--muted); font-size: var(--fs-macro); }
+
+/* ===============================
+   RESPONSIVE
+=============================== */
+@media (max-width: 960px){
+  /* Sidebar becomes normal flow on small screens */
+  .mp-sidebar{
+    position: static;
+    width: auto;
+    padding: 0;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .mp-root{
+    padding-left: 24px;
+  }
+  .mp-scroller{
+    max-width: none;
+    grid-auto-columns: minmax(240px, 1fr);
+  }
+}
+
+/* Slightly denser on short viewports */
+@media (max-height: 820px){
+  :root{ --img-h: 140px; }
+}
+
+/* ===== Mobile / narrow screens: fixed left sidebar + stacked days ===== */
+@media (max-width: 900px) {
+  /* Sidebar stays pinned on the left */
+  :root { --sb-w: 220px; }                /* sidebar width on small screens */
+  .mp-sidebar{
+    position: fixed;
+    top: calc(var(--topbar-h, 0px) + 12px);
+    left: 12px;
+    width: var(--sb-w);
+    z-index: 40;
+  }
+
+  /* Make room for the fixed sidebar */
+  .mp-root{
+    padding-left: calc(var(--sb-w) + 24px);
+  }
+
+  /* Days become a vertical list (no horizontal scroll) */
+  .mp-scroller{
+    display: flex;
+    flex-direction: column;  /* stack days */
+    gap: 14px;
+    max-width: 760px;        /* optional: keep content readable */
+    overflow-x: hidden;      /* kill the horizontal scroll on small screens */
+    overflow-y: visible;
+  }
+
+  /* Day columns take full width */
+  .mp-day{
+    width: 100%;
+  }
+
+  /* Slightly tighter cards on small screens */
+  .mp-card-img{ height: 140px; }
+  .mp-card-title{ font-size: 15px; }
+  .mp-pill{ font-size: 11px; }
+  .mp-macros{ font-size: 12px; }
+}
+/* Pantry list items: label + delete button inline */
+.mp-pantry-item{
+  display: flex;
+  align-items: center;
   justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+
+/* Ensure long item names wrap nicely */
+.mp-pantry-text{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Small icon button for delete */
+/* Pantry list row (keeps the X perfectly centered vertically) */
+.mp-pantry-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+/* Delete button: no border/box, centered icon */
+.mp-icon-del{
+  all: unset;                 /* clear UA + inherited btn styles */
+  display: grid;
+  place-items: center;        /* centers the X */
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: transparent;    /* no background box */
+}
+
+/* Size the X icon */
+.mp-icon-del svg{
+  width: 16px;
+  height: 16px;
+}
+
+/* Hover/active states (just tint the X) */
+.mp-icon-del:hover svg{ color:#dc2626; }
+.mp-icon-del:active svg{ transform: scale(0.95); }
+
+/* Optional: a subtle keyboard focus without a box */
+.mp-icon-del:focus-visible svg{
+  color:#dc2626;
+}
+.mp-empty{
+  color: var(--muted);
+  font-size: 14px;
+  padding: 12px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  background: #fafafa;
+}
+/* Quick-add row */
+.mp-quickadd{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 12px;
+}
+
+/* Input should fill the row */
+.mp-quickadd .mp-input{
+  flex: 1;
+  margin: 0;          /* in case your input has default margins */
+}
+
+/* Square + button */
+.mp-add-btn{
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 12px;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mp-add-btn:hover{ background:#f9fafb; }
+.mp-add-btn:disabled{ opacity:.5; cursor:not-allowed; }
+/* Limit the whole sidebar height to the viewport (below the topbar) */
+
+
+/* The pantry card should fill the leftover space inside the sidebar */
+.mp-sidecard.vp{
+  flex: 1 1 auto;                 /* grow to take remaining height */
+  display: flex;
+  flex-direction: column;
+  min-height: 0;                  /* <-- critical so the list can scroll */
+}
+
+/* Make the list area scroll within the pantry card */
+.mp-pantry-list{
+  flex: 1 1 auto;                 /* consume vertical space inside card */
+  overflow-y: auto;               /* internal scroll */
+  margin: 10px 0;
+  padding: 0;
+}
+
+/* (Nice but optional) keep the empty-state box from getting huge */
+.mp-pantry-empty{
+  flex: 0 0 auto;
+}
+
+/* Keep the add-item input/row from stretching */
+.mp-quickadd, .mp-input, .mp-btn.ghost{
+  flex: 0 0 auto;
+}
+/* Modal shell */
+.mp-modal{
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(17,24,39,.45);
+  display: grid; place-items: center;
+  padding: 24px;
+}
+.mp-modal-card{
+  width: min(720px, 96vw);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex; flex-direction: column;
+  max-height: 85vh;
+}
+.mp-modal-head, .mp-modal-foot{
+  padding: 14px 16px; border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.mp-modal-foot{ border-top: 1px solid var(--line); border-bottom: 0; }
+.mp-modal-body{
+  padding: 16px; overflow: auto;
+}
+
+/* Upload row */
+.mp-upload-row{
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px; align-items: center;
+  margin-bottom: 12px;
+}
+.mp-upload-name{ color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Review list */
+.mp-review-title{ margin: 12px 0 6px; font-size: 14px; color: var(--muted); }
+.mp-review-list{ list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.mp-review-item{
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px; border: 1px solid var(--line);
+  border-radius: 10px; background: #fff;
+}
+.mp-review-text{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Reuse your icon delete style; ensure no border box */
+.mp-icon-btn{ border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 6px 8px; cursor: pointer; }
+.mp-icon-btn:hover{ background: #f9fafb; }
+.mp-icon-del{ all: unset; display: grid; place-items:center; cursor: pointer; padding: 4px; }
+.mp-icon-del:hover{ color: #dc2626; }
+
+/* === Modal button visibility upgrades === */
+
+/* Bigger, higher-contrast buttons in the modal */
+.mp-modal .mp-btn{
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  border: 2px solid #111;         /* crisp outline */
+  background: #ffffff;            /* light surface */
+  color: #111;
+  box-shadow: 0 1px 0 rgba(0,0,0,.05);
+}
+
+.mp-modal .mp-btn:hover{
+  background: #f3f4f6;
+}
+
+.mp-modal .mp-btn.primary{
+  background: #0f62fe;            /* IBM blue */
+  border-color: #0f62fe;
+  color: #fff;
+}
+
+.mp-modal .mp-btn.primary:hover{
+  filter: brightness(1.05);
+}
+
+/* Disabled still readable (not nearly black-on-black) */
+.mp-modal .mp-btn:disabled{
+  background: #e5e7eb;
+  border-color: #d1d5db;
+  color: #6b7280;
+  opacity: 1;                     /* keep text legible */
+  cursor: not-allowed;
+}
+
+/* Make the small “X” close button clearer and tappable */
+.mp-modal .mp-icon-btn{
+  border: 2px solid #111;
+  background: #fff;
+  color: #111;
+  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+}
+
+.mp-modal .mp-icon-btn:hover{
+  background: #f3f4f6;
+}
+
+/* Strong, accessible focus ring for keyboard users */
+.mp-modal .mp-btn:focus-visible,
+.mp-modal .mp-icon-btn:focus-visible{
+  outline: 3px solid #0f62fe66;
+  outline-offset: 2px;
 }

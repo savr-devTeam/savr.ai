@@ -5,7 +5,7 @@ import laptopImage2 from "/laptop2.png";
 
 const LandingPage = ({onNavigate}) => {
   const handleGetStarted = () => {
-    onNavigate("Meal-Plan");
+    onNavigate("Dashboard");
   };
 
   return (
