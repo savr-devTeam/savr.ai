@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import "./Dashboard.css";
 import "./GenerateMeals.css";
+import { uploadReceipt, parseReceipt, analyzeReceiptAI } from '../services/api';
 
 /* --- tiny bits --- */
 const CalendarIcon = () => (
@@ -62,27 +63,39 @@ function DayColumn({ label, day }) {
   );
 }
 
-/* --- optional: receipt scan api (unchanged from your version) --- */
-const SCAN_ENDPOINT = "https://<api-id>.execute-api.<region>.amazonaws.com/scan-receipt";
-async function scanWithTextractApiGateway(file) {
-  const buf = await file.arrayBuffer();
-  let binary = "";
-  const bytes = new Uint8Array(buf);
-  for (let i = 0; i < bytes.length; i += 0x8000) {
-    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+/* ---------- Scan receipt using real API ---------- */
+async function scanWithTextractApiGateway(file, sessionId) {
+  try {
+    // Step 1: Upload to S3 (gets presigned URL and uploads)
+    console.log('📤 Uploading receipt to S3...');
+    const uploadResult = await uploadReceipt(file, sessionId);
+    console.log('✅ Upload successful:', uploadResult);
+
+    // Step 2: Parse receipt with Textract (calls Lambda directly)
+    console.log('🔍 Parsing receipt with Textract...');
+    const parseResult = await parseReceipt(uploadResult.s3Key, sessionId);
+    console.log('✅ Parse successful:', parseResult);
+
+    // Step 3: Format items for display
+    const items = parseResult.result?.items || [];
+
+    // Transform items to match expected format: [{name, qty?, unit?}]
+    const formattedItems = items.map(item => ({
+      name: item.name,
+      qty: item.quantity || null,
+      unit: null  // Textract doesn't extract units by default
+    }));
+
+    return { items: formattedItems };
+
+  } catch (error) {
+    console.error('❌ Receipt scan error:', error);
+    throw error;
   }
-  const base64 = btoa(binary);
-  const r = await fetch(SCAN_ENDPOINT, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ filename: file.name, contentType: file.type, data: base64 }),
-  });
-  if (!r.ok) throw new Error("Scan failed");
-  return r.json();
 }
 
-/* --- main --- */
-export default function MealPlan() {
+/* --- main component --- */
+export default function MealPlan({ sessionId } = {}) {
   /* Pantry */
   const [pantryItems, setPantryItems] = useState([]);
   const [newItem, setNewItem] = useState("");
@@ -156,8 +169,12 @@ export default function MealPlan() {
 
       const { items } = await scanWithTextractApiGateway(selectedFile, userSessionId);
       setParsed(Array.isArray(items) ? items : []);
-    } catch { setScanError("We couldn't read that receipt. Try another image/PDF."); }
-    finally { setIsParsing(false); }
+    } catch (err) {
+      console.error('Scan error:', err);
+      setScanError("We couldn't read that receipt. Try another image/PDF.");
+    } finally {
+      setIsParsing(false);
+    }
   };
   const removeParsedItem = (idx) => setParsed((p) => p.filter((_, i) => i !== idx));
   const addParsedToPantry = () => {
@@ -235,9 +252,14 @@ export default function MealPlan() {
 
       {/* Scan Modal */}
       {scanOpen && (
-        <div className="mp-modal" role="dialog" aria-modal="true" aria-labelledby="scan-title"
-             onClick={(e)=>{ if(e.target.classList.contains('mp-modal')) closeScan(); }}>
-          <div className="mp-modal-card" onClick={(e)=>e.stopPropagation()}>
+        <div
+          className="mp-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="scan-title"
+          onClick={(e) => { if (e.target.classList.contains('mp-modal')) closeScan(); }}
+        >
+          <div className="mp-modal-card" onClick={(e) => e.stopPropagation()}>
             <header className="mp-modal-head">
               <h3 id="scan-title">Scan Receipt</h3>
               <button className="mp-icon-btn" onClick={closeScan} aria-label="Close">✕</button>
