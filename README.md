@@ -1,16 +1,17 @@
-# Savr.ai — Autonomous Meal Planning
+<div align="center">
+  <img src="frontend/public/savricon.png" alt="savr.ai" width="120"/>
+  <h1>savr.ai</h1>
+  <p><strong>Autonomous AI Meal Planning Agent</strong></p>
+  <p>Scan receipts. Get personalized meal plans. Powered by AWS & AI.</p>
+</div>
 
-Savr.ai scans grocery receipts and turns purchases into personalized, actionable meal plans. Designed for a fast hackathon demo, this repo contains a responsive React frontend, serverless AWS backend (Lambda + API Gateway), receipt OCR (Textract), and AI reasoning (Amazon Bedrock / Claude).
+---
 
-Live demo: https://savr-ai-one.vercel.app
+##  Overview
 
-Quick highlights
+**savr.ai** is an intelligent meal planning system that scans grocery receipts and generates personalized meal plans based on your dietary restrictions, allergies, and fitness goals. 
 
-- Upload a grocery receipt (image / PDF)
-- Parse items & prices with Textract
-- Enrich and reason about groceries with Bedrock (Claude)
-- Generate weekly meal plans tailored to diet, allergies, budget
-- Session-based lightweight user persistence (no third-party auth required for demo)
+Built with **AWS Bedrock (Claude 3.5 Sonnet)**, **Amazon Textract**, and **AWS Lambda**, savr.ai turns your grocery purchases into actionable, health-conscious meal recommendations.
 
 ---
 
@@ -22,54 +23,99 @@ Quick highlights
 - **Data Management** - Stores user profiles, receipts, and meal plans in **DynamoDB**
 - **Serverless Backend** - Built with **AWS Lambda** and **API Gateway**
 - **Frontend Dashboard** - Responsive **React + Vite + Vercel** web app
-- **Monitoring & Analytics** - **CloudWatch** and **X-Ray** for logging
+- **User Authentication** - Secured through **Amazon Cognito** _(planned)_
+- **Monitoring & Analytics** - **CloudWatch** and **X-Ray** for logging _(planned)_
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 **Frontend:** React 18, Vite, Axios, Vercel  
 **Backend:** AWS Lambda (Python 3.9), API Gateway, Textract, Bedrock  
 **Database:** DynamoDB  
-**Storage:** S3
-
-## Screenshot / Demo
-
-Include screenshots or a short GIF here for the presentation. Example:
-
-![Demo placeholder](./frontend/public/demo-placeholder.png)
+**Storage:** S3  
+**Infrastructure:** AWS CDK, CloudFormation  
+**CI/CD:** GitHub Actions
 
 ---
 
-## What’s in this repository
+## 🚀 Quick Start
 
-- `frontend/` — React + Vite single-page app (Dashboard, MealPlan, ReceiptScan)
-- `backend/` — Lambda handlers (receipt parsing, upload, analyze, preferences)
-- `infra/` — AWS CDK stacks (S3, DynamoDB, Lambda, API Gateway, IAM)
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev          # Runs on http://localhost:3000
+npm run build        # Production build
+```
+
+### Infrastructure
+
+```bash
+cd infra
+python -m venv .venv
+.venv\Scripts\activate  # Windows
+pip install -r requirements.txt
+cdk synth               # Generate CloudFormation (no AWS needed)
+cdk deploy --all        # Deploy to AWS (requires credentials)
+```
 
 ---
 
-## Architecture (high level)
+## 🔄 CI/CD
 
-1. Frontend uploads receipts via presigned S3 URLs (Lambda generates URL)
-2. Textract (via `parse_receipt` Lambda) extracts items/prices from the receipt
-3. AI analysis Lambda (`analyze_receipt_ai`) calls Amazon Bedrock (Claude) to produce categories, recipes, health & budget insights
-4. Meal planning generation uses Bedrock and stores plans in DynamoDB
+- **CI Pipeline**: Runs on every PR - Frontend build, linting, security scans
+- **CD Pipeline**: Manual deployment to AWS + Vercel
+- **Vercel**: Automatic preview deployments on every PR
 
-Diagram (suggested for slides):
-
-- Browser → API Gateway → Lambda → S3 / DynamoDB / Bedrock
+See [`.github/workflows/README.md`](.github/workflows/README.md) for details.
 
 ---
 
-## API (important endpoints)
+## 📦 Deployment
 
-Base URL: set `VITE_API_URL` in `frontend/.env` or rely on the fallback configured in `frontend/src/services/api.js`.
+### Frontend (Vercel)
 
-- POST `/upload` — Request a presigned S3 URL. Body: `{ fileName, contentType, userId }` → returns `{ uploadUrl, s3Key }`
-- POST `/parse-receipt` — Parse an uploaded receipt. Body: `{ s3Key, userId }` → returns parsed items
-- POST `/analyze-receipt` — Bedrock-powered AI analysis. Body: `{ s3Key, userId }` → returns insights, recipe suggestions, budget analysis
-- POST `/generate-plan` — Generate a meal plan from preferences. Body: `{ preferences, userId }`
-- GET `/meal-plan` — Fetch stored meal plan by `userId`
+```bash
+cd frontend
+vercel --prod
+```
 
-If you hit a 404 for `/upload` or other endpoints, confirm `VITE_API_URL` points to the correct API Gateway stage URL.
+### Backend (AWS)
+
+```bash
+cd infra
+cdk deploy --all
+```
+
+---
+
+## 🧪 Testing
+
+```bash
+# Frontend
+cd frontend && npm run lint && npm run build
+
+# Infrastructure
+cd infra && pytest tests/ -v
+
+# Backend
+cd backend && pytest tests/ -v
+```
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repo
+2. Create a branch: `git checkout -b feature/amazing-feature`
+3. Commit: `git commit -m "feat: add amazing feature"`
+4. Push: `git push origin feature/amazing-feature`
+5. Open a Pull Request
+
+We use [Conventional Commits](https://www.conventionalcommits.org/).
+
+---
+
+**Built with using AWS, React, and AI**
