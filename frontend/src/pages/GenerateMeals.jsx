@@ -68,7 +68,7 @@ export default function GenerateMeals({ sessionId }) {
       if (Array.isArray(saved) && saved.length === 7) {
         setWeek(saved);
       }
-    } catch {}
+    } catch { }
   }, []);
 
   /* ---------- Persist & broadcast ---------- */
@@ -174,7 +174,7 @@ export default function GenerateMeals({ sessionId }) {
         setError("No meals generated. Try adding more items to your pantry.");
     } catch (err) {
       console.error("❌ Error generating meals:", err);
-      setError("Sorry—couldn't generate meals. Try again.");
+      setError("Sorry — couldn't generate meals. Try again.");
     } finally {
       setIsGenerating(false);
     }
@@ -185,39 +185,39 @@ export default function GenerateMeals({ sessionId }) {
     <div className="mp-root gm-page">
       <main className="mp-main">
         {/* Top Navigation */}
-<header className="mp-topbar">
-  <div className="mp-left">
-    <img src="/savricon.png" alt="Logo" className="mp-brand-logo" />
-    <span className="Anybody" className="gm-hero-title"
-        style={{ marginLeft: "8px", marginTop: "8px", fontSize: "2rem", fontWeight: "bold" }}
-    >Plan once. Eat better all week.</span>
-  </div>
+        <header className="mp-topbar">
+          <div className="mp-left">
+            <img src="/savricon.png" alt="Logo" className="mp-brand-logo" />
+            <span className="Anybody" className="gm-hero-title"
+              style={{ marginLeft: "8px", marginTop: "8px", fontSize: "2rem", fontWeight: "bold" }}
+            >Plan once. Eat better all week.</span>
+          </div>
 
-  <div className="mp-right">
-    <button
-      className="clear-btn"
-      onClick={() => {
-        if (window.confirm("Clear all meals and suggestions?")) {
-          setSuggestions([]);
-          setWeek(emptyWeek());
-          localStorage.removeItem("savr.week.v1");
-          localStorage.removeItem("savr.week.publishedAt");
-          console.log("🧹 Cleared all meal data");
-        }
-      }}
-    >
-      Clear All
-    </button>
+          <div className="mp-right">
+            <button
+              className="clear-btn"
+              onClick={() => {
+                if (window.confirm("Clear all meals and suggestions?")) {
+                  setSuggestions([]);
+                  setWeek(emptyWeek());
+                  localStorage.removeItem("savr.week.v1");
+                  localStorage.removeItem("savr.week.publishedAt");
+                  console.log("🧹 Cleared all meal data");
+                }
+              }}
+            >
+              Clear All
+            </button>
 
-    <button
-      className="save-MealPlan-btn"
-      onClick={() => window.location.assign("/#Dashboard")}
-      title="Save and return to Dashboard"
-    >
-      Save & View on Dashboard
-    </button>
-  </div>
-</header>
+            <button
+              className="save-MealPlan-btn"
+              onClick={() => window.location.assign("/#Dashboard")}
+              title="Save and return to Dashboard"
+            >
+              Save & View on Dashboard
+            </button>
+          </div>
+        </header>
 
         {/* Split Layout */}
         <div className="gm-split">
@@ -237,7 +237,7 @@ export default function GenerateMeals({ sessionId }) {
             {!suggestions.length && (
               <div className="gm-pane-subhead">
                 <p className="gm-hint">
-                  Click “Generate with AI” to get meal ideas.
+                  Click “Generate with Savr” to get meal ideas.
                 </p>
               </div>
             )}
