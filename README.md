@@ -91,59 +91,6 @@ savr.ai/
 
 ---
 
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+ and npm
-- Python 3.9+
-- AWS Account with configured credentials (`aws configure`)
-- AWS Bedrock access (request Claude 4.5 Sonnet model access)
-
-### 1. Frontend Setup
-
-```bash
-cd frontend
-npm install
-npm run dev          # Runs on http://localhost:5173
-```
-
-### 2. Deploy AWS Infrastructure
-
-```bash
-cd infra
-
-# Setup Python environment
-python -m venv .venv
-.venv\Scripts\activate    # Windows
-# source .venv/bin/activate  # Mac/Linux
-
-pip install -r requirements.txt
-
-# Bootstrap CDK (first time only)
-cdk bootstrap
-
-# Deploy all stacks
-cdk deploy --all
-```
-
-### 3. Configure Frontend
-
-After deploying, update `frontend/.env`:
-```env
-VITE_API_URL=https://your-api-gateway-url.execute-api.us-east-1.amazonaws.com/prod
-```
-
-### 4. Deploy Frontend
-
-```bash
-cd frontend
-npm run build
-vercel --prod
-```
-
----
-
 ## API Endpoints
 
 | Endpoint | Method | Description |
