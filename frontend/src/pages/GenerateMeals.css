@@ -246,17 +246,14 @@
 :root { --topbar-h: 72px; }       /* tweak to your logo height */
 
 /* Keep the bar above content */
-.mp-topbar{
-  position: sticky;               /* or `fixed` if you prefer */
-  top: 0;
-  z-index: 1000;
-  height: var(--topbar-h);
+.mp-topbar {
   display: flex;
   align-items: center;
-  gap: 12x;
-  background: var(--page, #f6f8fb);   /* same as page bg */
-  border-bottom: 1px solid var(--line);
-  padding: 0 16px;
+  justify-content: space-between; /* pushes buttons to the far right */
+  padding: 12px 40px;
+  background: #f9f9f9;
+  border-bottom: 1px solid #e5e7eb;
+  border-radius: 12px;
 }
 
 /* Push content below the bar */
@@ -413,3 +410,341 @@
   box-shadow: 0 4px 14px rgba(17,24,39,.08);
 }
 
+.mp-top-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.mp-header-btns {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.clear-btn,
+.save-btn {
+  height: 44px;
+  border-radius: 10px;
+  padding: 0 20px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clear-btn,
+.save-btn {
+  height: 44px;
+  width: 200px;
+  text-align: center;
+  border-radius: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Clear button styling */
+.clear-btn {
+  background: #fff;
+  border: 1.5px solid #ff3b30;
+  color: #ff3b30;
+}
+
+.clear-btn:hover {
+  background: #ff3b30;
+  color: #fff;
+}
+
+/* Save button styling */
+.save-btn {
+  background: #1f2437;
+  color: white;
+  border: none;
+}
+
+.save-btn:hover {
+  background: #2d3250;
+}
+/* ---------- TOP BAR LAYOUT ---------- */
+.mp-topbar {
+  position: fixed;                /* keeps it locked at the top */
+  top: 0;
+  left: 0;
+  width: 100%;                    /* make it span full width */
+  height: var(--topbar-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* logo left, buttons right */
+  padding: 0 40px;
+  background: #ffffff;            /* or use var(--panel) */
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  z-index: 1000;                  /* ensures it stays above everything */
+  border-radius: 0;               /* remove rounded edges */
+}
+
+/* ensure page content starts below the header */
+.gm-page.mp-root {
+  padding-top: var(--topbar-h);
+}
+
+/* Left side (logo + brand) */
+.mp-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mp-brand-logo {
+  height: 42px;
+  width: auto;
+}
+
+.mp-brand-name {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Right side (buttons group) */
+.mp-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+/* --- Button Group --- */
+.mp-header-btns {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* --- Shared Button Base --- */
+.clear-btn,
+.save-MealPlan-btn {
+  height: 46px;                   /* equal height */
+  min-width: 190px;               /* same width */
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1;                 /* fix text centering */
+  display: flex;
+  align-items: center;
+  justify-content: center;        /* perfectly center text */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-sizing: border-box;         /* include border in size */
+}
+
+/* --- Clear All --- */
+.clear-btn {
+  background: #fff;
+  border: 2px solid #ff3b30;      /* thicker border */
+  color: #ff3b30;
+}
+
+.clear-btn:hover {
+  background: #ff3b30;
+  color: #fff;
+}
+
+/* --- Save Button --- */
+.save-MealPlan-btn {
+  background: #1f2437;
+  color: #fff;
+  border: 2px solid #1f2437;      /* add matching border for balance */
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.save-btn:hover {
+  background: #2d3250;
+  border-color: #2d3250;
+}
+
+/* Base header styling */
+.mp-header,
+.dashboard-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 40px;
+  box-sizing: border-box;
+  z-index: 1000;
+  transition: all 0.25s ease; /* smooth shrink animation */
+}
+
+/* Logo and title */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  transition: all 0.3s ease;
+}
+
+.header-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 0;
+  transition: font-size 0.3s ease;
+}
+
+/* Buttons */
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap; /* allow stacking on narrow screens */
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .mp-header,
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px 20px;
+    gap: 8px;
+  }
+
+  .header-buttons {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .header-logo {
+    width: 36px;
+    height: 36px;
+  }
+
+  .header-title {
+    font-size: 1.4rem;
+  }
+
+  .clear-btn,
+  .save-btn {
+    height: 38px;
+    min-width: 120px;
+    font-size: 14px;
+  }
+}
+@media (max-width: 900px) {
+  .mp-header,
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px 20px;
+    gap: 8px;
+  }
+
+  .header-buttons {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .header-logo {
+    width: 36px;
+    height: 36px;
+  }
+
+  .header-title {
+    font-size: 1.4rem;
+  }
+
+  .clear-btn,
+  .save-btn {
+    height: 38px;
+    min-width: 120px;
+    font-size: 14px;
+  }
+
+  .gm-hero-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .header-title {
+    font-size: 1.2rem;
+  }
+
+  .header-buttons {
+    flex-direction: column;
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .clear-btn,
+  .save-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  @media (max-width: 900px) {
+  .gm-hero-title {
+    font-size: 2rem;
+  }
+}
+}
+@media (max-width: 700px) {
+  .gm-hero-title {
+    display: none;
+  }
+}
+@media (max-width: 700px) {
+  .header-title {
+    font-size: 1.2rem;
+  }
+
+  .header-buttons {
+    flex-direction: column;
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .clear-btn,
+  .save-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Hide big hero text entirely on very small screens */
+  .gm-hero-title {
+    display: none !important;
+  }
+}
+/* Fade-out transition for the hero title */
+.gm-hero-title {
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Shrink slightly as it fades */
+@media (max-width: 900px) {
+  .gm-hero-title {
+    font-size: 2rem;
+  }
+}
+
+/* Fade out and slide up on small screens */
+@media (max-width: 700px) {
+  .gm-hero-title {
+    opacity: 0;
+    transform: translateY(-20px);
+    pointer-events: none; /* prevents it from blocking clicks */
+  }
+}
