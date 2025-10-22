@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import "./Dashboard.css";
 import "./GenerateMeals.css";
-import { uploadReceipt, parseReceipt, analyzeReceiptAI } from '../services/api';
+import { uploadReceipt, parseReceipt, analyzeReceipt } from '../services/api';
 
 /* --- tiny bits --- */
 const CalendarIcon = () => (
