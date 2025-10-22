@@ -16,7 +16,7 @@
 
 - Upload grocery receipts (image/PDF)
 - Parse items & prices with Amazon Textract
-- Enrich and reason about groceries using Bedrock (Claude 3.5 Sonnet)
+- Enrich and reason about groceries using Bedrock (Claude 4.5 Sonnet)
 - Generate weekly meal plans tailored to diet, allergies, and budget
 - Session-based user persistence with DynamoDB
 
