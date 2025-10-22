@@ -1,16 +1,16 @@
 import React, { useRef, useState, useEffect } from "react";
 import "./MealPlan.css";
 
-/* ---------- Inline SVG icons ---------- */
+/* ---------- SVGs ---------- */
 const CalendarIcon = () => (
   <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
     <path fill="currentColor" d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h1V3a1 1 0 0 1 1-1Zm12 8H5v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9Zm-2-5H7v1a1 1 0 1 1-2 0V5H5a1 1 0 0 0-1 1v2h16V6a1 1 0 0 0-1-1h-1V5a1 1 0 1 1-2 0V5Z"/>
   </svg>
 );
 
-/* ---------- UI bits ---------- */
 const Pill = ({ children }) => <span className="mp-pill">{children}</span>;
 
+/* ---------- Demo data ---------- */
 const foods = {
   monday: [
     { title: "Yogurt with Banana & Cinnamon", meal: "Breakfast", cals: 260, p: 12, c: 42, f: 4, img: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=800&auto=format&fit=crop" },
@@ -80,42 +80,32 @@ const DayColumn = ({ label, items }) => (
   </section>
 );
 
+/* ---------- CALL YOUR API GATEWAY (AnalyzeExpense) ---------- */
+/* Replace SCAN_ENDPOINT with your real endpoint. Return shape: { items: [{name, qty?, unit?}, ...] } */
+const SCAN_ENDPOINT = "https://<api-id>.execute-api.<region>.amazonaws.com/scan-receipt";
+
+async function scanWithTextractApiGateway(file) {
+  // Convert file to base64
+  const buf = await file.arrayBuffer();
+  let binary = "";
+  const bytes = new Uint8Array(buf);
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+  }
+  const base64 = btoa(binary);
+
+  const r = await fetch(SCAN_ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ filename: file.name, contentType: file.type, data: base64 }),
+  });
+  if (!r.ok) throw new Error("Scan failed");
+  return r.json(); // { items: [...] }
+}
+
 /* ---------- Main component ---------- */
 export default function MealPlan() {
-  /* Receipts upload */
-  const [receipts, setReceipts] = useState([]);
-  const fileInputRef = useRef(null);
-
-  const triggerReceiptPicker = () => fileInputRef.current?.click();
-
-  const onFilesSelected = (e) => {
-    const files = Array.from(e.target.files || []);
-    if (!files.length) return;
-
-    const mapped = files.map((f) => ({
-      id: (crypto.randomUUID && crypto.randomUUID()) || `${Date.now()}-${f.name}`,
-      name: f.name,
-      size: f.size,
-      type: f.type,
-      url: URL.createObjectURL(f),
-    }));
-
-    setReceipts((prev) => [...mapped, ...prev]);
-    e.target.value = "";
-  };
-
-  const removeReceipt = (id) => {
-    setReceipts((prev) => {
-      const match = prev.find((r) => r.id === id);
-      if (match?.url) URL.revokeObjectURL(match.url);
-      return prev.filter((r) => r.id !== id);
-    });
-  };
-
-  useEffect(() => {
-    return () => receipts.forEach((r) => r.url && URL.revokeObjectURL(r.url));
-  }, [receipts]);
-
   /* Virtual Pantry */
   const [pantryItems, setPantryItems] = useState([]);
   const [newItem, setNewItem] = useState("");
@@ -128,6 +118,66 @@ export default function MealPlan() {
   };
   const removePantryItem = (idx) =>
     setPantryItems((prev) => prev.filter((_, i) => i !== idx));
+
+  /* Receipt Scan Modal */
+  const [scanOpen, setScanOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [parsed, setParsed] = useState([]);       // [{name, qty?, unit?}]
+  const [isParsing, setIsParsing] = useState(false);
+  const [scanError, setScanError] = useState("");
+  const fileInputRef = useRef(null);
+
+  const openScan = () => {
+    setScanOpen(true);
+    setSelectedFile(null);
+    setParsed([]);
+    setScanError("");
+  };
+  const closeScan = () => setScanOpen(false);
+
+  const onPickFile = () => fileInputRef.current?.click();
+
+  const onFileChange = (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setSelectedFile(f);
+    setParsed([]);
+    setScanError("");
+  };
+
+  const runScan = async () => {
+    if (!selectedFile) return;
+    try {
+      setIsParsing(true);
+      setScanError("");
+      const { items } = await scanWithTextractApiGateway(selectedFile);
+      setParsed(Array.isArray(items) ? items : []);
+    } catch (err) {
+      setScanError("We couldn't read that receipt. Try another image/PDF.");
+    } finally {
+      setIsParsing(false);
+    }
+  };
+
+  const removeParsedItem = (idx) => {
+    setParsed((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const addParsedToPantry = () => {
+    if (!parsed.length) return;
+    // Format label (simple; tweak as you like)
+    const labels = parsed.map((it) => {
+      const qty = it.qty ? ` x${it.qty}${it.unit ? " " + it.unit : ""}` : "";
+      return `${it.name}${qty}`;
+    });
+    setPantryItems((prev) => [...labels, ...prev]);
+    closeScan();
+  };
+
+  /* Clean up modal file input value when closing */
+  useEffect(() => {
+    if (!scanOpen && fileInputRef.current) fileInputRef.current.value = "";
+  }, [scanOpen]);
 
   return (
     <>
@@ -153,59 +203,11 @@ export default function MealPlan() {
               </button>
               <button className="mp-btn ghost">Clear Week</button>
 
-              {/* Add Receipt -> native file picker */}
-              <button className="mp-btn ghost" onClick={triggerReceiptPicker}>
-                + Add Receipt
+              {/* OPEN MODAL INSTEAD OF DIRECT UPLOAD */}
+              <button className="mp-btn ghost" onClick={openScan}>
+                Scan Receipt
               </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*,.pdf"
-                multiple
-                onChange={onFilesSelected}
-                hidden
-              />
             </div>
-          </div>
-
-          {/* Receipts list (optional but useful) */}
-          <div className="mp-sidecard">
-            <h4 className="mp-sidecard-title">Receipts</h4>
-            {receipts.length === 0 ? (
-              <div className="mp-empty">No receipts uploaded</div>
-            ) : (
-              <ul className="mp-file-list">
-                {receipts.map((r) => (
-                  <li key={r.id} className="mp-file-item">
-                    <a
-                      href={r.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mp-file-link"
-                      title={r.name}
-                    >
-                      {r.name}
-                    </a>
-                    <span className="mp-file-meta">
-                      {(r.size / 1024).toFixed(0)} KB
-                    </span>
-                    <button
-                      className="mp-icon-btn mp-icon-del"
-                      aria-label={`Remove ${r.name}`}
-                      title="Remove"
-                      onClick={() => removeReceipt(r.id)}
-                    >
-                      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden>
-                        <path
-                          fill="currentColor"
-                          d="M18.3 5.7a1 1 0 0 0-1.4 0L12 10.6 7.1 5.7A1 1 0 0 0 5.7 7.1L10.6 12l-4.9 4.9a1 1 0 1 0 1.4 1.4L12 13.4l4.9 4.9a1 1 0 0 0 1.4-1.4L13.4 12l4.9-4.9a1 1 0 0 0 0-1.4z"
-                        />
-                      </svg>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
 
           {/* Virtual Pantry */}
@@ -291,6 +293,84 @@ export default function MealPlan() {
           </div>
         </main>
       </div>
+
+      {/* ---------- Modal: Scan Receipt ---------- */}
+      {scanOpen && (
+        <div className="mp-modal" role="dialog" aria-modal="true" aria-labelledby="scan-title" onClick={(e)=>{ if(e.target.classList.contains('mp-modal')) closeScan(); }}>
+          <div className="mp-modal-card" onClick={(e)=>e.stopPropagation()}>
+            <header className="mp-modal-head">
+              <h3 id="scan-title">Scan Receipt</h3>
+              <button className="mp-icon-btn" onClick={closeScan} aria-label="Close">
+                ✕
+              </button>
+            </header>
+
+            <div className="mp-modal-body">
+              {/* Step 1: pick file */}
+              <div className="mp-upload-row">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*,.pdf"
+                  onChange={onFileChange}
+                  hidden
+                />
+                <button className="mp-btn" onClick={onPickFile}>
+                  {selectedFile ? "Change file" : "Choose file"}
+                </button>
+                <span className="mp-upload-name">
+                  {selectedFile ? selectedFile.name : "No file chosen"}
+                </span>
+                <button
+                  className="mp-btn primary"
+                  onClick={runScan}
+                  disabled={!selectedFile || isParsing}
+                >
+                  {isParsing ? "Scanning…" : "Scan with AI"}
+                </button>
+              </div>
+
+              {scanError && <div className="mp-alert error">{scanError}</div>}
+
+              {/* Step 2: review items */}
+              {!!parsed.length && (
+                <>
+                  <h4 className="mp-review-title">Items found</h4>
+                  <ul className="mp-review-list">
+                    {parsed.map((it, idx) => (
+                      <li key={idx} className="mp-review-item">
+                        <span className="mp-review-text">
+                          {it.name}
+                          {it.qty ? ` x${it.qty}` : ""}
+                          {it.unit ? ` ${it.unit}` : ""}
+                        </span>
+                        <button
+                          className="mp-icon-btn mp-icon-del"
+                          aria-label={`Remove ${it.name}`}
+                          onClick={() => removeParsedItem(idx)}
+                        >
+                          ✕
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </div>
+
+            <footer className="mp-modal-foot">
+              <button className="mp-btn ghost" onClick={closeScan}>Cancel</button>
+              <button
+                className="mp-btn primary"
+                disabled={!parsed.length}
+                onClick={addParsedToPantry}
+              >
+                Add to Pantry
+              </button>
+            </footer>
+          </div>
+        </div>
+      )}
     </>
   );
 }

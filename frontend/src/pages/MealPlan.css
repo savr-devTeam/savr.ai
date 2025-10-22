@@ -531,5 +531,113 @@
 .mp-quickadd, .mp-input, .mp-btn.ghost{
   flex: 0 0 auto;
 }
+/* Modal shell */
+.mp-modal{
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(17,24,39,.45);
+  display: grid; place-items: center;
+  padding: 24px;
+}
+.mp-modal-card{
+  width: min(720px, 96vw);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex; flex-direction: column;
+  max-height: 85vh;
+}
+.mp-modal-head, .mp-modal-foot{
+  padding: 14px 16px; border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.mp-modal-foot{ border-top: 1px solid var(--line); border-bottom: 0; }
+.mp-modal-body{
+  padding: 16px; overflow: auto;
+}
 
+/* Upload row */
+.mp-upload-row{
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px; align-items: center;
+  margin-bottom: 12px;
+}
+.mp-upload-name{ color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+/* Review list */
+.mp-review-title{ margin: 12px 0 6px; font-size: 14px; color: var(--muted); }
+.mp-review-list{ list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.mp-review-item{
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px; border: 1px solid var(--line);
+  border-radius: 10px; background: #fff;
+}
+.mp-review-text{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Reuse your icon delete style; ensure no border box */
+.mp-icon-btn{ border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 6px 8px; cursor: pointer; }
+.mp-icon-btn:hover{ background: #f9fafb; }
+.mp-icon-del{ all: unset; display: grid; place-items:center; cursor: pointer; padding: 4px; }
+.mp-icon-del:hover{ color: #dc2626; }
+
+/* === Modal button visibility upgrades === */
+
+/* Bigger, higher-contrast buttons in the modal */
+.mp-modal .mp-btn{
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  border: 2px solid #111;         /* crisp outline */
+  background: #ffffff;            /* light surface */
+  color: #111;
+  box-shadow: 0 1px 0 rgba(0,0,0,.05);
+}
+
+.mp-modal .mp-btn:hover{
+  background: #f3f4f6;
+}
+
+.mp-modal .mp-btn.primary{
+  background: #0f62fe;            /* IBM blue */
+  border-color: #0f62fe;
+  color: #fff;
+}
+
+.mp-modal .mp-btn.primary:hover{
+  filter: brightness(1.05);
+}
+
+/* Disabled still readable (not nearly black-on-black) */
+.mp-modal .mp-btn:disabled{
+  background: #e5e7eb;
+  border-color: #d1d5db;
+  color: #6b7280;
+  opacity: 1;                     /* keep text legible */
+  cursor: not-allowed;
+}
+
+/* Make the small “X” close button clearer and tappable */
+.mp-modal .mp-icon-btn{
+  border: 2px solid #111;
+  background: #fff;
+  color: #111;
+  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+}
+
+.mp-modal .mp-icon-btn:hover{
+  background: #f3f4f6;
+}
+
+/* Strong, accessible focus ring for keyboard users */
+.mp-modal .mp-btn:focus-visible,
+.mp-modal .mp-icon-btn:focus-visible{
+  outline: 3px solid #0f62fe66;
+  outline-offset: 2px;
+}
