@@ -180,7 +180,7 @@ def generate_meal_plan_with_ai(preferences, grocery_items):
             modelId='us.anthropic.claude-3-5-sonnet-20241022-v2:0',
             body=json.dumps({
                 'anthropic_version': 'bedrock-2023-05-31',
-                'max_tokens': 4000,
+                'max_tokens': 8000,
                 'messages': [
                     {
                         'role': 'user',
@@ -217,26 +217,17 @@ def create_meal_plan_prompt(preferences, grocery_items):
     
     prompt = f"""You are a professional nutritionist and meal planning expert. Create a personalized 7-day meal plan based on the following information:
 
-USER PREFERENCES:
-- Weekly Budget: ${preferences['budget']}
-- Dietary Restrictions/Allergies: {preferences['dietaryRestrictions'] or 'None specified'}
-- Nutrition Goal: {preferences['nutritionGoal']}
-- Daily Caloric Target: {preferences['caloricTarget']} calories
-- Protein Target: {preferences['proteinTarget']}g
-- Carb Target: {preferences['carbTarget']}g  
-- Fat Target: {preferences['fatTarget']}g
-
-AVAILABLE GROCERY ITEMS (from recent purchases):
+AVAILABLE GROCERY ITEMS:
 {grocery_list if grocery_list.strip() else 'No recent grocery data available'}
 
 REQUIREMENTS:
-1. Create a 7-day meal plan (Monday-Sunday)
-2. Include breakfast, lunch, dinner, and 1-2 snacks per day
-3. Prioritize using available grocery items when possible
-4. Stay within the weekly budget
-5. Meet nutritional goals and respect dietary restrictions
-6. Include simple, practical recipes
-7. Provide estimated prep time for each meal
+1. Create a COMPLETE 7-day meal plan (Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday)
+2. Include breakfast, lunch, dinner, and 1-2 snacks per day for ALL 7 DAYS
+3. Use the available grocery items when possible
+4. Include simple, practical recipes
+5. Provide estimated prep time and nutrition info for each meal
+
+IMPORTANT: You MUST include all 7 days. Do not truncate or abbreviate any days.
 
 RESPONSE FORMAT (JSON):
 {{
@@ -362,7 +353,8 @@ def get_default_image(meal_type):
     fallbacks = {
         'breakfast': 'https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?auto=compress&cs=tinysrgb&w=800',
         'lunch': 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'dinner': 'https://images.pexels.com/photos/262959/pexels-photo-262959.jpeg?auto=compress&cs=tinysrgb&w=800'
+        'dinner': 'https://images.pexels.com/photos/262959/pexels-photo-262959.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'snack': 'https://images.pexels.com/photos/1092730/pexels-photo-1092730.jpeg?auto=compress&cs=tinysrgb&w=800'
     }
     return fallbacks.get(meal_type.lower(), fallbacks['lunch'])
 
@@ -402,6 +394,29 @@ def format_meals_for_frontend(weekly_plan):
                     'img': img_url,
                     'ingredients': meal_data.get('ingredients', []),
                     'prepTime': meal_data.get('prepTime', 'N/A')
+                })
+        
+        # Add snacks for this day
+        snacks = day_meals.get('snacks', [])
+        for snack_data in snacks:
+            if snack_data:
+                snack_name = snack_data.get('name', 'Untitled Snack')
+                print(f"DEBUG: Getting Pexels image for snack: {snack_name}")
+                
+                # Get image from Pexels
+                img_url = get_meal_image(snack_name, 'snack')
+                
+                # Format for frontend
+                meals.append({
+                    'title': snack_name,
+                    'meal': 'Snack',
+                    'cals': snack_data.get('calories', 0),
+                    'p': snack_data.get('protein', 0),
+                    'c': snack_data.get('carbs', 0),
+                    'f': snack_data.get('fat', 0),
+                    'img': img_url,
+                    'ingredients': snack_data.get('ingredients', []),
+                    'prepTime': snack_data.get('prepTime', 'N/A')
                 })
     
     print(f"DEBUG: Formatted {len(meals)} total meals with Pexels images")
