@@ -89,60 +89,6 @@ savr.ai/
 ```
 Browser → API Gateway → Lambda Functions → S3 / DynamoDB / Bedrock
 ```
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+ and npm
-- Python 3.9+
-- AWS Account with configured credentials (`aws configure`)
-- AWS Bedrock access (request Claude 3.5 Sonnet model access)
-
-### 1. Frontend Setup
-
-```bash
-cd frontend
-npm install
-npm run dev          # Runs on http://localhost:5173
-```
-
-### 2. Deploy AWS Infrastructure
-
-```bash
-cd infra
-
-# Setup Python environment
-python -m venv .venv
-.venv\Scripts\activate    # Windows
-# source .venv/bin/activate  # Mac/Linux
-
-pip install -r requirements.txt
-
-# Bootstrap CDK (first time only)
-cdk bootstrap
-
-# Deploy all stacks
-cdk deploy --all
-```
-
-### 3. Configure Frontend
-
-After deploying, update `frontend/.env`:
-```env
-VITE_API_URL=https://your-api-gateway-url.execute-api.us-east-1.amazonaws.com/prod
-```
-
-### 4. Deploy Frontend
-
-```bash
-cd frontend
-npm run build
-vercel --prod
-```
-
 ---
 
 ## API Endpoints
@@ -162,28 +108,6 @@ Base URL: `VITE_API_URL` (set in `frontend/.env`)
 curl -X POST https://your-api-url/upload \
   -H "Content-Type: application/json" \
   -d '{"fileName": "receipt.jpg", "contentType": "image/jpeg", "userId": "user123"}'
-```
-
----
-
-## Testing
-
-```bash
-# Frontend linting and build
-cd frontend
-npm run lint
-npm run build
-
-# Backend Lambda tests
-cd backend
-pytest tests/ -v
-
-# Infrastructure tests
-cd infra
-pytest tests/ -v
-
-# Test backend endpoints
-python test_backend.py
 ```
 
 ---
