@@ -32,15 +32,25 @@ const SLOTS = ["Breakfast", "Lunch", "Dinner"];
 const emptyWeek = () =>
   DAY_LABELS.map(() => ({ Breakfast: null, Lunch: null, Dinner: null }));
 
-/* Replace with your real endpoint later */
-const GENERATE_ENDPOINT = "https://<api-id>.execute-api.<region>.amazonaws.com/generate-meals";
+// Import API function
+import { generateMealPlan } from '../services/api';
 
 /* Storage + channel keys */
 const STORAGE_KEY = "savr.week.v1";
 const CHANNEL_NAME = "savr";
 
 /* --- Page --- */
-export default function GenerateMeals() {
+export default function GenerateMeals({ sessionId }) {
+  /* Load pantry items from localStorage */
+  const [pantryItems] = useState(() => {
+    try {
+      const saved = localStorage.getItem('savr_pantry_items');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
   const [week, setWeek] = useState(emptyWeek());
   const [suggestions, setSuggestions] = useState([]); // array of meal objects
   const [isGenerating, setIsGenerating] = useState(false);
@@ -55,7 +65,7 @@ export default function GenerateMeals() {
       if (Array.isArray(saved) && saved.length === 7) {
         setWeek(saved);
       }
-    } catch {}
+    } catch { }
   }, []);
 
   /* ---------- Persist & broadcast on change ---------- */
@@ -147,17 +157,41 @@ export default function GenerateMeals() {
     });
   };
 
-  // Hook up to backend later; using mock data for now
+  // Generate meals using Claude AI based on pantry items
   const generateWithAI = async () => {
     try {
       setIsGenerating(true);
       setError("");
-      // const res = await fetch(GENERATE_ENDPOINT, { method: "POST" });
-      // if (!res.ok) throw new Error("Generate failed");
-      // const { meals } = await res.json();
-      const meals = MOCK_MEALS; // <- swap with API result
+
+      console.log('🤖 Generating meals with Claude AI...');
+      console.log('Pantry items:', pantryItems);
+
+      // Call the API with pantry items
+      const response = await generateMealPlan(
+        pantryItems,
+        {
+          budget: 100,
+          dietaryRestrictions: '',
+          nutritionGoal: 'maintenance',
+          caloricTarget: 2000,
+          proteinTarget: 150,
+          carbTarget: 200,
+          fatTarget: 65
+        },
+        sessionId || 'anonymous'
+      );
+
+      console.log('✅ Meals generated:', response);
+
+      // Extract meals array from response
+      const meals = response.meals || [];
       setSuggestions(meals);
+
+      if (meals.length === 0) {
+        setError("No meals generated. Try adding more items to your pantry.");
+      }
     } catch (err) {
+      console.error('❌ Error generating meals:', err);
       setError("Sorry—couldn't generate meals. Try again.");
     } finally {
       setIsGenerating(false);
@@ -187,11 +221,11 @@ export default function GenerateMeals() {
           <header className="mp-header">
             <h1 className="mp-title">🍽️ Plan once. Eat better all week</h1>
             <button
-            className="save-btn"
-            onClick={() => window.location.assign("/#Dashboard")}
-            title="Save and return to Dashboard"
+              className="save-btn"
+              onClick={() => window.location.assign("/#Dashboard")}
+              title="Save and return to Dashboard"
             >
-            Save & View on Dashboard
+              Save & View on Dashboard
             </button>
           </header>
 
@@ -231,8 +265,8 @@ export default function GenerateMeals() {
 
                   const rows = [
                     { key: "breakfast", label: "Breakfast", data: byType("breakfast") },
-                    { key: "lunch",     label: "Lunch",     data: byType("lunch") },
-                    { key: "dinner",    label: "Dinner",    data: byType("dinner") },
+                    { key: "lunch", label: "Lunch", data: byType("lunch") },
+                    { key: "dinner", label: "Dinner", data: byType("dinner") },
                   ];
 
                   return rows.map(({ key, label, data }) =>
