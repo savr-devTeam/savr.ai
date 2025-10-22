@@ -101,13 +101,6 @@ savr.ai/
 | `/generate-plan` | POST | Generate meal plan from preferences |
 | `/meal-plan` | GET | Fetch stored meal plan by userId |
 
-**Example Request:**
-```bash
-curl -X POST https://your-api-url/upload \
-  -H "Content-Type: application/json" \
-  -d '{"fileName": "receipt.jpg", "contentType": "image/jpeg", "userId": "user123"}'
-```
-
 ---
 
 ## AWS Cost Estimation
