@@ -304,35 +304,70 @@ def parse_meal_plan_response(response_text):
         }
 
 
+def get_meal_image(meal_name, meal_type):
+    """
+    Get meal image from Pexels API
+    """
+    return get_pexels_image(meal_name, meal_type)
+
+
+def get_pexels_image(meal_name, meal_type):
+    """
+    Get meal image from Pexels API based on meal name
+    """
+    import urllib.request
+    import urllib.parse
+    
+    try:
+        # Pexels API key from environment
+        pexels_api_key = os.environ.get('PEXELS_API_KEY', '')
+        
+        if not pexels_api_key:
+            print("Warning: PEXELS_API_KEY not set, using default images")
+            return get_default_image(meal_type)
+        
+        # Create search query from meal name (e.g., "Grilled Chicken Salad" -> "grilled chicken salad food")
+        query = f"{meal_name} food"
+        encoded_query = urllib.parse.quote(query)
+        
+        # Call Pexels API
+        url = f"https://api.pexels.com/v1/search?query={encoded_query}&per_page=1"
+        req = urllib.request.Request(url)
+        req.add_header('Authorization', pexels_api_key)
+        
+        with urllib.request.urlopen(req, timeout=5) as response:
+            data = json.loads(response.read())
+            if data.get('photos') and len(data['photos']) > 0:
+                return data['photos'][0]['src']['large']
+        
+        # If no results for specific meal, try generic meal type
+        return get_default_image(meal_type)
+        
+    except Exception as e:
+        print(f"Error fetching from Pexels for {meal_name}: {str(e)}")
+        return get_default_image(meal_type)
+
+
+def get_default_image(meal_type):
+    """
+    Default fallback images (no API needed) - high quality Pexels images
+    """
+    fallbacks = {
+        'breakfast': 'https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'lunch': 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'dinner': 'https://images.pexels.com/photos/262959/pexels-photo-262959.jpeg?auto=compress&cs=tinysrgb&w=800'
+    }
+    return fallbacks.get(meal_type.lower(), fallbacks['lunch'])
+
+
 def format_meals_for_frontend(weekly_plan):
     """
-    Convert weekly plan to flat array of meals with Unsplash images
+    Convert weekly plan to flat array of meals with AI-generated images
     Format expected by GenerateMeals.jsx
     """
     meals = []
     
     print(f"DEBUG: Formatting meals from weekly_plan with keys: {list(weekly_plan.keys())}")
-    
-    # Unsplash image URLs for different meal types (free, no API key needed)
-    meal_images = {
-        'breakfast': [
-            'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=800&auto=format&fit=crop',
-            'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&auto=format&fit=crop',
-            'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800&auto=format&fit=crop',
-        ],
-        'lunch': [
-            'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop',
-            'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&auto=format&fit=crop',
-            'https://images.unsplash.com/photo-1547592180-85f173990554?w=800&auto=format&fit=crop',
-        ],
-        'dinner': [
-            'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&auto=format&fit=crop',
-            'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=800&auto=format&fit=crop',
-            'https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop',
-        ]
-    }
-    
-    meal_index = {'breakfast': 0, 'lunch': 0, 'dinner': 0}
     
     for day_name, day_meals in weekly_plan.items():
         print(f"DEBUG: Processing day {day_name} with meal types: {list(day_meals.keys()) if isinstance(day_meals, dict) else 'not a dict'}")
@@ -343,17 +378,15 @@ def format_meals_for_frontend(weekly_plan):
         for meal_type in ['breakfast', 'lunch', 'dinner']:
             meal_data = day_meals.get(meal_type)
             if meal_data:
-                print(f"DEBUG: Found {meal_type} for {day_name}: {meal_data.get('name', 'no name')}")
+                meal_name = meal_data.get('name', 'Untitled Meal')
+                print(f"DEBUG: Getting Pexels image for {meal_type}: {meal_name}")
                 
-                # Get image URL (cycle through available images)
-                meal_type_lower = meal_type.lower()
-                images = meal_images.get(meal_type_lower, meal_images['lunch'])
-                img_url = images[meal_index[meal_type_lower] % len(images)]
-                meal_index[meal_type_lower] += 1
+                # Get image from Pexels
+                img_url = get_meal_image(meal_name, meal_type)
                 
                 # Format for frontend
                 meals.append({
-                    'title': meal_data.get('name', 'Untitled Meal'),
+                    'title': meal_name,
                     'meal': meal_type.capitalize(),
                     'cals': meal_data.get('calories', 0),
                     'p': meal_data.get('protein', 0),
@@ -364,7 +397,7 @@ def format_meals_for_frontend(weekly_plan):
                     'prepTime': meal_data.get('prepTime', 'N/A')
                 })
     
-    print(f"DEBUG: Formatted {len(meals)} total meals")
+    print(f"DEBUG: Formatted {len(meals)} total meals with Pexels images")
     return meals
 
 
