@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="frontend/public/savricon.png" alt="savr.ai" width="120"/>
+  <img src="frontend/public/savricon3.png" alt="savr.ai" width="120"/>
   <h1>savr.ai — Autonomous Meal Planning Agent</h1>
   <p>Scan grocery receipts. Get personalized meal plans. Powered by AWS & AI.</p>
   
