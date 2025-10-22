@@ -8,21 +8,21 @@
 
 ---
 
-## 📋 Project Overview
+## Project Overview
 
 **savr.ai** scans grocery receipts and turns purchases into personalized, actionable meal plans. Designed for fast deployment, this project combines receipt OCR (Amazon Textract), AI reasoning (Amazon Bedrock/Claude), and a serverless AWS backend to deliver intelligent meal recommendations based on dietary restrictions, allergies, and budget constraints.
 
 ### Key Highlights
 
-- 📸 Upload grocery receipts (image/PDF)
-- 🔍 Parse items & prices with Amazon Textract
-- 🧠 Enrich and reason about groceries using Bedrock (Claude 3.5 Sonnet)
-- 📅 Generate weekly meal plans tailored to diet, allergies, and budget
-- 💾 Session-based user persistence with DynamoDB
+- Upload grocery receipts (image/PDF)
+- Parse items & prices with Amazon Textract
+- Enrich and reason about groceries using Bedrock (Claude 3.5 Sonnet)
+- Generate weekly meal plans tailored to diet, allergies, and budget
+- Session-based user persistence with DynamoDB
 
 ---
 
-## ✨ Features
+## Features
 
 - **Receipt Scanning** - Extracts purchased items using Amazon Textract OCR
 - **AI Reasoning Engine** - Generates meal plans via Claude 3.5 Sonnet on Amazon Bedrock
@@ -34,7 +34,7 @@
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technologies |
 |-------|-------------|
@@ -48,7 +48,7 @@
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```
 savr.ai/
@@ -75,7 +75,7 @@ savr.ai/
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 **High-Level Flow:**
 
@@ -92,7 +92,7 @@ Browser → API Gateway → Lambda Functions → S3 / DynamoDB / Bedrock
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -145,7 +145,7 @@ vercel --prod
 
 ---
 
-## 🔌 API Endpoints
+## API Endpoints
 
 Base URL: `VITE_API_URL` (set in `frontend/.env`)
 
@@ -166,7 +166,7 @@ curl -X POST https://your-api-url/upload \
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Frontend linting and build
@@ -188,7 +188,7 @@ python test_backend.py
 
 ---
 
-## 💰 AWS Cost Estimation
+## AWS Cost Estimation
 
 Expected monthly costs (light usage):
 - Lambda: $0-5
@@ -200,7 +200,7 @@ Expected monthly costs (light usage):
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please follow these steps:
 
@@ -214,13 +214,13 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/) specifica
 
 ---
 
-## 📄 License
+## License
 
 ISC License - See LICENSE file for details
 
 ---
 
 <div align="center">
-  <p><strong>Built with ❤️ using AWS, React, and AI</strong></p>
+  <p><strong>Built with AWS, React, and AI</strong></p>
   <p>© 2025 Savr.ai Dev Team</p>
 </div>
