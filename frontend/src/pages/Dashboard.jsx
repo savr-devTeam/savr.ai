@@ -90,6 +90,7 @@ export default function MealPlan({ sessionId } = {}) {
   const [week, setWeek] = useState(emptyWeek());
   const [hasCustomPlan, setHasCustomPlan] = useState(false);
   const [scanOpen, setScanOpen] = useState(false);
+  const [scanStatus, setScanStatus] = useState("");
 
   useEffect(() => {
     localStorage.setItem("savr_pantry_items", JSON.stringify(pantryItems));
@@ -134,7 +135,37 @@ export default function MealPlan({ sessionId } = {}) {
     setHasCustomPlan(false);
   };
 
-  /* Scan receipt modal logic omitted for brevity (same as before) */
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setScanStatus("🔄 Uploading and scanning receipt...");
+
+    try {
+      const result = await scanWithTextractApiGateway(file, sessionId || 'anonymous');
+
+      if (result.items && result.items.length > 0) {
+        // Add scanned items to pantry
+        const newItems = result.items.map(item => item.name).filter(name => name && name.trim());
+        setPantryItems(prev => {
+          const existing = new Set(prev.map(item => item.toLowerCase()));
+          const uniqueNew = newItems.filter(item => !existing.has(item.toLowerCase()));
+          return [...prev, ...uniqueNew];
+        });
+
+        setScanStatus(`✅ Added ${newItems.length} items to your pantry!`);
+        setTimeout(() => {
+          setScanStatus("");
+          setScanOpen(false);
+        }, 2000);
+      } else {
+        setScanStatus("❌ No items found in receipt. Try a clearer image.");
+      }
+    } catch (error) {
+      console.error("Scan error:", error);
+      setScanStatus("❌ Failed to scan receipt. Please try again.");
+    }
+  };
 
   return (
     <>
@@ -239,8 +270,27 @@ export default function MealPlan({ sessionId } = {}) {
               <button className="mp-icon-btn" onClick={() => setScanOpen(false)}>×</button>
             </div>
             <div className="mp-modal-body">
-              <p>Receipt scanning functionality will be available soon!</p>
-              <p>For now, you can manually add items to your Virtual Pantry.</p>
+              <div className="scan-upload-area">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  style={{ display: 'none' }}
+                  id="receipt-upload"
+                />
+                <label htmlFor="receipt-upload" className="upload-label">
+                  <div className="upload-content">
+                    <div className="upload-icon">📄</div>
+                    <p>Click to upload receipt image</p>
+                    <p className="upload-hint">Supports JPG, PNG, PDF</p>
+                  </div>
+                </label>
+              </div>
+              {scanStatus && (
+                <div className="scan-status">
+                  <p>{scanStatus}</p>
+                </div>
+              )}
             </div>
             <div className="mp-modal-foot">
               <button className="mp-btn" onClick={() => setScanOpen(false)}>Close</button>
