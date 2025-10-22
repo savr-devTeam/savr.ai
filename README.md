@@ -3,7 +3,7 @@
   <h1>savr.ai — Autonomous Meal Planning Agent</h1>
   <p>Scan grocery receipts. Get personalized meal plans. Powered by AWS & AI.</p>
   
-  **[Live Demo](https://savr-ai-one.vercel.app)** | **[Documentation](./DEPLOYMENT_GUIDE.md)**
+  **[Live Demo](https://savr-ai-one.vercel.app)** 
 </div>
 
 ---
