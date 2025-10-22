@@ -1,699 +1,376 @@
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import "./Dashboard.css";
-import {
-  getUserPreferences,
-  saveUserPreferences,
-  generateMealPlan,
-} from "../services/api";
 
-const MEALPLAN_KEY = "mealPlan.v1";
-const GROCERY_KEY = "groceryList.v1";
+/* ---------- SVGs ---------- */
+const CalendarIcon = () => (
+  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+    <path fill="currentColor" d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h1V3a1 1 0 0 1 1-1Zm12 8H5v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9Zm-2-5H7v1a1 1 0 1 1-2 0V5H5a1 1 0 0 0-1 1v2h16V6a1 1 0 0 0-1-1h-1V5a1 1 0 1 1-2 0V5Z"/>
+  </svg>
+);
 
-/* ---------- utils ---------- */
-function isoDate(d = new Date()) {
-  const z = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
-  return z.toISOString().slice(0, 10);
-}
-const uid =
-  () =>
-    (crypto?.randomUUID?.() ||
-      `id-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+const Pill = ({ children }) => <span className="mp-pill">{children}</span>;
 
-function planSignature(plan) {
-  if (!plan?.days?.length) return "";
-  const all = [];
-  for (const day of plan.days) {
-    for (const L of ["Breakfast", "Lunch", "Dinner"]) {
-      (day.meals?.[L]?.ingredients || []).forEach((x) =>
-        all.push(String(x).trim().toLowerCase())
-      );
-    }
+/* ---------- Demo data ---------- */
+const foods = {
+  monday: [
+    { title: "Yogurt with Banana & Cinnamon", meal: "Breakfast", cals: 260, p: 12, c: 42, f: 4, img: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=800&auto=format&fit=crop" },
+    { title: "Lentil Soup", meal: "Lunch", cals: 380, p: 22, c: 60, f: 6, img: "https://images.unsplash.com/photo-1547592180-85f173990554?q=80&w=800&auto=format&fit=crop" },
+    { title: "Baked Salmon & Veggies", meal: "Dinner", cals: 520, p: 35, c: 28, f: 26, img: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=800&auto=format&fit=crop" },
+  ],
+  tuesday: [
+    { title: "Yogurt with Banana & Cinnamon", meal: "Breakfast", cals: 260, p: 12, c: 42, f: 4, img: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=800&auto=format&fit=crop" },
+    { title: "Lentil Soup", meal: "Lunch", cals: 380, p: 22, c: 60, f: 6, img: "https://images.unsplash.com/photo-1547592180-85f173990554?q=80&w=800&auto=format&fit=crop" },
+    { title: "Chicken Stir-Fry", meal: "Dinner", cals: 540, p: 36, c: 55, f: 16, img: "https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=800&auto=format&fit=crop" },
+  ],
+  wednesday: [
+    { title: "Scrambled Eggs & Spinach", meal: "Breakfast", cals: 240, p: 18, c: 4, f: 14, img: "https://images.unsplash.com/photo-1525351484163-7529414344d8?q=80&w=800&auto=format&fit=crop" },
+    { title: "Chickpea Pita Salad", meal: "Lunch", cals: 430, p: 18, c: 70, f: 9, img: "https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=800&auto=format&fit=crop" },
+    { title: "Beef & Broccoli Rice Bowl", meal: "Dinner", cals: 610, p: 34, c: 68, f: 20, img: "https://images.unsplash.com/photo-1544025163-2509f02c57d9?q=80&w=800&auto=format&fit=crop" },
+  ],
+  thursday: [
+    { title: "Bagel with Butter & Apples", meal: "Breakfast", cals: 350, p: 9, c: 55, f: 12, img: "https://images.unsplash.com/photo-1466637574441-749b8f19452f?q=80&w=800&auto=format&fit=crop" },
+    { title: "Turkey Sandwich", meal: "Lunch", cals: 370, p: 26, c: 48, f: 8, img: "https://images.unsplash.com/photo-1544025162-8a1f9f65b3d3?q=80&w=800&auto=format&fit=crop" },
+    { title: "Shrimp Tacos", meal: "Dinner", cals: 520, p: 30, c: 52, f: 20, img: "https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?q=80&w=800&auto=format&fit=crop" },
+  ],
+  friday: [
+    { title: "Omelette with Peppers", meal: "Breakfast", cals: 300, p: 18, c: 6, f: 18, img: "https://images.unsplash.com/photo-1551218808-94e220e084d2?q=80&w=800&auto=format&fit=crop" },
+    { title: "Black Bean Bowl", meal: "Lunch", cals: 420, p: 16, c: 58, f: 10, img: "https://images.unsplash.com/photo-1526318472351-c75fcf070305?q=80&w=800&auto=format&fit=crop" },
+    { title: "Margherita Pizza (Thin Crust)", meal: "Dinner", cals: 630, p: 24, c: 78, f: 24, img: "https://images.unsplash.com/photo-1542281286-9e0a16bb7366?q=80&w=800&auto=format&fit=crop" },
+  ],
+  saturday: [
+    { title: "Avocado Toast", meal: "Breakfast", cals: 310, p: 10, c: 35, f: 14, img: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?q=80&w=800&auto=format&fit=crop" },
+    { title: "Grilled Chicken Bowl", meal: "Lunch", cals: 450, p: 34, c: 50, f: 12, img: "https://images.unsplash.com/photo-1514511547113-bff19f1f0b38?q=80&w=800&auto=format&fit=crop" },
+    { title: "Spaghetti & Meatballs", meal: "Dinner", cals: 700, p: 32, c: 82, f: 26, img: "https://images.unsplash.com/photo-1605470208304-4562d18e84a5?q=80&w=800&auto=format&fit=crop" },
+  ],
+  sunday: [
+    { title: "Overnight Oats", meal: "Breakfast", cals: 290, p: 11, c: 48, f: 6, img: "https://images.unsplash.com/photo-1572441710534-780c9f25926d?q=80&w=800&auto=format&fit=crop" },
+    { title: "Veggie Pasta", meal: "Lunch", cals: 520, p: 20, c: 72, f: 14, img: "https://images.unsplash.com/photo-1521389508051-d7ffb5dc8bbf?q=80&w=800&auto=format&fit=crop" },
+    { title: "Roast Chicken & Potatoes", meal: "Dinner", cals: 640, p: 42, c: 48, f: 26, img: "https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=800&auto=format&fit=crop" },
+  ],
+};
+
+const MacroRow = ({ cals, p, c, f }) => (
+  <div className="mp-macros">C {cals}kcal | P {p}g | C {c}g | F {f}g</div>
+);
+
+const MealCard = ({ item }) => (
+  <article className="mp-card">
+    <div className="mp-card-img">
+      <img src={item.img} alt="meal" loading="lazy" />
+    </div>
+    <div className="mp-card-body">
+      <h3 className="mp-card-title">{item.title}</h3>
+      <Pill>{item.meal}</Pill>
+      <MacroRow cals={item.cals} p={item.p} c={item.c} f={item.f} />
+    </div>
+  </article>
+);
+
+const DayColumn = ({ label, items }) => (
+  <section className="mp-day">
+    <header className="mp-day-head">
+      <span className="mp-day-name">{label}</span>
+      <span className="mp-day-count">{items.length}</span>
+    </header>
+    <div className="mp-day-list">
+      {items.map((it, idx) => (
+        <MealCard item={it} key={idx} />
+      ))}
+    </div>
+  </section>
+);
+
+/* ---------- CALL YOUR API GATEWAY (AnalyzeExpense) ---------- */
+/* Replace SCAN_ENDPOINT with your real endpoint. Return shape: { items: [{name, qty?, unit?}, ...] } */
+const SCAN_ENDPOINT = "https://<api-id>.execute-api.<region>.amazonaws.com/scan-receipt";
+
+async function scanWithTextractApiGateway(file) {
+  // Convert file to base64
+  const buf = await file.arrayBuffer();
+  let binary = "";
+  const bytes = new Uint8Array(buf);
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
   }
-  return all.filter(Boolean).sort().join("|");
+  const base64 = btoa(binary);
+
+  const r = await fetch(SCAN_ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ filename: file.name, contentType: file.type, data: base64 }),
+  });
+  if (!r.ok) throw new Error("Scan failed");
+  return r.json(); // { items: [...] }
 }
 
-/* ---------- component ---------- */
-const Dashboard = ({ onNavigate, sessionId }) => {
-  // popups
-  const [showAllergyPopup, setShowAllergyPopup] = useState(false);
-  const [showBudgetPopup, setShowBudgetPopup] = useState(false);
-
-  // allergies
-  const [selectedAllergies, setSelectedAllergies] = useState([]);
-  const [savedAllergies, setSavedAllergies] = useState([]);
-
-  // budget
-  const [budget, setBudget] = useState(0);
-  const [newBudget, setNewBudget] = useState("");
-  const [spent, setSpent] = useState(0);
-  const [newExpense, setNewExpense] = useState("");
-  const [lastReset, setLastReset] = useState(null);
-  const [expenseAdded, setExpenseAdded] = useState(false);
-
-  // meal plan & UI state
-  const [mealPlan, setMealPlan] = useState(null);
-  const [askAnything, setAskAnything] = useState("");
-  const [loadingPrefs, setLoadingPrefs] = useState(false);
-  const [error, setError] = useState("");
-  const [mealPlanLoading, setMealPlanLoading] = useState(false);
-  const [mealPlanError, setMealPlanError] = useState("");
-
-  // grocery list
-  const [groceryList, setGroceryList] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem(GROCERY_KEY)) ?? [];
-    } catch {
-      return [];
-    }
-  });
+/* ---------- Main component ---------- */
+export default function MealPlan() {
+  /* Virtual Pantry */
+  const [pantryItems, setPantryItems] = useState([]);
   const [newItem, setNewItem] = useState("");
 
-  /* ---------- derived ---------- */
-  const getProgress = () => (budget === 0 ? 0 : (spent / budget) * 100);
-  const getProgressColor = () => {
-    const p = getProgress();
-    if (p > 100) return "#dc2626";
-    if (p >= 90) return "#ef4444";
-    if (p >= 70) return "#f59e0b";
-    return "#10b981";
-  };
-
-  const todayMeals = (() => {
-    if (!mealPlan) return null;
-    const today = isoDate();
-    const day = mealPlan.days?.find((d) => d.date === today) ?? mealPlan.days?.[0];
-    return day?.meals || null;
-  })();
-
-  /* ---------- effects ---------- */
-  // Persist groceries
-  useEffect(() => {
-    localStorage.setItem(GROCERY_KEY, JSON.stringify(groceryList));
-  }, [groceryList]);
-
-  // Load prefs (backend first, then local) + load meal plan cache
-  useEffect(() => {
-    const load = async () => {
-      try {
-        setLoadingPrefs(true);
-        setError("");
-        if (sessionId) {
-          const res = await getUserPreferences(sessionId);
-          const prefs = res?.preferences || {};
-          if (Array.isArray(prefs.allergies)) {
-            setSavedAllergies(prefs.allergies);
-            setSelectedAllergies(prefs.allergies);
-          }
-          if (prefs.budget != null) setBudget(Number(prefs.budget));
-          if (prefs.spent != null) setSpent(Number(prefs.spent));
-        } else {
-          const savedBudget = localStorage.getItem("budget");
-          const savedSpent = localStorage.getItem("spent");
-          if (savedBudget) setBudget(Number(savedBudget));
-          if (savedSpent) setSpent(Number(savedSpent));
-        }
-        const savedPlan = localStorage.getItem(MEALPLAN_KEY);
-        if (savedPlan) {
-          try { setMealPlan(JSON.parse(savedPlan)); } catch { setMealPlan(null); }
-        }
-      } catch {
-        setError("Could not load preferences. Using defaults.");
-      } finally {
-        setLoadingPrefs(false);
-      }
-    };
-    load();
-  }, [sessionId]);
-
-  // Weekly auto-reset (most recent Sunday 11:59:59 PM)
-  useEffect(() => {
-    const now = new Date();
-    const savedLastReset = localStorage.getItem("lastReset");
-    const lastResetDate = savedLastReset ? new Date(savedLastReset) : null;
-    const lastSunday = new Date(now);
-    lastSunday.setDate(now.getDate() - ((now.getDay() + 7) % 7));
-    lastSunday.setHours(23, 59, 59, 999);
-
-    if (!lastResetDate || lastResetDate < lastSunday) {
-      setSpent(0);
-      localStorage.setItem("spent", "0");
-      localStorage.setItem("lastReset", now.toISOString());
-      setLastReset(now);
-    } else {
-      setLastReset(lastResetDate);
-    }
-  }, []);
-
-  // Persist budget & spent
-  useEffect(() => { localStorage.setItem("budget", String(budget)); }, [budget]);
-  useEffect(() => { localStorage.setItem("spent", String(spent)); }, [spent]);
-
-  // Auto-sync groceries when meal plan changes (dedupe)
-  useEffect(() => {
-    if (!mealPlan) return;
-    const sig = planSignature(mealPlan);
-    const prev = localStorage.getItem("mealPlan.ingredients.sig");
-    if (sig && sig !== prev) {
-      addItemsFromPlan(mealPlan);
-      localStorage.setItem("mealPlan.ingredients.sig", sig);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mealPlan]);
-
-  /* ---------- handlers ---------- */
-  const toggleAllergyPopup = () => setShowAllergyPopup((s) => !s);
-  const toggleBudgetPopup = () => setShowBudgetPopup((s) => !s);
-
-  const toggleAllergy = (item) => {
-    setSelectedAllergies((prev) =>
-      prev.includes(item) ? prev.filter((a) => a !== item) : [...prev, item]
-    );
-  };
-
-  const saveAllergies = async () => {
-    setSavedAllergies(selectedAllergies);
-    setShowAllergyPopup(false);
-    try {
-      if (sessionId) {
-        await saveUserPreferences(sessionId, {
-          allergies: selectedAllergies,
-          budget,
-          spent,
-        });
-      }
-    } catch {
-      setError("Failed to save allergies");
-    }
-  };
-
-  const handleAddExpense = () => {
-    const amount = Number(newExpense);
-    if (amount > 0) {
-      setSpent((s) => s + amount);
-      setNewExpense("");
-      setExpenseAdded(true);
-      setTimeout(() => setExpenseAdded(false), 2000);
-    }
-  };
-
-  const handleResetBudget = async () => {
-    setSpent(0);
-    setExpenseAdded(false);
-    localStorage.setItem("spent", "0");
-    localStorage.setItem("lastReset", new Date().toISOString());
-    try {
-      if (sessionId) {
-        await saveUserPreferences(sessionId, {
-          allergies: selectedAllergies,
-          budget,
-          spent: 0,
-        });
-      }
-    } catch {
-      setError("Failed to reset budget");
-    }
-  };
-
-  // Grocery list helpers
-  function addManualItem() {
-    const text = newItem.trim();
-    if (!text) return;
-    setGroceryList((prev) => [
-      { id: uid(), text, checked: false, source: "manual" },
-      ...prev,
-    ]);
+  const addPantryItem = () => {
+    const label = newItem.trim();
+    if (!label) return;
+    setPantryItems((prev) => [label, ...prev]);
     setNewItem("");
-  }
-  function toggleGrocery(id) {
-    setGroceryList((prev) =>
-      prev.map((it) => (it.id === id ? { ...it, checked: !it.checked } : it))
-    );
-  }
-  function removeGrocery(id) {
-    setGroceryList((prev) => prev.filter((it) => it.id !== id));
-  }
-  function clearAllItems() {
-    setGroceryList([]);
-    localStorage.removeItem("mealPlan.ingredients.sig"); // allow re-population on next plan
-  }
-  function addItemsFromPlan(plan) {
-    if (!plan?.days?.length) return;
-    const existing = new Set(groceryList.map((i) => i.text.toLowerCase()));
-    const incoming = [];
-    for (const day of plan.days) {
-      for (const label of ["Breakfast", "Lunch", "Dinner"]) {
-        const ings = day.meals?.[label]?.ingredients || [];
-        for (const raw of ings) {
-          const t = String(raw).trim();
-          if (!t) continue;
-          const k = t.toLowerCase();
-          if (existing.has(k)) continue;
-          existing.add(k);
-          incoming.push({ id: uid(), text: t, checked: false, source: "ai" });
-        }
-      }
-    }
-    if (incoming.length) setGroceryList((prev) => [...incoming, ...prev]);
-  }
+  };
+  const removePantryItem = (idx) =>
+    setPantryItems((prev) => prev.filter((_, i) => i !== idx));
 
-  // Generate plan via backend (Claude through API Gateway → Lambda)
-  const handleMealPlanning = async () => {
-    setMealPlanLoading(true);
-    setMealPlanError("");
+  /* Receipt Scan Modal */
+  const [scanOpen, setScanOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [parsed, setParsed] = useState([]);       // [{name, qty?, unit?}]
+  const [isParsing, setIsParsing] = useState(false);
+  const [scanError, setScanError] = useState("");
+  const fileInputRef = useRef(null);
+
+  const openScan = () => {
+    setScanOpen(true);
+    setSelectedFile(null);
+    setParsed([]);
+    setScanError("");
+  };
+  const closeScan = () => setScanOpen(false);
+
+  const onPickFile = () => fileInputRef.current?.click();
+
+  const onFileChange = (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setSelectedFile(f);
+    setParsed([]);
+    setScanError("");
+  };
+
+  const runScan = async () => {
+    if (!selectedFile) return;
     try {
-      const payload = {
-        startDate: isoDate(),
-        days: 7,
-        allergies: selectedAllergies,
-        budget: budget || undefined,
-        customPreferences: askAnything || undefined,
-      };
-      const plan = await generateMealPlan(payload, sessionId);
-      setMealPlan(plan);
-      localStorage.setItem(MEALPLAN_KEY, JSON.stringify(plan));
-      setAskAnything("");
-    } catch (e) {
-      setMealPlanError(e?.message || "Failed to generate meal plan. Please try again.");
+      setIsParsing(true);
+      setScanError("");
+      const { items } = await scanWithTextractApiGateway(selectedFile);
+      setParsed(Array.isArray(items) ? items : []);
+    } catch (err) {
+      setScanError("We couldn't read that receipt. Try another image/PDF.");
     } finally {
-      setMealPlanLoading(false);
+      setIsParsing(false);
     }
   };
 
-  /* ---------- render ---------- */
+  const removeParsedItem = (idx) => {
+    setParsed((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const addParsedToPantry = () => {
+    if (!parsed.length) return;
+    // Format label (simple; tweak as you like)
+    const labels = parsed.map((it) => {
+      const qty = it.qty ? ` x${it.qty}${it.unit ? " " + it.unit : ""}` : "";
+      return `${it.name}${qty}`;
+    });
+    setPantryItems((prev) => [...labels, ...prev]);
+    closeScan();
+  };
+
+  /* Clean up modal file input value when closing */
+  useEffect(() => {
+    if (!scanOpen && fileInputRef.current) fileInputRef.current.value = "";
+  }, [scanOpen]);
+
   return (
-    <div className="dashboard-container">
-      {/* Header */}
-      <header className="dashboard-header">
-        <h1
-          className="pacifico-regular logo"
-          onClick={() => onNavigate("home")}
-          style={{ cursor: "pointer" }}
-        >
-          Savr
-        </h1>
+    <>
+      {/* Brand header */}
+      <header className="mp-topbar">
+        <img src="/savricon.png" alt="Logo" className="mp-brand-logo" />
+        <div className="mp-brand-name">
+          <span className="pacifico-regular">Savr</span>
+        </div>
       </header>
 
-      <hr className="divider" />
+      {/* Page layout */}
+      <div className="mp-root">
+        {/* Sidebar */}
+        <aside className="mp-sidebar">
+          {/* Quick Buttons */}
+          <div className="mp-sidecard">
+            <h4 className="mp-sidebar-title">Quick Buttons</h4>
+            <div className="mp-quick-buttons">
+              <button className="mp-btn ghost">
+                <img src="/savricon.png" alt="" className="mp-savr-icon" />
+                Generate Meal Plan
+              </button>
+              <button className="mp-btn ghost">Clear Week</button>
 
-      <main className="dashboard-content">
-        {/* LEFT PANEL */}
-        <div className="left-panel">
-          <div className="help-section">
-            <img src="/savricon.png" alt="Savr Icon" className="help-icon" />
-            <h3>How can I help you?</h3>
+              {/* OPEN MODAL INSTEAD OF DIRECT UPLOAD */}
+              <button className="mp-btn ghost" onClick={openScan}>
+                Scan Receipt
+              </button>
+            </div>
           </div>
 
-          <div className="ask-section">
-            <input
-              type="text"
-              placeholder="Ask Anything"
-              className="ask-input"
-              value={askAnything}
-              onChange={(e) => setAskAnything(e.target.value)}
-              disabled={mealPlanLoading}
-            />
-            <button className="attach-btn" disabled={mealPlanLoading}>
-              <img src="/attachclip.png" className="attach-icon" alt="Attach" /> Attach
-            </button>
-          </div>
+          {/* Virtual Pantry */}
+          <div className="mp-sidecard vp">
+            <h4 className="mp-sidecard-title">Virtual Pantry</h4>
 
-          {(error || mealPlanError) && (
-            <div
-              className="error-message"
-              style={{
-                marginTop: 10,
-                padding: 10,
-                backgroundColor: "#fee",
-                borderRadius: 6,
-                color: "#c00",
-              }}
-            >
-              ⚠️ {error || mealPlanError}
-            </div>
-          )}
-        </div>
-
-        {/* RIGHT PANEL */}
-        <div className="right-panel">
-          {/* Meal Plan */}
-          <section className="card meal-plan">
-            <div
-              className="card-header"
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <div>
-                <h2>Today's Meal</h2>
-                <p className="date">
-                  {new Date().toLocaleDateString(undefined, {
-                    weekday: "long",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </p>
+            {pantryItems.length === 0 ? (
+              <div className="mp-empty" aria-live="polite">
+                No items in Virtual Pantry
               </div>
-
-              {mealPlan && (
-                <button className="view-meal-btn" onClick={() => onNavigate("MealPlan")}>
-                  View Meal Plan 🍽️
-                </button>
-              )}
-            </div>
-
-            {!mealPlan ? (
-              <div className="empty-plan">
-                <p style={{ margin: "8px 0 16px", opacity: 0.8 }}>No meal plan yet.</p>
-                <button
-                  className="primary-btn"
-                  onClick={handleMealPlanning}
-                  disabled={mealPlanLoading}
-                >
-                  {mealPlanLoading ? "⏳ Generating…" : "Start planning with Savr"}
-                </button>
-              </div>
-            ) : !todayMeals ? (
-              <p>Loading today’s meals…</p>
             ) : (
-              <>
-                {["Breakfast", "Lunch", "Dinner"].map((label) => {
-                  const meal = todayMeals[label];
-                  return (
-                    <button key={label} className="meal-item">
-                      <h4>{label}</h4>
-                      <div className="meal-detail">
-                        <div className="meal-image-placeholder">🍽️</div>
-                        <div>
-                          <p className="meal-name">{meal?.name || "TBD"}</p>
-                          <p className="ingredients">
-                            {meal?.ingredients?.length
-                              ? `Ingredients: ${meal.ingredients.join(", ")}`
-                              : "List ingredients here"}
-                          </p>
-                        </div>
-                      </div>
+              <ul className="mp-pantry-list">
+                {pantryItems.map((label, idx) => (
+                  <li key={idx} className="mp-pantry-item">
+                    <span className="mp-pantry-text">{label}</span>
+                    <button
+                      className="mp-icon-btn mp-icon-del"
+                      aria-label={`Remove ${label}`}
+                      title="Remove"
+                      onClick={() => removePantryItem(idx)}
+                    >
+                      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden>
+                        <path
+                          fill="currentColor"
+                          d="M18.3 5.7a1 1 0 0 0-1.4 0L12 10.6 7.1 5.7A1 1 0 0 0 5.7 7.1L10.6 12l-4.9 4.9a1 1 0 1 0 1.4 1.4L12 13.4l4.9 4.9a1 1 0 0 0 1.4-1.4L13.4 12l4.9-4.9a1 1 0 0 0 0-1.4z"
+                        />
+                      </svg>
                     </button>
-                  );
-                })}
-              </>
+                  </li>
+                ))}
+              </ul>
             )}
-          </section>
 
-          {/* Bottom Row */}
-          <div className="bottom-row">
-            {/* Allergies */}
-            <section className="card allergies">
-              <div className="card-header">
-                <h3>Allergies</h3>
-                <img
-                  src="/editicon.png"
-                  className="edit-allergy-btn"
-                  alt="Edit"
-                  onClick={toggleAllergyPopup}
-                />
-              </div>
-              <div className="tags">
-                {savedAllergies.length > 0 ? (
-                  savedAllergies.map((a) => <span key={a}>{a}</span>)
-                ) : (
-                  <p className="placeholder-text">No allergies selected yet</p>
-                )}
-              </div>
-            </section>
-
-            {/* Weekly Budget */}
-            <section className="card budget">
-              <div className="card-header">
-                <h3>Weekly Budget</h3>
-                <img
-                  src="/editicon.png"
-                  className="edit-budget-btn"
-                  alt="Edit"
-                  onClick={toggleBudgetPopup}
-                />
-              </div>
-
-              <h2>${budget.toFixed(2)}</h2>
-
-              <div className="progress-bar">
-                <div
-                  className="progress"
-                  style={{
-                    width: `${Math.min(getProgress(), 100)}%`,
-                    backgroundColor: getProgressColor(),
-                    transition: "all 0.3s ease",
-                  }}
-                ></div>
-              </div>
-
-              {spent <= budget ? (
-                <p className="remaining">
-                  ${(budget - spent).toFixed(2)} remaining
-                  {spent > 0 && (
-                    <span style={{ marginLeft: 8, fontSize: "0.9em", opacity: 0.7 }}>
-                      (${spent.toFixed(2)} spent)
-                    </span>
-                  )}
-                </p>
-              ) : (
-                <p className="remaining" style={{ color: "#dc2626" }}>
-                  ${(spent - budget).toFixed(2)} over budget!
-                  <span style={{ marginLeft: 8, fontSize: "0.9em", opacity: 0.7 }}>
-                    (${spent.toFixed(2)} spent of ${budget.toFixed(2)})
-                  </span>
-                </p>
-              )}
-
-              <div className="spend-section">
-                <input
-                  type="number"
-                  placeholder="Add expense..."
-                  value={newExpense}
-                  onChange={(e) => setNewExpense(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleAddExpense()}
-                  className="popup-input"
-                  min="0"
-                  step="0.01"
-                />
-                <button
-                  className="save-btn"
-                  onClick={handleAddExpense}
-                  disabled={!newExpense || Number(newExpense) <= 0}
-                  style={{
-                    opacity: !newExpense || Number(newExpense) <= 0 ? 0.5 : 1,
-                    cursor:
-                      !newExpense || Number(newExpense) <= 0 ? "not-allowed" : "pointer",
-                  }}
-                >
-                  Add
-                </button>
-              </div>
-
-              {expenseAdded && (
-                <p
-                  style={{
-                    color: "#10b981",
-                    fontSize: "0.9em",
-                    marginTop: 8,
-                    animation: "fadeIn 0.3s ease",
-                  }}
-                >
-                  ✓ Expense added successfully!
-                </p>
-              )}
-
-              {spent > 0 && (
-                <button
-                  className="reset-budget-btn"
-                  onClick={handleResetBudget}
-                  style={{
-                    marginTop: 12,
-                    padding: "8px 16px",
-                    backgroundColor: spent > budget ? "#dc2626" : "#667eea",
-                    color: "white",
-                    border: "none",
-                    borderRadius: 8,
-                    cursor: "pointer",
-                    fontSize: "0.9em",
-                    fontWeight: 500,
-                    transition: "all 0.2s ease",
-                    width: "100%",
-                  }}
-                  onMouseOver={(e) => (e.target.style.opacity = "0.9")}
-                  onMouseOut={(e) => (e.target.style.opacity = "1")}
-                >
-                  {spent > budget ? "🔄 Reset Budget (Over Limit!)" : "🔄 Reset Budget"}
-                </button>
-              )}
-            </section>
-
-            {/* Grocery List */}
-            <section className="card grocery-list">
-              <div
-                className="card-header"
-                style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}
+            <div
+              className="mp-quickadd"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") addPantryItem();
+              }}
+            >
+              <input
+                className="mp-input"
+                placeholder="Add Item"
+                value={newItem}
+                onChange={(e) => setNewItem(e.target.value)}
+              />
+              <button
+                className="mp-add-btn"
+                aria-label="Add item"
+                onClick={addPantryItem}
+                disabled={!newItem.trim()}
               >
-                <h3>🛒 Grocery List</h3>
+                +
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        {/* Main */}
+        <main className="mp-main">
+          <header className="mp-header">
+            <h1 className="mp-title">Meal Plan</h1>
+            <div className="mp-toolbar">
+              <button className="mp-chip">
+                <CalendarIcon />
+                <span>Weekly Plan</span>
+              </button>
+              <button className="mp-chip">
+                <img src="/savricon.png" className="mp-savr-icon" alt="" />
+                Generate Meal Plan
+              </button>
+              <div className="mp-toolbar-spacer" />
+            </div>
+          </header>
+
+          <div className="mp-scroller">
+            <DayColumn label="Monday" items={foods.monday} />
+            <DayColumn label="Tuesday" items={foods.tuesday} />
+            <DayColumn label="Wednesday" items={foods.wednesday} />
+            <DayColumn label="Thursday" items={foods.thursday} />
+            <DayColumn label="Friday" items={foods.friday} />
+            <DayColumn label="Saturday" items={foods.saturday} />
+            <DayColumn label="Sunday" items={foods.sunday} />
+          </div>
+        </main>
+      </div>
+
+      {/* ---------- Modal: Scan Receipt ---------- */}
+      {scanOpen && (
+        <div className="mp-modal" role="dialog" aria-modal="true" aria-labelledby="scan-title" onClick={(e)=>{ if(e.target.classList.contains('mp-modal')) closeScan(); }}>
+          <div className="mp-modal-card" onClick={(e)=>e.stopPropagation()}>
+            <header className="mp-modal-head">
+              <h3 id="scan-title">Scan Receipt</h3>
+              <button className="mp-icon-btn" onClick={closeScan} aria-label="Close">
+                ✕
+              </button>
+            </header>
+
+            <div className="mp-modal-body">
+              {/* Step 1: pick file */}
+              <div className="mp-upload-row">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*,.pdf"
+                  onChange={onFileChange}
+                  hidden
+                />
+                <button className="mp-btn" onClick={onPickFile}>
+                  {selectedFile ? "Change file" : "Choose file"}
+                </button>
+                <span className="mp-upload-name">
+                  {selectedFile ? selectedFile.name : "No file chosen"}
+                </span>
+                <button
+                  className="mp-btn primary"
+                  onClick={runScan}
+                  disabled={!selectedFile || isParsing}
+                >
+                  {isParsing ? "Scanning…" : "Scan with AI"}
+                </button>
               </div>
 
-              {groceryList.length === 0 ? (
-                <p className="placeholder-text" style={{ marginTop: 6 }}>
-                  No items yet.
-                </p>
-              ) : (
-                <div className="grocery-scroll">
-                  <ul className="grocery-ul">
-                    {groceryList.map((item) => (
-                      <li
-                        key={item.id}
-                        className={`grocery-li ${item.checked ? "checked" : ""}`}
-                      >
-                        <label className="grocery-row">
-                          <input
-                            type="checkbox"
-                            checked={item.checked}
-                            onChange={() => toggleGrocery(item.id)}
-                          />
-                          <span className="grocery-text">{item.text}</span>
-                          {item.source === "ai" && <span className="chip"></span>}
-                        </label>
+              {scanError && <div className="mp-alert error">{scanError}</div>}
+
+              {/* Step 2: review items */}
+              {!!parsed.length && (
+                <>
+                  <h4 className="mp-review-title">Items found</h4>
+                  <ul className="mp-review-list">
+                    {parsed.map((it, idx) => (
+                      <li key={idx} className="mp-review-item">
+                        <span className="mp-review-text">
+                          {it.name}
+                          {it.qty ? ` x${it.qty}` : ""}
+                          {it.unit ? ` ${it.unit}` : ""}
+                        </span>
                         <button
-                          className="icon-btn"
-                          aria-label="Remove"
-                          onClick={() => removeGrocery(item.id)}
+                          className="mp-icon-btn mp-icon-del"
+                          aria-label={`Remove ${it.name}`}
+                          onClick={() => removeParsedItem(idx)}
                         >
                           ✕
                         </button>
                       </li>
                     ))}
                   </ul>
-                </div>
+                </>
               )}
-
-              <div style={{ display: "flex", gap: 8, margin: "8px 0 14px", marginTop: "auto" }}>
-                <input
-                  type="text"
-                  className="ask-input"
-                  placeholder="Add an item..."
-                  value={newItem}
-                  onChange={(e) => setNewItem(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && addManualItem()}
-                />
-                <button className="save-btn" onClick={addManualItem} disabled={!newItem.trim()}>
-                  Add
-                </button>
-              </div>
-
-              <div style={{ display: "flex", gap: 8, justifyContent: "space-between", marginTop: 12 }}>
-                <button className="mini-btn danger" onClick={clearAllItems}>
-                  Clear all
-                </button>
-              </div>
-            </section>
-          </div>
-        </div>
-      </main>
-
-      {/* POPUP: Allergies */}
-      {showAllergyPopup && (
-        <div className="popup-overlay" onClick={toggleAllergyPopup}>
-          <div className="popup-box" onClick={(e) => e.stopPropagation()}>
-            <button className="cancel-btn" onClick={toggleAllergyPopup}>
-              ✖
-            </button>
-            <div className="allergy-section">
-              <h2>Allergies</h2>
-              <h3>We want every meal to be safe and delicious — select any allergies you have below.</h3>
             </div>
 
-            <div className="allergy-options">
-              {[
-                "Peanuts",
-                "Tree Nuts",
-                "Gluten",
-                "Dairy",
-                "Shellfish",
-                "Eggs",
-                "Soy",
-                "Sesame",
-                "Fish",
-                "Wheat",
-                "Other",
-              ].map((item) => (
-                <button
-                  key={item}
-                  className={`allergy-option ${selectedAllergies.includes(item) ? "selected" : ""}`}
-                  onClick={() => toggleAllergy(item)}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-
-            <div className="popup-buttons">
-              <button className="save-btn" onClick={saveAllergies}>
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* POPUP: Budget */}
-      {showBudgetPopup && (
-        <div className="popup-overlay" onClick={toggleBudgetPopup}>
-          <div className="popup-box" onClick={(e) => e.stopPropagation()}>
-            <h2>Enter weekly budget for groceries</h2>
-            <input
-              type="number"
-              className="budget-input"
-              placeholder="Enter new budget amount..."
-              value={newBudget}
-              onChange={(e) => setNewBudget(e.target.value)}
-            />
-            <div className="popup-buttons">
-              <button className="cancel-btn" onClick={toggleBudgetPopup}>
-                ✖
-              </button>
+            <footer className="mp-modal-foot">
+              <button className="mp-btn ghost" onClick={closeScan}>Cancel</button>
               <button
-                className="save-btn"
-                onClick={async () => {
-                  const amount = Number(newBudget);
-                  if (amount >= 0) {
-                    setBudget(amount);
-                    setNewBudget("");
-                    setShowBudgetPopup(false);
-                    try {
-                      if (sessionId) {
-                        await saveUserPreferences(sessionId, {
-                          allergies: selectedAllergies,
-                          budget: amount,
-                          spent,
-                        });
-                      }
-                    } catch {
-                      setError("Failed to save budget");
-                    }
-                  }
-                }}
-                disabled={!newBudget || Number(newBudget) < 0}
-                style={{
-                  opacity: !newBudget || Number(newBudget) < 0 ? 0.5 : 1,
-                  cursor:
-                    !newBudget || Number(newBudget) < 0 ? "not-allowed" : "pointer",
-                }}
+                className="mp-btn primary"
+                disabled={!parsed.length}
+                onClick={addParsedToPantry}
               >
-                Save
+                Add to Pantry
               </button>
-            </div>
+            </footer>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
-};
-
-export default Dashboard;
-
+}
