@@ -109,7 +109,7 @@ async function scanWithTextractApiGateway(file) {
   }
 }
 /* ---------- Main component ---------- */
-export default function MealPlan() {
+export default function Dashboard({ sessionId }) {
   /* Virtual Pantry */
   const [pantryItems, setPantryItems] = useState([]);
   const [newItem, setNewItem] = useState("");
